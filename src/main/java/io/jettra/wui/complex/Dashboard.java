@@ -1,48 +1,25 @@
 package io.jettra.wui.complex;
-
-/**
- * Main dashboard class representing a 3D-styled UI.
- * It is composed of Top, Left, Center, and Footer regions.
- */
-public class Dashboard {
-    
+import io.jettra.wui.core.UIComponent;
+public class Dashboard extends UIComponent {
     private Top top;
     private Left left;
     private Center center;
     private Footer footer;
 
     public Dashboard() {
+        super("div");
+        this.initialClasses = "j-dashboard";
     }
 
-    public Top getTop() {
-        return top;
-    }
+    public Top getTop() { return top; }
+    public void setTop(Top top) { this.top = top; add(top); }
 
-    public void setTop(Top top) {
-        this.top = top;
-    }
+    public Left getLeft() { return left; }
+    public void setLeft(Left left) { this.left = left; add(left); }
 
-    public Left getLeft() {
-        return left;
-    }
+    public Center getCenter() { return center; }
+    public void setCenter(Center center) { this.center = center; add(center); }
 
-    public void setLeft(Left left) {
-        this.left = left;
-    }
-
-    public Center getCenter() {
-        return center;
-    }
-
-    public void setCenter(Center center) {
-        this.center = center;
-    }
-
-    public Footer getFooter() {
-        return footer;
-    }
-
-    public void setFooter(Footer footer) {
-        this.footer = footer;
-    }
+    public Footer getFooter() { return footer; }
+    public void setFooter(Footer footer) { this.footer = footer; add(footer); }
 }

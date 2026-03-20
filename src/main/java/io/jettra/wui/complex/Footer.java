@@ -1,11 +1,8 @@
 package io.jettra.wui.complex;
-
-/**
- * Footer component for the Dashboard, typically containing application info, status, etc.
- */
-public class Footer {
-    
+import io.jettra.wui.core.UIComponent;
+public class Footer extends UIComponent {
     public Footer() {
+        super("div");
+        this.initialClasses = "j-footer";
     }
-    
 }
