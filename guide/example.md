@@ -36,7 +36,64 @@ public class Main {
         String rawHtml = page.render();
         System.out.println(rawHtml);
         
-        // Output can then be written to index.html or served via REST Application.
+    }
+}
+```
+
+## Dashboard and Page Example
+To use the new `Dashboard`, `Menu` components, and `Page` lifecycle annotations:
+
+```java
+import io.jettra.wui.complex.*;
+import io.jettra.wui.components.*;
+import io.jettra.wui.core.annotations.*;
+
+public class AdminDashboardPage extends Page {
+
+    private Dashboard dashboard;
+
+    public AdminDashboardPage() {
+        super();
+    }
+
+    @Init
+    public void initUI() {
+        dashboard = new Dashboard();
+        
+        // 1. Setup Top
+        Top top = new Top();
+        dashboard.setTop(top);
+
+        // 2. Setup Left with Menus
+        Left left = new Left();
+        Menu menu = new Menu();
+        MenuBar fileMenu = new MenuBar("File");
+        fileMenu.add(new MenuItem("Open"));
+        fileMenu.add(new Separator());
+        fileMenu.add(new MenuItem("Save", Icon.SAVE));
+        menu.add(fileMenu);
+        left.add(menu); // Assuming Left has an add() method
+        
+        dashboard.setLeft(left);
+
+        // 3. Setup Center and Footer
+        dashboard.setCenter(new Center());
+        dashboard.setFooter(new Footer());
+    }
+
+    @PostConstructor
+    public void postConstructor() {
+        System.out.println("Page created successfully.");
+    }
+
+    @PreDestroy
+    public void preDestroy() {
+        System.out.println("Cleaning up resources before navigating away...");
+    }
+
+    @OnEvent(name = "submit")
+    public void onSubmit() {
+        System.out.println("Received submit event from Dashboard.");
     }
 }
 ```
