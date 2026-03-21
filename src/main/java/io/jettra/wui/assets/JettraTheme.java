@@ -24,6 +24,7 @@ public class JettraTheme {
             "  perspective: 1000px;\n" +
             "}\n" +
             ".j-dashboard {\n" +
+            "  position: relative;\n" +
             "  display: grid;\n" +
             "  grid-template-columns: 250px 1fr;\n" +
             "  grid-template-rows: auto 1fr auto;\n" +
@@ -31,10 +32,43 @@ public class JettraTheme {
             "  min-height: 100vh; gap: 20px; padding: 20px; box-sizing: border-box;\n" +
             "  width: 100%;\n" +
             "}\n" +
+            ".j-hamburger {\n" +
+            "  display: none;\n" +
+            "  font-size: 28px;\n" +
+            "  color: var(--jettra-accent);\n" +
+            "  cursor: pointer;\n" +
+            "  position: absolute;\n" +
+            "  top: 20px;\n" +
+            "  left: 20px;\n" +
+            "  z-index: 1001;\n" +
+            "  background: var(--jettra-glass);\n" +
+            "  border: 1px solid var(--jettra-border);\n" +
+            "  border-radius: 8px;\n" +
+            "  width: 45px; height: 45px;\n" +
+            "  text-align: center; line-height: 45px;\n" +
+            "  box-shadow: 0 0 10px var(--jettra-glow);\n" +
+            "}\n" +
             "@media (max-width: 768px) {\n" +
             "  .j-dashboard {\n" +
             "    grid-template-columns: 1fr;\n" +
-            "    grid-template-areas: 'top' 'left' 'center' 'footer';\n" +
+            "    grid-template-areas: 'top' 'center' 'footer';\n" +
+            "  }\n" +
+            "  .j-top { margin-left: 60px; /* Space for hamburger */ }\n" +
+            "  .j-hamburger {\n" +
+            "    display: block;\n" +
+            "  }\n" +
+            "  .j-left {\n" +
+            "    position: fixed;\n" +
+            "    top: 75px;\n" +
+            "    left: -300px;\n" +
+            "    width: 250px;\n" +
+            "    max-height: calc(100vh - 90px);\n" +
+            "    z-index: 1000;\n" +
+            "    transition: left 0.3s ease-in-out;\n" +
+            "    overflow-y: auto;\n" +
+            "  }\n" +
+            "  .j-left.active {\n" +
+            "    left: 20px;\n" +
             "  }\n" +
             "}\n" +
             ".j-top { grid-area: top; display: flex; justify-content: space-between; align-items: center; }\n" +
@@ -83,6 +117,18 @@ public class JettraTheme {
     
     public static String getJS() {
         return "<script>\n" +
+            "document.addEventListener('DOMContentLoaded', () => {\n" +
+            "  const dash = document.querySelector('.j-dashboard');\n" +
+            "  if (dash && !document.querySelector('.j-hamburger')) {\n" +
+            "    const hm = document.createElement('div');\n" +
+            "    hm.className = 'j-hamburger';\n" +
+            "    hm.innerHTML = '&#9776;';\n" +
+            "    hm.onclick = () => {\n" +
+            "       document.querySelector('.j-left')?.classList.toggle('active');\n" +
+            "    };\n" +
+            "    dash.prepend(hm);\n" +
+            "  }\n" +
+            "});\n" +
             "document.addEventListener('mousemove', (e) => {\n" +
             "  const cards = document.querySelectorAll('.j-component, .j-top, .j-left, .j-center, .j-footer');\n" +
             "  cards.forEach(card => {\n" +
