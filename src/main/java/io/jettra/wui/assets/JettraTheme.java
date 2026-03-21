@@ -53,7 +53,20 @@ public class JettraTheme {
             "    grid-template-columns: 1fr;\n" +
             "    grid-template-areas: 'top' 'center' 'footer';\n" +
             "  }\n" +
-            "  .j-top { margin-left: 60px; /* Space for hamburger */ }\n" +
+            "  .j-top {\n" +
+            "    margin-left: 60px;\n" + /* Space for hamburger */
+            "    flex-direction: column;\n" +
+            "    align-items: flex-start;\n" +
+            "    gap: 10px;\n" +
+            "  }\n" +
+            "  .j-top h2 {\n" +
+            "    font-size: 1.2rem;\n" +
+            "    margin: 0;\n" +
+            "  }\n" +
+            "  .j-footer {\n" +
+            "    font-size: 0.85rem;\n" +
+            "    padding: 15px;\n" +
+            "  }\n" +
             "  .j-hamburger {\n" +
             "    display: block;\n" +
             "  }\n" +
