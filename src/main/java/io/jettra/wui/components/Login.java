@@ -9,6 +9,7 @@ public class Login extends Form {
     private TextBox password;
     private Button loginButton;
     private Button forgotPasswordButton;
+    private Alert alertMessage;
 
     public Login(String action) {
         super("login-form", action);
@@ -25,6 +26,10 @@ public class Login extends Form {
         // Se pueden añadir propiedades CSS predeterminadas para que parezca enlace
         forgotPasswordButton.setProperty("class", "j-forgot-btn");
 
+        alertMessage = new Alert();
+        alertMessage.setType("warning"); // Default warning
+        
+        add(alertMessage);
         add(username);
         add(password);
         add(loginButton);
@@ -45,5 +50,9 @@ public class Login extends Form {
 
     public Button getForgotPasswordButton() {
         return forgotPasswordButton;
+    }
+
+    public Alert getAlertMessage() {
+        return alertMessage;
     }
 }

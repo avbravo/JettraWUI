@@ -43,3 +43,4 @@ JettraWUI está configurado como un módulo dependiente dentro de la super-suite
 En el directorio `/guide/` dentro de este proyecto encontrarás:
 - [arquitectura.md](./guide/arquitectura.md): Explicación técnica detallada del funcionamiento del AST de inyección DOM.
 - [example.md](./guide/example.md): Fragmentos de código en Java mostrando cómo iniciar el `Page`, envolver elementos en el formulario de acceso `Login`, e imprimir la cadena final en `<HTML>`.
+- [notification.md](./guide/notification.md): Uso del nuevo componente `Notification`.
