@@ -85,36 +85,49 @@ public class JettraTheme {
             "  .j-dashboard {\n" +
             "    grid-template-columns: 1fr;\n" +
             "    grid-template-areas: 'top' 'center' 'footer';\n" +
-            "  }\n" +
-            "  .j-top {\n" +
-            "    margin-left: 60px;\n" + /* Space for hamburger */
-            "    flex-direction: column;\n" +
-            "    align-items: flex-start;\n" +
+            "    padding: 10px;\n" +
             "    gap: 10px;\n" +
             "  }\n" +
+            "  .j-top {\n" +
+            "    margin-left: 55px;\n" + /* Space for hamburger */
+            "    flex-direction: row;\n" +
+            "    flex-wrap: wrap;\n" +
+            "    justify-content: space-between;\n" +
+            "    padding: 8px 12px;\n" +
+            "  }\n" +
             "  .j-top h2 {\n" +
-            "    font-size: 1.2rem;\n" +
-            "    margin: 0;\n" +
+            "    font-size: 1rem;\n" +
+            "    width: 100%;\n" +
+            "    margin-bottom: 5px;\n" +
+            "  }\n" +
+            "  .j-top-right {\n" +
+            "    width: 100%;\n" +
+            "    justify-content: flex-end;\n" +
+            "  }\n" +
+            "  .hide-mobile {\n" +
+            "    display: none !important;\n" +
             "  }\n" +
             "  .j-footer {\n" +
-            "    font-size: 0.85rem;\n" +
-            "    padding: 15px;\n" +
+            "    font-size: 0.8rem;\n" +
+            "    padding: 10px;\n" +
             "  }\n" +
             "  .j-hamburger {\n" +
             "    display: block;\n" +
+            "    top: 15px; left: 15px;\n" +
+            "    width: 40px; height: 40px; line-height: 40px;\n" +
             "  }\n" +
             "  .j-left {\n" +
             "    position: fixed;\n" +
-            "    top: 75px;\n" +
+            "    top: 65px;\n" +
             "    left: -300px;\n" +
             "    width: 250px;\n" +
-            "    max-height: calc(100vh - 90px);\n" +
+            "    max-height: calc(100vh - 80px);\n" +
             "    z-index: 1000;\n" +
             "    transition: left 0.3s ease-in-out;\n" +
             "    overflow-y: auto;\n" +
             "  }\n" +
             "  .j-left.active {\n" +
-            "    left: 20px;\n" +
+            "    left: 10px;\n" +
             "  }\n" +
             "}\n" +
             ".j-top { grid-area: top; display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 20px; overflow: visible; z-index: 2000; position: relative; transform: translateZ(20px); }\n" +
