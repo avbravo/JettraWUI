@@ -11,13 +11,46 @@ public class JettraTheme {
             "  --jettra-text: #e0f0ff;\n" +
             "  --jettra-accent: #00e5ff;\n" +
             "}\n" +
+            "body.theme-white {\n" +
+            "  --jettra-bg: #f5f7fa;\n" +
+            "  --jettra-glow: rgba(0, 100, 255, 0.1);\n" +
+            "  --jettra-glass: rgba(255, 255, 255, 0.9);\n" +
+            "  --jettra-border: rgba(0, 50, 150, 0.1);\n" +
+            "  --jettra-text: #2c3e50;\n" +
+            "  --jettra-accent: #3498db;\n" +
+            "}\n" +
+            "body.theme-dark {\n" +
+            "  --jettra-bg: #121212;\n" +
+            "  --jettra-glow: rgba(255, 255, 255, 0.05);\n" +
+            "  --jettra-glass: rgba(30, 30, 30, 0.8);\n" +
+            "  --jettra-border: rgba(255, 255, 255, 0.1);\n" +
+            "  --jettra-text: #e0e0e0;\n" +
+            "  --jettra-accent: #bb86fc;\n" +
+            "}\n" +
+            "body.theme-futuristic {\n" +
+            "  --jettra-bg: #0a0a0f;\n" +
+            "  --jettra-glow: rgba(0, 240, 255, 0.4);\n" +
+            "  --jettra-glass: rgba(20, 25, 40, 0.6);\n" +
+            "  --jettra-border: rgba(100, 200, 255, 0.2);\n" +
+            "  --jettra-text: #e0f0ff;\n" +
+            "  --jettra-accent: #00e5ff;\n" +
+            "}\n" +
             "body {\n" +
             "  background-color: var(--jettra-bg);\n" +
-            "  background-image: radial-gradient(circle at 50% 50%, #151525 0%, #0a0a0f 100%);\n" +
             "  color: var(--jettra-text);\n" +
             "  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n" +
             "  margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;\n" +
             "  overflow-x: hidden;\n" +
+            "  transition: background-color 0.5s ease, color 0.5s ease;\n" +
+            "}\n" +
+            "body.theme-futuristic {\n" +
+            "  background-image: radial-gradient(circle at 50% 50%, #151525 0%, #0a0a0f 100%);\n" +
+            "}\n" +
+            "body.theme-white {\n" +
+            "  background-image: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);\n" +
+            "}\n" +
+            "body.theme-dark {\n" +
+            "  background-image: linear-gradient(180deg, #121212 0%, #1a1a1a 100%);\n" +
             "}\n" +
             ".jettra-viewport {\n" +
             "  width: 100%; padding: 0; box-sizing: border-box;\n" +
@@ -84,15 +117,15 @@ public class JettraTheme {
             "    left: 20px;\n" +
             "  }\n" +
             "}\n" +
-            ".j-top { grid-area: top; display: flex; justify-content: space-between; align-items: center; }\n" +
+            ".j-top { grid-area: top; display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 20px; }\n" +
             ".j-left { grid-area: left; }\n" +
             ".j-center { grid-area: center; }\n" +
-            ".j-footer { grid-area: footer; text-align: center; }\n" +
+            ".j-footer { grid-area: footer; text-align: center; padding: 10px; }\n" +
             ".j-component, .j-top, .j-left, .j-center, .j-footer {\n" +
             "  background: var(--jettra-glass);\n" +
             "  border: 1px solid var(--jettra-border);\n" +
             "  border-radius: 12px;\n" +
-            "  padding: 20px;\n" +
+            "  padding: 15px;\n" +
             "  backdrop-filter: blur(10px);\n" +
             "  box-shadow: 0 8px 32px 0 rgba(0,0,0,0.37), inset 0 0 10px rgba(0,255,255,0.05);\n" +
             "  transition: transform 0.1s ease-out, box-shadow 0.3s ease;\n" +
@@ -130,7 +163,13 @@ public class JettraTheme {
     
     public static String getJS() {
         return "<script>\n" +
+            "function changeTheme(theme) {\n" +
+            "  document.body.className = 'theme-' + theme;\n" +
+            "  localStorage.setItem('jettra-theme', theme);\n" +
+            "}\n" +
             "document.addEventListener('DOMContentLoaded', () => {\n" +
+            "  const savedTheme = localStorage.getItem('jettra-theme') || 'futuristic';\n" +
+            "  changeTheme(savedTheme);\n" +
             "  const dash = document.querySelector('.j-dashboard');\n" +
             "  if (dash && !document.querySelector('.j-hamburger')) {\n" +
             "    const hm = document.createElement('div');\n" +

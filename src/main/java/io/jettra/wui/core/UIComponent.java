@@ -45,6 +45,22 @@ public abstract class UIComponent {
         this.content = content;
     }
 
+    public List<UIComponent> getChildren() {
+        return children;
+    }
+
+    public Map<String, String> getProperties() {
+        return properties;
+    }
+
+    public Map<String, String> getStyles() {
+        return styles;
+    }
+
+    public String getTag() {
+        return tag;
+    }
+
     public String render() {
         StringBuilder builder = new StringBuilder();
         builder.append("<").append(tag);
