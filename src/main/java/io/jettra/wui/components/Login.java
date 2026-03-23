@@ -1,10 +1,11 @@
 package io.jettra.wui.components;
 
 /**
- * Componente compuesto de Login funcional que agrupa controles de autenticación.
+ * Componente compuesto de Login funcional que agrupa controles de
+ * autenticación.
  */
 public class Login extends Form {
-    
+
     private TextBox username;
     private TextBox password;
     private Button loginButton;
@@ -29,11 +30,39 @@ public class Login extends Form {
         alertMessage = new Alert();
         alertMessage.setType("warning"); // Default warning
         
+        // Aplica estilo 3D
+        style3D();
+        
         add(alertMessage);
         add(username);
         add(password);
         add(loginButton);
         add(forgotPasswordButton);
+    }
+
+    public Login style3D() {
+
+        try {
+            this.setProperty("style", "margin: 10% auto; padding: 30px; width: 350px; "
+                    + "background: rgba(20, 30, 50, 0.85); box-shadow: 0 0 20px cyan; "
+                    + "border-radius: 15px; backdrop-filter: blur(10px); "
+                    + "color: white; font-family: 'Courier New', monospace; text-align: center;");
+
+            this.getUsername().setProperty("style", "width: 100%; padding: 10px; margin-bottom: 15px; "
+                    + "background: #0f172a; border: 1px solid cyan; color: white; border-radius: 5px;");
+
+            this.getPassword().setProperty("style", "width: 100%; padding: 10px; margin-bottom: 15px; "
+                    + "background: #0f172a; border: 1px solid cyan; color: white; border-radius: 5px;");
+
+            this.getLoginButton().setProperty("style", "width: 100%; padding: 12px; margin-bottom: 10px; "
+                    + "background: cyan; color: #0f172a; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; "
+                    + "box-shadow: 0 0 10px cyan;");
+
+            this.getForgotPasswordButton().setProperty("style", "background: transparent; border: none; "
+                    + "color: cyan; cursor: pointer; text-decoration: underline; font-size: 0.9em;");
+        } catch (Exception e) {
+        }
+        return this;
     }
 
     public TextBox getUsername() {
