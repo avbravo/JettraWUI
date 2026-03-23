@@ -63,8 +63,6 @@ public class SelectOneIcon extends UIComponent {
     
     @Override
     public String render() {
-        // We need to re-check the children before rendering to hide/show the label
-        // This is a bit hacky but works for this simple framework.
         UIComponent trigger = getChildren().stream()
             .filter(c -> c instanceof Div && "j-select-icon-trigger".equals(c.getProperties().get("class")))
             .findFirst().orElse(null);
@@ -75,8 +73,10 @@ public class SelectOneIcon extends UIComponent {
             if (label != null) {
                 if (showLabelInTrigger) {
                     label.getStyles().remove("display");
+                    getStyles().remove("width");
                 } else {
                     label.setStyle("display", "none");
+                    setStyle("width", "50px");
                 }
             }
         }
@@ -138,10 +138,20 @@ public class SelectOneIcon extends UIComponent {
         Style style = new Style("""
             .j-select-icon-container {
                 position: relative;
-                width: 150px;
+                width: auto;
+                min-width: 45px;
                 font-family: sans-serif;
                 user-select: none;
-                z-index: 2100;
+                z-index: 1000;
+            }
+            @media (max-width: 480px) {
+                .j-select-icon-container {
+                    min-width: 40px;
+                }
+            }
+            .j-select-icon-container .j-select-icon-trigger {
+                width: 100%;
+                box-sizing: border-box;
             }
             .j-select-icon-trigger {
                 display: flex;

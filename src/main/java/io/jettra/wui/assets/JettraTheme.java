@@ -130,6 +130,19 @@ public class JettraTheme {
             "    left: 10px;\n" +
             "  }\n" +
             "}\n" +
+            "@media (max-width: 480px) {\n" +
+            "  .j-top-right {\n" +
+            "    gap: 5px !important;\n" +
+            "  }\n" +
+            "  .j-btn {\n" +
+            "    padding: 8px 12px;\n" +
+            "    font-size: 0.8rem;\n" +
+            "  }\n" +
+            "  .modal-content {\n" +
+            "    width: 95% !important;\n" +
+            "    padding: 15px !important;\n" +
+            "  }\n" +
+            "}\n" +
             ".j-top { grid-area: top; display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 20px; overflow: visible; z-index: 2000; position: relative; transform: translateZ(20px); }\n" +
             ".j-left { grid-area: left; }\n" +
             ".j-center { grid-area: center; }\n" +
@@ -152,7 +165,6 @@ public class JettraTheme {
             "  text-transform: uppercase; font-weight: bold; letter-spacing: 1px;\n" +
             "  box-shadow: 0 0 10px var(--jettra-glow);\n" +
             "  transition: all 0.3s ease;\n" +
-            "  width: 100%;\n" +
             "}\n" +
             ".j-btn:hover {\n" +
             "  background: var(--jettra-accent);\n" +
@@ -170,6 +182,9 @@ public class JettraTheme {
             ".j-input:focus {\n" +
             "  border-color: var(--jettra-accent);\n" +
             "  box-shadow: inset 0 0 8px var(--jettra-glow);\n" +
+            "}\n" +
+            ".j-table-container {\n" +
+            "  width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch;\n" +
             "}\n" +
             "</style>\n";
     }
