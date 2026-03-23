@@ -160,8 +160,8 @@ public class SelectOneIcon extends UIComponent {
                 background: rgba(20, 25, 40, 0.8);
                 border: 1px solid var(--jettra-accent, #00e5ff);
                 color: var(--jettra-text, #fff);
-                padding: 5px 12px;
-                border-radius: 8px;
+                padding: 3px 10px;
+                border-radius: 6px;
                 cursor: pointer;
                 box-shadow: 0 0 10px rgba(0, 229, 255, 0.2);
                 transition: all 0.3s;

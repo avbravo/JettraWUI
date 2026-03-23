@@ -62,7 +62,7 @@ public class JettraTheme {
             "  grid-template-columns: 250px 1fr;\n" +
             "  grid-template-rows: auto 1fr auto;\n" +
             "  grid-template-areas: 'top top' 'left center' 'footer footer';\n" +
-            "  min-height: 100vh; gap: 20px; padding: 20px; box-sizing: border-box;\n" +
+            "  min-height: 100vh; gap: 10px; padding: 10px; box-sizing: border-box;\n" +
             "  width: 100%;\n" +
             "}\n" +
             ".j-hamburger {\n" +
@@ -93,10 +93,10 @@ public class JettraTheme {
             "    flex-direction: row;\n" +
             "    flex-wrap: wrap;\n" +
             "    justify-content: space-between;\n" +
-            "    padding: 8px 12px;\n" +
+            "    padding: 4px 10px;\n" +
             "  }\n" +
             "  .j-top h2 {\n" +
-            "    font-size: 1rem;\n" +
+            "    font-size: 0.9rem;\n" +
             "    width: 100%;\n" +
             "    margin-bottom: 5px;\n" +
             "  }\n" +
@@ -143,7 +143,7 @@ public class JettraTheme {
             "    padding: 15px !important;\n" +
             "  }\n" +
             "}\n" +
-            ".j-top { grid-area: top; display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 20px; overflow: visible; z-index: 2000; position: relative; transform: translateZ(20px); }\n" +
+            ".j-top { grid-area: top; display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 5px 15px !important; overflow: visible; z-index: 2000; position: relative; transform: translateZ(20px); }\n" +
             ".j-left { grid-area: left; }\n" +
             ".j-center { grid-area: center; }\n" +
             ".j-footer { grid-area: footer; text-align: center; padding: 10px; }\n" +
@@ -151,7 +151,7 @@ public class JettraTheme {
             "  background: var(--jettra-glass);\n" +
             "  border: 1px solid var(--jettra-border);\n" +
             "  border-radius: 12px;\n" +
-            "  padding: 15px;\n" +
+            "  padding: 10px 15px;\n" +
             "  backdrop-filter: blur(10px);\n" +
             "  box-shadow: 0 8px 32px 0 rgba(0,0,0,0.37), inset 0 0 10px rgba(0,255,255,0.05);\n" +
             "  transition: transform 0.1s ease-out, box-shadow 0.3s ease;\n" +
