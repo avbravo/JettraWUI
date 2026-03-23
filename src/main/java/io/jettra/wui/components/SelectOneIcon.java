@@ -11,7 +11,7 @@ public class SelectOneIcon extends UIComponent {
     
     private String name;
 
-    public SelectOneIcon(String name) {
+    public SelectOneIcon(String name, String label) {
         super("div");
         this.name = name;
         addClass("j-select-icon-container");
@@ -33,7 +33,7 @@ public class SelectOneIcon extends UIComponent {
         selectedIcon.setProperty("id", name + "_selected_icon");
         selectedIcon.addClass("j-selected-icon");
         
-        Span selectedLabel = new Span("Select...");
+        Span selectedLabel = new Span(label);
         selectedLabel.setProperty("id", name + "_selected_label");
         
         trigger.add(selectedIcon);
@@ -104,6 +104,36 @@ public class SelectOneIcon extends UIComponent {
         return this;
     }
 
+    public SelectOneIcon setSelectedValue(String value, String label, String iconHtml) {
+        // Update hidden input
+        // Find children[0] which is the hidden input
+        if (getChildren().size() > 0) {
+            getChildren().get(0).setProperty("value", value);
+        }
+        
+        // Find trigger -> selectedIcon and selectedLabel
+        UIComponent trigger = getChildren().stream()
+            .filter(c -> c instanceof Div && "j-select-icon-trigger".equals(c.getProperties().get("class")))
+            .findFirst().orElse(null);
+            
+        if (trigger != null) {
+            UIComponent iconDiv = trigger.getChildren().stream()
+                .filter(c -> (name + "_selected_icon").equals(c.getProperties().get("id")))
+                .findFirst().orElse(null);
+            if (iconDiv != null) {
+                iconDiv.setContent(iconHtml);
+            }
+            
+            UIComponent labelSpan = trigger.getChildren().stream()
+                .filter(c -> (name + "_selected_label").equals(c.getProperties().get("id")))
+                .findFirst().orElse(null);
+            if (labelSpan != null) {
+                labelSpan.setContent(label);
+            }
+        }
+        return this;
+    }
+    
     private void addStyles() {
         Style style = new Style("""
             .j-select-icon-container {
@@ -111,7 +141,7 @@ public class SelectOneIcon extends UIComponent {
                 width: 150px;
                 font-family: sans-serif;
                 user-select: none;
-                z-index: 100;
+                z-index: 2100;
             }
             .j-select-icon-trigger {
                 display: flex;

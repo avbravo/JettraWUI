@@ -27,7 +27,7 @@ public class JettraTheme {
             "  --jettra-text: #e0e0e0;\n" +
             "  --jettra-accent: #bb86fc;\n" +
             "}\n" +
-            "body.theme-futuristic {\n" +
+            "body.theme-3d {\n" +
             "  --jettra-bg: #0a0a0f;\n" +
             "  --jettra-glow: rgba(0, 240, 255, 0.4);\n" +
             "  --jettra-glass: rgba(20, 25, 40, 0.6);\n" +
@@ -43,7 +43,7 @@ public class JettraTheme {
             "  overflow-x: hidden;\n" +
             "  transition: background-color 0.5s ease, color 0.5s ease;\n" +
             "}\n" +
-            "body.theme-futuristic {\n" +
+            "body.theme-3d {\n" +
             "  background-image: radial-gradient(circle at 50% 50%, #151525 0%, #0a0a0f 100%);\n" +
             "}\n" +
             "body.theme-white {\n" +
@@ -117,7 +117,7 @@ public class JettraTheme {
             "    left: 20px;\n" +
             "  }\n" +
             "}\n" +
-            ".j-top { grid-area: top; display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 20px; }\n" +
+            ".j-top { grid-area: top; display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 20px; overflow: visible; z-index: 2000; position: relative; transform: translateZ(20px); }\n" +
             ".j-left { grid-area: left; }\n" +
             ".j-center { grid-area: center; }\n" +
             ".j-footer { grid-area: footer; text-align: center; padding: 10px; }\n" +
@@ -163,12 +163,13 @@ public class JettraTheme {
     
     public static String getJS() {
         return "<script>\n" +
+            "let jettraAnimated = localStorage.getItem('jettra-animated') === null ? true : localStorage.getItem('jettra-animated') === 'true';\n" +
             "function changeTheme(theme) {\n" +
             "  document.body.className = 'theme-' + theme;\n" +
             "  localStorage.setItem('jettra-theme', theme);\n" +
             "}\n" +
             "document.addEventListener('DOMContentLoaded', () => {\n" +
-            "  const savedTheme = localStorage.getItem('jettra-theme') || 'futuristic';\n" +
+            "  const savedTheme = localStorage.getItem('jettra-theme') || '3d';\n" +
             "  changeTheme(savedTheme);\n" +
             "  const dash = document.querySelector('.j-dashboard');\n" +
             "  if (dash && !document.querySelector('.j-hamburger')) {\n" +
@@ -180,8 +181,11 @@ public class JettraTheme {
             "    };\n" +
             "    dash.prepend(hm);\n" +
             "  }\n" +
+            "  const cb = document.getElementById('anim-toggle');\n" +
+            "  if (cb) cb.checked = jettraAnimated;\n" +
             "});\n" +
             "document.addEventListener('mousemove', (e) => {\n" +
+            "  if (!jettraAnimated) return;\n" +
             "  const cards = document.querySelectorAll('.j-component, .j-top, .j-left, .j-center, .j-footer');\n" +
             "  cards.forEach(card => {\n" +
             "    const rect = card.getBoundingClientRect();\n" +
