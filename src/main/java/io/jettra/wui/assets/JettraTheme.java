@@ -81,6 +81,12 @@ public class JettraTheme {
             "  text-align: center; line-height: 45px;\n" +
             "  box-shadow: 0 0 10px var(--jettra-glow);\n" +
             "}\n" +
+            ".show-on-low-res {\n" +
+            "  display: none !important;\n" +
+            "}\n" +
+            ".hide-on-low-res {\n" +
+            "  display: inline-block !important;\n" +
+            "}\n" +
             "@media (max-width: 768px) {\n" +
             "  .j-dashboard {\n" +
             "    grid-template-columns: 1fr;\n" +
@@ -120,6 +126,9 @@ public class JettraTheme {
             "    padding: 10px;\n" +
             "  }\n" +
             "  .show-on-low-res {\n" +
+            "    display: inline-block !important;\n" +
+            "  }\n" +
+            "  .hide-on-low-res {\n" +
             "    display: none !important;\n" +
             "  }\n" +
             "  .j-hamburger {\n" +
@@ -140,31 +149,6 @@ public class JettraTheme {
             "  .j-left.active {\n" +
             "    left: 10px;\n" +
             "  }\n" +
-            "}\n" +
-            "@media (max-width: 480px) {\n" +
-            "  .j-top-right {\n" +
-            "    gap: 5px !important;\n" +
-            "  }\n" +
-            "  .j-btn {\n" +
-            "    padding: 8px 12px;\n" +
-            "    font-size: 0.8rem;\n" +
-            "  }\n" +
-            "  .modal-content {\n" +
-            "    width: 95% !important;\n" +
-            "    padding: 15px !important;\n" +
-            "  }\n" +
-            "  .show-on-low-res {\n" +
-            "    display: inline-block !important;\n" +
-            "  }\n" +
-            "  .hide-on-low-res {\n" +
-            "    display: none !important;\n" +
-            "  }\n" +
-            "}\n" +
-            ".show-on-low-res {\n" +
-            "  display: none !important;\n" +
-            "}\n" +
-            ".hide-on-low-res {\n" +
-            "  display: inline-block !important;\n" +
             "}\n" +
             ".j-top { grid-area: top; display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 2px 10px !important; overflow: visible; z-index: 2000; position: relative; transform: translateZ(20px); }\n" +
             ".j-left { grid-area: left; }\n" +
@@ -209,12 +193,60 @@ public class JettraTheme {
             ".j-table-container {\n" +
             "  width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch;\n" +
             "}\n" +
+            ".j-avatar {\n" +
+            "  position: relative; display: inline-flex; align-items: center; justify-content: center;\n" +
+            "  background: var(--jettra-glass); border: 1px solid var(--jettra-border);\n" +
+            "  box-shadow: 0 0 10px var(--jettra-glow); color: var(--jettra-text);\n" +
+            "  overflow: visible; font-weight: bold; transition: all 0.3s ease;\n" +
+            "}\n" +
+            ".j-avatar img {\n" +
+            "  width: 100%; height: 100%; object-fit: cover;\n" +
+            "}\n" +
+            ".j-avatar-circle, .j-avatar-circle img {\n" +
+            "  border-radius: 50%;\n" +
+            "}\n" +
+            ".j-avatar-rounded, .j-avatar-rounded img {\n" +
+            "  border-radius: 8px;\n" +
+            "}\n" +
+            ".j-avatar-xs { width: 24px; height: 24px; font-size: 0.6rem; }\n" +
+            ".j-avatar-sm { width: 32px; height: 32px; font-size: 0.8rem; }\n" +
+            ".j-avatar-md { width: 48px; height: 48px; font-size: 1rem; }\n" +
+            ".j-avatar-lg { width: 64px; height: 64px; font-size: 1.5rem; }\n" +
+            ".j-avatar-xl { width: 96px; height: 96px; font-size: 2rem; }\n" +
+            ".j-avatar-badge {\n" +
+            "  position: absolute; bottom: 2px; right: 2px; width: 25%; height: 25%;\n" +
+            "  min-width: 8px; min-height: 8px; border-radius: 50%; border: 2px solid var(--jettra-bg);\n" +
+            "  background-color: #22c55e; z-index: 10;\n" +
+            "}\n" +
+            ".j-avatar-group {\n" +
+            "  display: flex; align-items: center;\n" +
+            "}\n" +
+            ".j-avatar-group .j-avatar {\n" +
+            "  margin-left: -15px; border: 2px solid var(--jettra-bg);\n" +
+            "}\n" +
+            ".j-avatar-group .j-avatar:first-child {\n" +
+            "  margin-left: 0;\n" +
+            "}\n" +
+            ".j-avatar-group .j-avatar:hover {\n" +
+            "  transform: scale(1.1) translateZ(20px);\n" +
+            "  z-index: 100; box-shadow: 0 0 20px var(--jettra-accent);\n" +
+            "}\n" +
             "</style>\n";
     }
     
     public static String getJS() {
         return "<script>\n" +
             "window.jettraAnimated = localStorage.getItem('jettra-animated') === null ? true : localStorage.getItem('jettra-animated') === 'true';\n" +
+            "function toggleJettraAnimation(checked) {\n" +
+            "  window.jettraAnimated = checked;\n" +
+            "  localStorage.setItem('jettra-animated', checked);\n" +
+            "  if (!checked) {\n" +
+            "    document.querySelectorAll('.j-component, .j-top, .j-left, .j-center, .j-footer').forEach(c => {\n" +
+            "       c.style.transform = '';\n" +
+            "       c.style.boxShadow = '';\n" +
+            "    });\n" +
+            "  }\n" +
+            "}\n" +
             "function changeTheme(theme) {\n" +
             "  document.body.className = 'theme-' + theme;\n" +
             "  localStorage.setItem('jettra-theme', theme);\n" +
@@ -235,16 +267,6 @@ public class JettraTheme {
             "  const cb = document.getElementById('anim-toggle');\n" +
             "  if (cb) {\n" +
             "    cb.checked = window.jettraAnimated;\n" +
-            "    cb.addEventListener('change', (e) => {\n" +
-            "       window.jettraAnimated = e.target.checked;\n" +
-            "       localStorage.setItem('jettra-animated', window.jettraAnimated);\n" +
-            "       if (!window.jettraAnimated) {\n" +
-            "          document.querySelectorAll('.j-component, .j-top, .j-left, .j-center, .j-footer').forEach(c => {\n" +
-            "             c.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0)';\n" +
-            "             c.style.boxShadow = '';\n" +
-            "          });\n" +
-            "       }\n" +
-            "    });\n" +
             "  }\n" +
             "});\n" +
             "document.addEventListener('mousemove', (e) => {\n" +
