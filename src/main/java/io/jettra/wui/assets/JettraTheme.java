@@ -231,6 +231,31 @@ public class JettraTheme {
             "  transform: scale(1.1) translateZ(20px);\n" +
             "  z-index: 100; box-shadow: 0 0 20px var(--jettra-accent);\n" +
             "}\n" +
+            ".j-avatar-wrapper { position: relative; display: inline-block; cursor: pointer; }\n" +
+            ".j-avatar-dropdown {\n" +
+            "  position: absolute; top: calc(100% + 10px); right: 0;\n" +
+            "  min-width: 150px; background: var(--jettra-glass);\n" +
+            "  border: 1px solid var(--jettra-border); border-radius: 8px;\n" +
+            "  backdrop-filter: blur(10px); box-shadow: 0 10px 25px rgba(0,0,0,0.5);\n" +
+            "  display: none; flex-direction: column; overflow: visible; z-index: 1000;\n" +
+            "}\n" +
+            ".j-avatar-dropdown.active { display: flex; }\n" +
+            ".j-avatar-dropdown a, .j-avatar-dropdown-item {\n" +
+            "  padding: 10px 15px; color: var(--jettra-text); text-decoration: none;\n" +
+            "  font-size: 0.9rem; transition: background 0.2s; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--jettra-border);\n" +
+            "}\n" +
+            ".j-avatar-dropdown a:last-child, .j-avatar-dropdown-item:last-child { border-bottom: none; }\n" +
+            ".j-avatar-dropdown a:hover, .j-avatar-dropdown-item:hover { background: rgba(0, 229, 255, 0.1); color: var(--jettra-accent); }\n" +
+            ".j-toggle { position: relative; display: inline-flex; align-items: center; cursor: pointer; margin-left: auto; }\n" +
+            ".j-toggle-input { opacity: 0; width: 0; height: 0; position: absolute; }\n" +
+            ".j-toggle-slider { position: relative; width: 44px; height: 24px; background-color: rgba(20, 30, 50, 0.6); transition: .3s; border-radius: 24px; border: 1px solid var(--jettra-border); box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: space-between; padding: 0 5px; font-size: 10px; font-weight: bold; color: var(--jettra-text); overflow: hidden; }\n" +
+            ".j-toggle-slider:before { position: absolute; content: ''; height: 18px; width: 18px; left: 2px; bottom: 2px; background-color: #888; transition: .3s; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.5); z-index: 2; }\n" +
+            ".j-toggle-input:checked + .j-toggle-slider { background-color: rgba(0, 229, 255, 0.1); border-color: var(--jettra-accent); }\n" +
+            ".j-toggle-input:checked + .j-toggle-slider:before { transform: translateX(20px); background-color: var(--jettra-accent); box-shadow: 0 0 10px var(--jettra-accent); }\n" +
+            ".j-toggle-on { opacity: 0; transform: translateX(-10px); transition: .3s; color: var(--jettra-accent); pointer-events: none; }\n" +
+            ".j-toggle-off { opacity: 1; transform: translateX(0); transition: .3s; color: #888; pointer-events: none; }\n" +
+            ".j-toggle-input:checked + .j-toggle-slider .j-toggle-on { opacity: 1; transform: translateX(0); }\n" +
+            ".j-toggle-input:checked + .j-toggle-slider .j-toggle-off { opacity: 0; transform: translateX(10px); }\n" +
             "</style>\n";
     }
     
@@ -246,6 +271,10 @@ public class JettraTheme {
             "       c.style.boxShadow = '';\n" +
             "    });\n" +
             "  }\n" +
+            "}\n" +
+            "function toggleAvatarMenu() {\n" +
+            "  const menu = document.getElementById('user-avatar-dropdown');\n" +
+            "  if (menu) menu.classList.toggle('active');\n" +
             "}\n" +
             "function changeTheme(theme) {\n" +
             "  document.body.className = 'theme-' + theme;\n" +
@@ -268,6 +297,13 @@ public class JettraTheme {
             "  if (cb) {\n" +
             "    cb.checked = window.jettraAnimated;\n" +
             "  }\n" +
+            "  document.addEventListener('click', (e) => {\n" +
+            "    const wrapper = document.querySelector('.j-avatar-wrapper');\n" +
+            "    const menu = document.getElementById('user-avatar-dropdown');\n" +
+            "    if (wrapper && !wrapper.contains(e.target)) {\n" +
+            "      if (menu) menu.classList.remove('active');\n" +
+            "    }\n" +
+            "  });\n" +
             "});\n" +
             "document.addEventListener('mousemove', (e) => {\n" +
             "  if (!window.jettraAnimated) return;\n" +
