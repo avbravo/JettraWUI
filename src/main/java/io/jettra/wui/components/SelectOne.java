@@ -10,7 +10,17 @@ public class SelectOne extends UIComponent {
     public SelectOne(String name) {
         super("select");
         setProperty("name", name);
-        this.initialClasses = "j-select";
+        this.initialClasses = "j-select j-component";
+        this.setStyle("padding", "8px 12px")
+            .setStyle("border-radius", "4px")
+            .setStyle("border", "1px solid var(--jettra-border)")
+            .setStyle("background-color", "var(--jettra-bg-primary)")
+            .setStyle("color", "var(--jettra-text)")
+            .setStyle("font-family", "inherit")
+            .setStyle("font-size", "14px")
+            .setStyle("cursor", "pointer")
+            .setStyle("outline", "none")
+            .setStyle("transition", "all 0.3s ease");
     }
 
     /**
