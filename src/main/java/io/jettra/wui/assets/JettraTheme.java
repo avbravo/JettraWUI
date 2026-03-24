@@ -103,14 +103,10 @@ public class JettraTheme {
             "    min-width: 30px;\n" +
             "  }\n" +
             "  .j-top h2 {\n" +
-            "    font-size: 0.85rem !important;\n" +
-            "    margin: 0 !important;\n" +
-            "    width: auto !important;\n" +
-            "  }\n" +
-            "  .j-top h2 {\n" +
             "    font-size: 0.9rem;\n" +
-            "    width: 100%;\n" +
-            "    margin-bottom: 5px;\n" +
+            "    margin: 0;\n" +
+            "    width: auto;\n" +
+            "    white-space: nowrap;\n" +
             "  }\n" +
             "  .j-top-right {\n" +
             "    width: 100%;\n" +
@@ -122,6 +118,9 @@ public class JettraTheme {
             "  .j-footer {\n" +
             "    font-size: 0.8rem;\n" +
             "    padding: 10px;\n" +
+            "  }\n" +
+            "  .show-on-low-res {\n" +
+            "    display: none !important;\n" +
             "  }\n" +
             "  .j-hamburger {\n" +
             "    display: block;\n" +
@@ -154,6 +153,18 @@ public class JettraTheme {
             "    width: 95% !important;\n" +
             "    padding: 15px !important;\n" +
             "  }\n" +
+            "  .show-on-low-res {\n" +
+            "    display: inline-block !important;\n" +
+            "  }\n" +
+            "  .hide-on-low-res {\n" +
+            "    display: none !important;\n" +
+            "  }\n" +
+            "}\n" +
+            ".show-on-low-res {\n" +
+            "  display: none !important;\n" +
+            "}\n" +
+            ".hide-on-low-res {\n" +
+            "  display: inline-block !important;\n" +
             "}\n" +
             ".j-top { grid-area: top; display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 2px 10px !important; overflow: visible; z-index: 2000; position: relative; transform: translateZ(20px); }\n" +
             ".j-left { grid-area: left; }\n" +
@@ -203,7 +214,7 @@ public class JettraTheme {
     
     public static String getJS() {
         return "<script>\n" +
-            "let jettraAnimated = localStorage.getItem('jettra-animated') === null ? true : localStorage.getItem('jettra-animated') === 'true';\n" +
+            "window.jettraAnimated = localStorage.getItem('jettra-animated') === null ? true : localStorage.getItem('jettra-animated') === 'true';\n" +
             "function changeTheme(theme) {\n" +
             "  document.body.className = 'theme-' + theme;\n" +
             "  localStorage.setItem('jettra-theme', theme);\n" +
@@ -223,11 +234,11 @@ public class JettraTheme {
             "  }\n" +
             "  const cb = document.getElementById('anim-toggle');\n" +
             "  if (cb) {\n" +
-            "    cb.checked = jettraAnimated;\n" +
+            "    cb.checked = window.jettraAnimated;\n" +
             "    cb.addEventListener('change', (e) => {\n" +
-            "       jettraAnimated = e.target.checked;\n" +
-            "       localStorage.setItem('jettra-animated', jettraAnimated);\n" +
-            "       if (!jettraAnimated) {\n" +
+            "       window.jettraAnimated = e.target.checked;\n" +
+            "       localStorage.setItem('jettra-animated', window.jettraAnimated);\n" +
+            "       if (!window.jettraAnimated) {\n" +
             "          document.querySelectorAll('.j-component, .j-top, .j-left, .j-center, .j-footer').forEach(c => {\n" +
             "             c.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0)';\n" +
             "             c.style.boxShadow = '';\n" +
@@ -237,7 +248,7 @@ public class JettraTheme {
             "  }\n" +
             "});\n" +
             "document.addEventListener('mousemove', (e) => {\n" +
-            "  if (!jettraAnimated) return;\n" +
+            "  if (!window.jettraAnimated) return;\n" +
             "  const cards = document.querySelectorAll('.j-component, .j-top, .j-left, .j-center, .j-footer');\n" +
             "  cards.forEach(card => {\n" +
             "    const rect = card.getBoundingClientRect();\n" +
