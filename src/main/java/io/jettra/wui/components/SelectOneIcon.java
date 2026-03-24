@@ -156,15 +156,16 @@ public class SelectOneIcon extends UIComponent {
             .j-select-icon-trigger {
                 display: flex;
                 align-items: center;
-                gap: 10px;
+                gap: 6px;
                 background: rgba(20, 25, 40, 0.8);
                 border: 1px solid var(--jettra-accent, #00e5ff);
                 color: var(--jettra-text, #fff);
-                padding: 3px 10px;
+                padding: 2px 8px;
                 border-radius: 6px;
                 cursor: pointer;
                 box-shadow: 0 0 10px rgba(0, 229, 255, 0.2);
                 transition: all 0.3s;
+                font-size: 0.85rem;
             }
             .j-select-icon-trigger:hover {
                 box-shadow: 0 0 15px rgba(0, 229, 255, 0.4);
@@ -189,18 +190,19 @@ public class SelectOneIcon extends UIComponent {
             .j-select-icon-option {
                 display: flex;
                 align-items: center;
-                gap: 10px;
-                padding: 10px 12px;
+                gap: 8px;
+                padding: 6px 10px;
                 cursor: pointer;
                 transition: background 0.2s;
                 color: #fff;
+                font-size: 0.85rem;
             }
             .j-select-icon-option:hover {
                 background: rgba(0, 229, 255, 0.2);
             }
             .j-option-icon, .j-selected-icon {
-                width: 20px;
-                height: 15px;
+                width: 18px;
+                height: 12px;
                 display: flex;
                 align-items: center;
                 justify-content: center;

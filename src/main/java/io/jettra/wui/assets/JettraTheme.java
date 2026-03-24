@@ -93,7 +93,19 @@ public class JettraTheme {
             "    flex-direction: row;\n" +
             "    flex-wrap: wrap;\n" +
             "    justify-content: space-between;\n" +
-            "    padding: 4px 10px;\n" +
+            "    padding: 2px 8px;\n" +
+            "    gap: 5px;\n" +
+            "  }\n" +
+            "  .j-top .j-btn {\n" +
+            "    padding: 4px 8px !important;\n" +
+            "    height: 30px !important;\n" +
+            "    width: auto !important;\n" +
+            "    min-width: 30px;\n" +
+            "  }\n" +
+            "  .j-top h2 {\n" +
+            "    font-size: 0.85rem !important;\n" +
+            "    margin: 0 !important;\n" +
+            "    width: auto !important;\n" +
             "  }\n" +
             "  .j-top h2 {\n" +
             "    font-size: 0.9rem;\n" +
@@ -143,7 +155,7 @@ public class JettraTheme {
             "    padding: 15px !important;\n" +
             "  }\n" +
             "}\n" +
-            ".j-top { grid-area: top; display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 5px 15px !important; overflow: visible; z-index: 2000; position: relative; transform: translateZ(20px); }\n" +
+            ".j-top { grid-area: top; display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 2px 10px !important; overflow: visible; z-index: 2000; position: relative; transform: translateZ(20px); }\n" +
             ".j-left { grid-area: left; }\n" +
             ".j-center { grid-area: center; }\n" +
             ".j-footer { grid-area: footer; text-align: center; padding: 10px; }\n" +
@@ -151,7 +163,7 @@ public class JettraTheme {
             "  background: var(--jettra-glass);\n" +
             "  border: 1px solid var(--jettra-border);\n" +
             "  border-radius: 12px;\n" +
-            "  padding: 10px 15px;\n" +
+            "  padding: 8px 12px;\n" +
             "  backdrop-filter: blur(10px);\n" +
             "  box-shadow: 0 8px 32px 0 rgba(0,0,0,0.37), inset 0 0 10px rgba(0,255,255,0.05);\n" +
             "  transition: transform 0.1s ease-out, box-shadow 0.3s ease;\n" +
@@ -210,7 +222,19 @@ public class JettraTheme {
             "    dash.prepend(hm);\n" +
             "  }\n" +
             "  const cb = document.getElementById('anim-toggle');\n" +
-            "  if (cb) cb.checked = jettraAnimated;\n" +
+            "  if (cb) {\n" +
+            "    cb.checked = jettraAnimated;\n" +
+            "    cb.addEventListener('change', (e) => {\n" +
+            "       jettraAnimated = e.target.checked;\n" +
+            "       localStorage.setItem('jettra-animated', jettraAnimated);\n" +
+            "       if (!jettraAnimated) {\n" +
+            "          document.querySelectorAll('.j-component, .j-top, .j-left, .j-center, .j-footer').forEach(c => {\n" +
+            "             c.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0)';\n" +
+            "             c.style.boxShadow = '';\n" +
+            "          });\n" +
+            "       }\n" +
+            "    });\n" +
+            "  }\n" +
             "});\n" +
             "document.addEventListener('mousemove', (e) => {\n" +
             "  if (!jettraAnimated) return;\n" +
