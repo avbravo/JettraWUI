@@ -1,9 +1,11 @@
 package io.jettra.wui.core;
 
+import io.jettra.wui.events.ClickListener;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public abstract class UIComponent {
     protected String tag;
@@ -12,9 +14,31 @@ public abstract class UIComponent {
     protected Map<String, String> properties = new LinkedHashMap<>();
     protected Map<String, String> styles = new LinkedHashMap<>();
     protected String initialClasses = "";
+    protected List<ClickListener> clickListeners = new ArrayList<>();
 
     public UIComponent(String tag) {
         this.tag = tag;
+    }
+
+    public String getId() {
+        return properties.get("id");
+    }
+
+    public UIComponent setId(String id) {
+        properties.put("id", id);
+        return this;
+    }
+
+    public UIComponent addClickListener(ClickListener listener) {
+        this.clickListeners.add(listener);
+        if (getId() == null) {
+            setId("jt-" + UUID.randomUUID().toString().substring(0, 8));
+        }
+        return this;
+    }
+
+    public List<ClickListener> getClickListeners() {
+        return clickListeners;
     }
 
     public UIComponent setProperty(String key, String value) {
@@ -68,6 +92,11 @@ public abstract class UIComponent {
         // Ensure class property carries default styling logic
         if (!initialClasses.isEmpty() && !properties.containsKey("class")) {
             properties.put("class", initialClasses.trim());
+        }
+
+        // Auto-inject jettra event trigger if listeners exist and no onclick is manually set
+        if (!clickListeners.isEmpty() && !properties.containsKey("onclick")) {
+            properties.put("onclick", "jtFire('" + getId() + "')");
         }
 
         // Properties
