@@ -1,6 +1,7 @@
 package io.jettra.wui.core;
 
 import io.jettra.wui.assets.JettraTheme;
+import io.jettra.wui.mvc.JettraMVC;
 
 public class Page extends UIComponent {
     
@@ -9,10 +10,15 @@ public class Page extends UIComponent {
     public Page(String title) {
         super("html");
         this.title = title;
+        // Initialize ViewModels with @InjectViewModel
+        JettraMVC.initializeViewModels(this);
     }
 
     @Override
     public String render() {
+        // Sync models to components before rendering
+        JettraMVC.updateViewFromModel(this);
+        
         StringBuilder builder = new StringBuilder();
         builder.append("<!DOCTYPE html>\n");
         builder.append("<html lang=\"en\">\n<head>\n");
