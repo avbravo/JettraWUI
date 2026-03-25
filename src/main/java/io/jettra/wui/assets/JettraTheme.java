@@ -261,11 +261,16 @@ public class JettraTheme {
     
     public static String getJS() {
         return "<script>\n" +
-            "window.jettraAnimated = localStorage.getItem('jettra-animated') === null ? true : localStorage.getItem('jettra-animated') === 'true';\n" +
+            "window.jettraAnimated = localStorage.getItem('jettra-animated') === null ? null : localStorage.getItem('jettra-animated') === 'true';\n" +
             "function toggleJettraAnimation(checked) {\n" +
             "  window.jettraAnimated = checked;\n" +
             "  localStorage.setItem('jettra-animated', checked);\n" +
             "  if (!checked) {\n" +
+            "    document.querySelectorAll('.j-component, .j-top, .j-left, .j-center, .j-footer').forEach(c => {\n" +
+            "       c.style.transform = 'none';\n" +
+            "       c.style.boxShadow = 'none';\n" +
+            "    });\n" +
+            "  } else {\n" +
             "    document.querySelectorAll('.j-component, .j-top, .j-left, .j-center, .j-footer').forEach(c => {\n" +
             "       c.style.transform = '';\n" +
             "       c.style.boxShadow = '';\n" +
@@ -294,8 +299,18 @@ public class JettraTheme {
             "    dash.prepend(hm);\n" +
             "  }\n" +
             "  const cb = document.getElementById('anim-toggle');\n" +
+            "  if (window.jettraAnimated === null) {\n" +
+            "    window.jettraAnimated = cb ? cb.hasAttribute('checked') : true;\n" +
+            "    localStorage.setItem('jettra-animated', window.jettraAnimated);\n" +
+            "  }\n" +
             "  if (cb) {\n" +
             "    cb.checked = window.jettraAnimated;\n" +
+            "  }\n" +
+            "  if (!window.jettraAnimated) {\n" +
+            "    document.querySelectorAll('.j-component, .j-top, .j-left, .j-center, .j-footer').forEach(c => {\n" +
+            "       c.style.transform = 'none';\n" +
+            "       c.style.boxShadow = 'none';\n" +
+            "    });\n" +
             "  }\n" +
             "  document.addEventListener('click', (e) => {\n" +
             "    const wrapper = document.querySelector('.j-avatar-wrapper');\n" +
@@ -307,6 +322,8 @@ public class JettraTheme {
             "});\n" +
             "document.addEventListener('mousemove', (e) => {\n" +
             "  if (!window.jettraAnimated) return;\n" +
+            "  const isInteractive = e.target.closest('button, a, input, select, textarea, .j-btn, .j-toggle-slider, .j-select-icon-trigger, .j-select-icon-options, .j-avatar-wrapper, .j-avatar-dropdown, label');\n" +
+            "  if (isInteractive) return;\n" +
             "  const cards = document.querySelectorAll('.j-component, .j-top, .j-left, .j-center, .j-footer');\n" +
             "  cards.forEach(card => {\n" +
             "    const rect = card.getBoundingClientRect();\n" +
