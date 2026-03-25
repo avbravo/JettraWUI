@@ -91,7 +91,38 @@ public class PaisPage extends DashboardBasePage {
 }
 ```
 
-## Ventajas
-- **Menos código repetitivo**: No es necesario hacer `formParams.get("nombre")` campo por campo.
-- **Sincronización automática**: Al editar, los campos se llenan solos si el ViewModel tiene datos.
-- **Mantenibilidad**: El modelo de datos es la única fuente de verdad.
+## Prácticas Recomendadas: "Reactive MVC"
+
+Para minimizar el uso de JavaScript manual y aprovechar al máximo el motor de binding de JettraWUI, se recomienda el siguiente flujo:
+
+### 1. Manejo del Estado en el Servidor
+En lugar de usar JS para limpiar o llenar inputs, usa parámetros de URL (`?action=edit&code=XX`) y sincroniza el ViewModel en el método `handle()`:
+
+```java
+if ("edit".equals(action)) {
+    Pais p = repository.find(code);
+    this.pais.setCode(p.getCode()); // El ViewModel ya tiene los datos
+    this.pais.setName(p.getName());
+}
+```
+
+### 2. Auto-Población de Componentes
+Dado que `JettraMVC.updateViewFromModel` escanea todo el árbol de componentes, los `TextBox` con el atributo `name` correcto se llenarán automáticamente al renderizar:
+
+```java
+TextBox input = new TextBox("text", "code"); // Bindeado a pais.code
+```
+
+### 3. Script Mínimo para Visibilidad
+Solo necesitas una línea de JS inyectada dinámicamente para abrir el modal si hay una acción activa:
+
+```java
+if (action != null) {
+    this.add(new Script("document.getElementById('modal').style.display='flex';"));
+}
+```
+
+## Beneficios
+- **Código Java Limpio**: No necesitas concatenar largas cadenas de JavaScript.
+- **Seguridad**: Los datos se procesan y validan en el servidor antes de renderizarse.
+- **Sincronización Total**: El ViewModel es siempre la única fuente de verdad (Single Source of Truth).
