@@ -178,6 +178,12 @@ public class JettraTheme {
             "  color: #000; box-shadow: 0 0 20px var(--jettra-glow), 0 0 40px var(--jettra-accent);\n" +
             "  transform: translateZ(10px);\n" +
             "}\n" +
+            ".j-btn-primary { background: linear-gradient(135deg, #007bff 0%, #0056b3 100%) !important; color: #fff !important; border-color: #004085 !important; }\n" +
+            ".j-btn-secondary { background: linear-gradient(135deg, #6c757d 0%, #495057 100%) !important; color: #fff !important; border-color: #343a40 !important; }\n" +
+            ".j-btn-help { background: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%) !important; color: #fff !important; border-color: #6b21a8 !important; }\n" +
+            ".j-btn-danger { background: linear-gradient(135deg, #dc3545 0%, #a71d2a 100%) !important; color: #fff !important; border-color: #721c24 !important; }\n" +
+            ".j-btn-info { background: linear-gradient(135deg, #0dcaf0 0%, #0aa2c0 100%) !important; color: #fff !important; border-color: #055160 !important; }\n" +
+            ".j-btn-warning { background: linear-gradient(135deg, #ffc107 0%, #d39e00 100%) !important; color: #212529 !important; border-color: #856404 !important; }\n" +
             ".j-input {\n" +
             "  background: rgba(0,0,0,0.5);\n" +
             "  border: 1px solid var(--jettra-border);\n" +

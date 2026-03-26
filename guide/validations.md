@@ -68,3 +68,35 @@ JettraValidations.apply(inputNombre, PersonaModel.class, "nombre");
 ```
 
 This will automatically set HTML5 attributes like `required`, `minlength`, `maxlength`, `min`, `max`, and `type="email"` on the generated component.
+
+## Button Component (Fluent API)
+
+The `Button` component supports a Fluent API for a more concise and readable setup.
+
+### Specialized Styles
+You can apply specialized styles using fluent methods:
+- `.primary()`: Blue theme.
+- `.secondary()`: Gray theme.
+- `.help()`: Purple theme.
+- `.danger()`: Red theme.
+- `.info()`: Cyan theme.
+- `.warning()`: Yellow/Orange theme.
+
+### Example Usage
+
+```java
+// Traditional way
+Button btn1 = new Button("Save");
+btn1.setId("saveBtn");
+btn1.addClass("my-custom-class");
+btn1.primary();
+
+// Fluent API way
+Button btn2 = new Button("Delete")
+    .id("delBtn")
+    .danger()
+    .addClass("no-print")
+    .addClickListener(() -> {
+        System.out.println("Deleted!");
+    });
+```
