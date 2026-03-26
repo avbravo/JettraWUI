@@ -54,8 +54,12 @@ public abstract class Page extends UIComponent implements HttpHandler {
 
         // 4. Lifecycle: Custom logic hooks
         if ("POST".equalsIgnoreCase(exchange.getRequestMethod())) {
-            System.out.println("[Page] Calling onPost...");
-            onPost(allParams);
+            if (!allParams.containsKey("_jtEvent")) {
+                System.out.println("[Page] Calling onPost...");
+                onPost(allParams);
+            } else {
+                System.out.println("[Page] Skipping onPost because _jtEvent is present (" + allParams.get("_jtEvent") + ")");
+            }
         } else {
             System.out.println("[Page] Calling onGet...");
             onGet(allParams);
