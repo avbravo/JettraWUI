@@ -263,7 +263,43 @@ public class JettraTheme {
             ".j-toggle-off { opacity: 1; transform: translateX(0); transition: .3s; color: #888; pointer-events: none; }\n" +
             ".j-toggle-input:checked + .j-toggle-slider .j-toggle-on { opacity: 1; transform: translateX(0); }\n" +
             ".j-toggle-input:checked + .j-toggle-slider .j-toggle-off { opacity: 0; transform: translateX(10px); }\n" +
-            "</style>\n";
+             "/* Sync Popup 3D */\n" +
+             ".j-sync-popup-3d {\n" +
+             "  position: fixed;\n" +
+             "  bottom: 20px;\n" +
+             "  right: 20px;\n" +
+             "  z-index: 10000;\n" +
+             "  background: var(--jettra-glass);\n" +
+             "  backdrop-filter: blur(10px);\n" +
+             "  border: 1px solid var(--jettra-accent);\n" +
+             "  border-radius: 12px;\n" +
+             "  padding: 15px;\n" +
+             "  box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 15px rgba(0,255,255,0.1);\n" +
+             "  transform: perspective(1000px) rotateY(-10deg);\n" +
+             "  transition: transform 0.3s ease, opacity 0.3s ease;\n" +
+             "  max-width: 300px;\n" +
+             "  animation: jSyncFadeIn 0.5s ease-out;\n" +
+             "}\n" +
+             ".j-sync-popup-3d:hover { transform: perspective(1000px) rotateY(0deg); }\n" +
+             "@keyframes jSyncFadeIn { from { opacity: 0; transform: translateY(20px) perspective(1000px) rotateY(-10deg); } to { opacity: 1; transform: translateY(0) perspective(1000px) rotateY(-10deg); } }\n" +
+             ".j-sync-content { display: flex; align-items: flex-start; gap: 12px; }\n" +
+             ".j-sync-icon { font-size: 1.5rem; }\n" +
+             ".j-sync-text strong { display: block; color: var(--jettra-accent); margin-bottom: 5px; }\n" +
+             ".j-sync-text p { margin: 0; font-size: 0.85rem; color: var(--jettra-text); }\n" +
+             ".j-sync-actions { display: flex; gap: 8px; margin-top: 12px; justify-content: flex-end; }\n" +
+             ".j-sync-actions button {\n" +
+             "  background: rgba(0,255,255,0.1);\n" +
+             "  border: 1px solid var(--jettra-border);\n" +
+             "  color: #fff;\n" +
+             "  padding: 4px 10px;\n" +
+             "  border-radius: 4px;\n" +
+             "  cursor: pointer;\n" +
+             "  font-size: 0.8rem;\n" +
+             "  transition: all 0.2s;\n" +
+             "}\n" +
+             ".j-sync-actions button:first-child { background: var(--jettra-accent); color: #000; border: none; font-weight: bold; }\n" +
+             ".j-sync-actions button:hover { transform: scale(1.05); filter: brightness(1.2); }\n" +
+             "</style>\n";
     }
     
     public static String getJS() {

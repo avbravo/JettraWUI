@@ -36,6 +36,11 @@ public abstract class Page extends UIComponent implements HttpHandler {
         Map<String, String> allParams = new HashMap<>(queryParams);
         allParams.putAll(formParams);
 
+        if (allParams.containsKey("_jtSyncCheck")) {
+            handleSyncCheck(exchange, allParams);
+            return;
+        }
+
         // 1. MVC Sink: Update models from form data
         if (!formParams.isEmpty()) {
             System.out.println("[Page] Updating models from request...");
@@ -127,6 +132,23 @@ public abstract class Page extends UIComponent implements HttpHandler {
         exchange.getResponseBody().close();
     }
 
+    private void handleSyncCheck(HttpExchange exchange, Map<String, String> params) throws IOException {
+        io.jettra.wui.sync.JettraPageSincronized syncAnno = this.getClass().getAnnotation(io.jettra.wui.sync.JettraPageSincronized.class);
+        if (syncAnno == null) {
+            renderResponse(exchange, "{}");
+            return;
+        }
+        String entity = syncAnno.entity().isEmpty() ? this.getClass().getSimpleName().replace("Page", "Model") : syncAnno.entity();
+        io.jettra.wui.sync.JettraSyncManager.SyncInfo info = io.jettra.wui.sync.JettraSyncManager.getLastChange(entity);
+        
+        if (info == null) {
+            renderResponse(exchange, "{}");
+        } else {
+            String json = String.format("{\"type\":\"%s\", \"user\":\"%s\", \"ts\":%d}", info.type, info.user, info.timestamp);
+            renderResponse(exchange, json);
+        }
+    }
+
     @Override
     public String render() {
         // Sync models to components before rendering
@@ -143,6 +165,9 @@ public abstract class Page extends UIComponent implements HttpHandler {
         builder.append(JettraTheme.getCSS());
         builder.append(JettraTheme.getJS());
         
+        // Inject Sync Logic if needed
+        injectSyncLogic(builder);
+        
         builder.append("</head>\n<body>\n");
         
         // Main container
@@ -153,8 +178,63 @@ public abstract class Page extends UIComponent implements HttpHandler {
         }
         
         builder.append("</div>\n");
+        
+        // Inject Sync Popup Container
+        builder.append("<div id='j-sync-popup-container'></div>\n");
+        
         builder.append("</body>\n</html>");
         
         return builder.toString();
+    }
+
+    private void injectSyncLogic(StringBuilder builder) {
+        io.jettra.wui.sync.JettraPageSincronized syncAnno = this.getClass().getAnnotation(io.jettra.wui.sync.JettraPageSincronized.class);
+        if (syncAnno == null) return;
+
+        String entity = syncAnno.entity().isEmpty() ? this.getClass().getSimpleName().replace("Page", "Model") : syncAnno.entity();
+        long loadTime = System.currentTimeMillis();
+
+        builder.append("<script>\n")
+               .append("  const J_SYNC_ENTITY = '").append(entity).append("';\n")
+               .append("  const J_SYNC_LOAD_TIME = ").append(loadTime).append(";\n")
+               .append("  const J_SYNC_TYPE = '").append(syncAnno.value()).append("';\n")
+               .append("  \n")
+               .append("  function checkJettraSync() {\n")
+               .append("    fetch(window.location.pathname + '?_jtSyncCheck=true')\n")
+               .append("      .then(r => r.json())\n")
+               .append("      .then(data => {\n")
+               .append("        if (data.ts && data.ts > J_SYNC_LOAD_TIME) {\n")
+               .append("          if (J_SYNC_TYPE === 'ALL' || J_SYNC_TYPE === data.type) {\n")
+               .append("            showJettraSyncPopup(data);\n")
+               .append("          }\n")
+               .append("        }\n")
+               .append("      });\n")
+               .append("  }\n")
+               .append("  \n")
+               .append("  function showJettraSyncPopup(data) {\n")
+               .append("    const container = document.getElementById('j-sync-popup-container');\n")
+               .append("    if (container.innerHTML !== '') return;\n") // Already showing
+               .append("    \n")
+               .append("    const msg = `Registro ${data.type.toLowerCase()} por ${data.user}. ¿Desea actualizar?`;\n")
+               .append("    const popup = document.createElement('div');\n")
+               .append("    popup.className = 'j-sync-popup-3d';\n")
+               .append("    popup.innerHTML = `\n")
+               .append("      <div class='j-sync-content'>\n")
+               .append("        <div class='j-sync-icon'>📡</div>\n")
+               .append("        <div class='j-sync-text'>\n")
+               .append("          <strong>Sincronización</strong>\n")
+               .append("          <p>${msg}</p>\n")
+               .append("        </div>\n")
+               .append("        <div class='j-sync-actions'>\n")
+               .append("          <button onclick='window.location.reload()'>Actualizar</button>\n")
+               .append("          <button onclick='this.closest(\".j-sync-popup-3d\").remove()'>Ignorar</button>\n")
+               .append("        </div>\n")
+               .append("      </div>\n")
+               .append("    `;\n")
+               .append("    container.appendChild(popup);\n")
+               .append("  }\n")
+               .append("  \n")
+               .append("  setInterval(checkJettraSync, 5000);\n")
+               .append("</script>\n");
     }
 }
