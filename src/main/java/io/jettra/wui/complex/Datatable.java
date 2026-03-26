@@ -5,6 +5,10 @@ import java.util.UUID;
 
 public class Datatable extends UIComponent {
     private String tableId;
+    private String prevLabel = "Anterior";
+    private String nextLabel = "Siguiente";
+    private String prevIcon = "";
+    private String nextIcon = "";
     
     private static class Element extends UIComponent {
         public Element(String tag) { super(tag); }
@@ -88,6 +92,11 @@ public class Datatable extends UIComponent {
         super.add(bottomBar);
     }
 
+    public Datatable setPrevLabel(String label) { this.prevLabel = label; return this; }
+    public Datatable setNextLabel(String label) { this.nextLabel = label; return this; }
+    public Datatable setPrevIcon(String icon) { this.prevIcon = icon; return this; }
+    public Datatable setNextIcon(String icon) { this.nextIcon = icon; return this; }
+
     public void addHeaderRow(io.jettra.wui.components.Row row) {
         row.setStyle("border-bottom", "2px solid var(--jettra-accent)");
         row.setStyle("background", "rgba(0,255,255,0.1)");
@@ -118,6 +127,20 @@ public class Datatable extends UIComponent {
 
     @Override
     public String render() {
+        // Update pagination buttons before rendering
+        try {
+            UIComponent bottomBar = getChildren().get(2);
+            UIComponent btnGroup = bottomBar.getChildren().get(1);
+            io.jettra.wui.components.Button bPrev = (io.jettra.wui.components.Button) btnGroup.getChildren().get(0);
+            io.jettra.wui.components.Button bNext = (io.jettra.wui.components.Button) btnGroup.getChildren().get(1);
+            
+            String pContent = (prevIcon != null && !prevIcon.isEmpty() ? prevIcon + " " : "") + (prevLabel != null ? prevLabel : "");
+            String nContent = (nextLabel != null ? nextLabel : "") + (nextIcon != null && !nextIcon.isEmpty() ? " " + nextIcon : "");
+            
+            bPrev.setContent(pContent.trim());
+            bNext.setContent(nContent.trim());
+        } catch (Exception e) {}
+
         String baseHtml = super.render();
         String script = "<script>\n" +
             "document.addEventListener('DOMContentLoaded', function() {\n" +
