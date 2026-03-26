@@ -62,6 +62,7 @@ public abstract class Page extends UIComponent implements HttpHandler {
         }
 
         // 5. Render Response
+        // check if headers were already sent (e.g. by a redirect)
         if (exchange.getResponseCode() == -1) {
             System.out.println("[Page] Rendering final HTML...");
             String html = this.render();

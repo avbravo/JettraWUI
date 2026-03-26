@@ -1,20 +1,21 @@
 package io.jettra.wui.core;
 
 import io.jettra.wui.events.ClickListener;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import java.util.concurrent.CopyOnWriteArrayList;
+
 public abstract class UIComponent {
     protected String tag;
     protected String content = "";
-    protected List<UIComponent> children = new ArrayList<>();
+    protected List<UIComponent> children = new CopyOnWriteArrayList<>();
     protected Map<String, String> properties = new LinkedHashMap<>();
     protected Map<String, String> styles = new LinkedHashMap<>();
     protected String initialClasses = "";
-    protected List<ClickListener> clickListeners = new ArrayList<>();
+    protected List<ClickListener> clickListeners = new CopyOnWriteArrayList<>();
 
     public UIComponent(String tag) {
         this.tag = tag;
