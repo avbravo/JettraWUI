@@ -4,8 +4,13 @@ import io.jettra.wui.core.Page;
 import io.jettra.wui.core.UIComponent;
 import io.jettra.wui.core.annotations.InjectViewModel;
 import io.jettra.wui.core.annotations.JettraViewModel;
+import io.jettra.wui.core.annotations.InjectProperties;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * Utility class to handle MVC binding between ViewModels and UIComponents.
@@ -26,6 +31,41 @@ public class JettraMVC {
                     }
                 } catch (Exception e) {
                     System.err.println("Error initializing ViewModel: " + e.getMessage());
+                }
+            }
+        }
+    }
+
+    /**
+     * Inyecta archivos de propiedades en campos con @InjectProperties.
+     */
+    public static void injectProperties(Page page, Map<String, String> params) {
+        String lang = params.getOrDefault("lang", "es");
+        for (Field field : page.getClass().getDeclaredFields()) {
+            if (field.isAnnotationPresent(InjectProperties.class)) {
+                try {
+                    InjectProperties anno = field.getAnnotation(InjectProperties.class);
+                    String baseName = anno.name();
+                    String fileName = baseName + "_" + lang + ".properties";
+                    
+                    Properties props = new Properties();
+                    try (InputStream is = page.getClass().getClassLoader().getResourceAsStream(fileName)) {
+                        if (is != null) {
+                            props.load(new InputStreamReader(is, StandardCharsets.UTF_8));
+                        } else {
+                            // Intenta cargar el archivo base sin sufijo de idioma si no existe el específico
+                            try (InputStream isBase = page.getClass().getClassLoader().getResourceAsStream(baseName + ".properties")) {
+                                if (isBase != null) {
+                                    props.load(new InputStreamReader(isBase, StandardCharsets.UTF_8));
+                                }
+                            }
+                        }
+                    }
+                    
+                    field.setAccessible(true);
+                    field.set(page, props);
+                } catch (Exception e) {
+                    System.err.println("Error injecting properties into " + field.getName() + ": " + e.getMessage());
                 }
             }
         }

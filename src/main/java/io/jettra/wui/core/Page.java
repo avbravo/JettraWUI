@@ -65,7 +65,10 @@ public abstract class Page extends UIComponent implements HttpHandler {
             JettraMVC.updateModelFromRequest(this, formParams);
         }
 
-        // 2. Lifecycle: Initialize layout
+        // 2. Lifecycle: Initialize properties & layout
+        System.out.println("[Page] Injecting properties...");
+        JettraMVC.injectProperties(this, allParams);
+        
         System.out.println("[Page] Initializing lifecycle (onInit)...");
         onInit(allParams);
 
