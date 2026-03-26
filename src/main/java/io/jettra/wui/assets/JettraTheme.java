@@ -150,7 +150,7 @@ public class JettraTheme {
             "    left: 10px;\n" +
             "  }\n" +
             "}\n" +
-            ".j-top { grid-area: top; display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 2px 10px !important; overflow: visible; z-index: 2000; position: relative; transform: translateZ(20px); }\n" +
+            ".j-top { grid-area: top; display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 2px 10px !important; overflow: visible; z-index: 2000; position: relative; }\n" +
             ".j-left { grid-area: left; }\n" +
             ".j-center { grid-area: center; }\n" +
             ".j-footer { grid-area: footer; text-align: center; padding: 10px; }\n" +
@@ -161,8 +161,9 @@ public class JettraTheme {
             "  padding: 8px 12px;\n" +
             "  backdrop-filter: blur(10px);\n" +
             "  box-shadow: 0 8px 32px 0 rgba(0,0,0,0.37), inset 0 0 10px rgba(0,255,255,0.05);\n" +
-            "  transition: transform 0.1s ease-out, box-shadow 0.3s ease;\n" +
+            "  transition: transform 0.2s ease-out, box-shadow 0.3s ease;\n" +
             "  transform-style: preserve-3d;\n" +
+            "  will-change: transform;\n" +
             "}\n" +
             ".j-btn {\n" +
             "  background: linear-gradient(135deg, rgba(0,229,255,0.2) 0%, rgba(0,100,255,0.2) 100%);\n" +
@@ -343,30 +344,57 @@ public class JettraTheme {
             "      if (menu) menu.classList.remove('active');\n" +
             "    }\n" +
             "  });\n" +
-            "});\n" +
-            "document.addEventListener('mousemove', (e) => {\n" +
-            "  if (!window.jettraAnimated) return;\n" +
-            "  const isInteractive = e.target.closest('button, a, input, select, textarea, .j-btn, .j-toggle-slider, .j-select-icon-trigger, .j-select-icon-options, .j-avatar-wrapper, .j-avatar-dropdown, label');\n" +
-            "  if (isInteractive) return;\n" +
-            "  const cards = document.querySelectorAll('.j-component, .j-top, .j-left, .j-center, .j-footer');\n" +
-            "  cards.forEach(card => {\n" +
-            "    const rect = card.getBoundingClientRect();\n" +
-            "    if(e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom) {\n" +
-            "      card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0)';\n" +
-            "      card.style.boxShadow = '0 8px 32px 0 rgba(0,0,0,0.37), inset 0 0 10px rgba(0,255,255,0.05)';\n" +
+            "  \n" +
+            "  const interactiveSelector = 'button, a, input, select, textarea, .j-btn, .j-toggle-slider, .j-select-icon-trigger, .j-select-icon-options, .j-avatar-wrapper, .j-avatar-dropdown, label';\n" +
+            "  \n" +
+            "  function applyTilt(e) {\n" +
+            "    if (!window.jettraAnimated) return;\n" +
+            "    const card = e.currentTarget;\n" +
+            "    const isInteractive = e.target.closest(interactiveSelector);\n" +
+            "    \n" +
+            "    if (isInteractive) {\n" +
+            "      card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(5px)';\n" +
             "      return;\n" +
             "    }\n" +
-            "    const x = e.clientX - rect.left; const y = e.clientY - rect.top;\n" +
-            "    const centerX = rect.width / 2; const centerY = rect.height / 2;\n" +
+            "    \n" +
+            "    const rect = card.getBoundingClientRect();\n" +
+            "    const x = e.clientX - rect.left;\n" +
+            "    const y = e.clientY - rect.top;\n" +
+            "    const centerX = rect.width / 2;\n" +
+            "    const centerY = rect.height / 2;\n" +
             "    const rotateX = ((centerY - y) / centerY) * 5;\n" +
             "    const rotateY = ((x - centerX) / centerX) * 5;\n" +
+            "    \n" +
             "    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(10px)`;\n" +
-            "    card.style.boxShadow = `0 15px 40px rgba(0,255,255,0.2), inset 0 0 20px rgba(0,255,255,0.1)`;\n" +
-            "  });\n" +
-            "});\n" +
-            "document.addEventListener('mouseleave', () => {\n" +
-            "  const cards = document.querySelectorAll('.j-component, .j-top, .j-left, .j-center, .j-footer');\n" +
-            "  cards.forEach(card => { card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0)'; card.style.boxShadow = ''; });\n" +
+            "    card.style.boxShadow = '0 15px 40px rgba(0,255,255,0.2), inset 0 0 20px rgba(0,255,255,0.1)';\n" +
+            "  }\n" +
+            "  \n" +
+            "  function resetTilt(e) {\n" +
+            "    const card = e.currentTarget;\n" +
+            "    card.style.transform = '';\n" +
+            "    card.style.boxShadow = '';\n" +
+            "  }\n" +
+            "  \n" +
+            "  function initAnimations() {\n" +
+            "    const cards = document.querySelectorAll('.j-component, .j-top, .j-left, .j-center, .j-footer');\n" +
+            "    cards.forEach(card => {\n" +
+            "      card.removeEventListener('mousemove', applyTilt);\n" +
+            "      card.removeEventListener('mouseleave', resetTilt);\n" +
+            "      if (window.jettraAnimated) {\n" +
+            "        card.addEventListener('mousemove', applyTilt);\n" +
+            "        card.addEventListener('mouseleave', resetTilt);\n" +
+            "      }\n" +
+            "    });\n" +
+            "  }\n" +
+            "  \n" +
+            "  initAnimations();\n" +
+            "  // Re-init if animations are toggled\n" +
+            "  const animToggle = document.getElementById('anim-toggle');\n" +
+            "  if (animToggle) {\n" +
+            "    animToggle.addEventListener('change', () => {\n" +
+            "      setTimeout(initAnimations, 100);\n" +
+            "    });\n" +
+            "  }\n" +
             "});\n" +
             "</script>\n";
     }
