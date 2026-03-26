@@ -11,6 +11,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public abstract class UIComponent {
     protected String tag;
     protected String content = "";
+    protected boolean rawContent = true;
     protected List<UIComponent> children = new CopyOnWriteArrayList<>();
     protected Map<String, String> properties = new LinkedHashMap<>();
     protected Map<String, String> styles = new LinkedHashMap<>();
@@ -68,6 +69,26 @@ public abstract class UIComponent {
 
     public void setContent(String content) {
         this.content = content;
+        this.rawContent = true;
+    }
+
+    /**
+     * Sets content and escapes it for safety (XSS protection).
+     * @param content the content to escape
+     */
+    public void setEscapedContent(String content) {
+        this.content = content;
+        this.rawContent = false;
+    }
+
+
+    private String escapeHtml(String input) {
+        if (input == null) return "";
+        return input.replace("&", "&amp;")
+                    .replace("<", "&lt;")
+                    .replace(">", "&gt;")
+                    .replace("\"", "&quot;")
+                    .replace("'", "&#39;");
     }
 
     public List<UIComponent> getChildren() {
@@ -115,7 +136,7 @@ public abstract class UIComponent {
         }
         
         builder.append(">");
-        builder.append(content);
+        builder.append(rawContent ? content : escapeHtml(content));
         
         for (UIComponent child : children) {
             builder.append(child.render());

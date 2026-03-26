@@ -5,6 +5,8 @@ import com.sun.net.httpserver.HttpHandler;
 import io.jettra.wui.assets.JettraTheme;
 import io.jettra.wui.events.EventRouter;
 import io.jettra.wui.mvc.JettraMVC;
+import com.jettra.server.core.JettraContext;
+import com.jettra.server.core.JettraContext.Scope;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,6 +24,22 @@ public abstract class Page extends UIComponent implements HttpHandler {
         this.title = title;
         // Initialize ViewModels with @InjectViewModel
         JettraMVC.initializeViewModels(this);
+    }
+
+    protected Object get(Scope scope, String key) {
+        return JettraContext.getCurrent().get(scope, key);
+    }
+
+    protected void set(Scope scope, String key, Object value) {
+        JettraContext.getCurrent().set(scope, key, value);
+    }
+
+    protected Map<String, Object> getRequestScope() {
+        return (Map<String, Object>) JettraContext.getCurrent().get(Scope.REQUEST, "MAP");
+    }
+    
+    protected Map<String, Object> getSessionScope() {
+        return (Map<String, Object>) JettraContext.getCurrent().get(Scope.SESSION, "MAP");
     }
 
     /**

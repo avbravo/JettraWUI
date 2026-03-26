@@ -23,7 +23,11 @@
     </properties>
 
     <dependencies>
-        <!-- No external HTML/CSS/JS generation dependencies; all done manually via Java -->
+        <dependency>
+            <groupId>com.jettra</groupId>
+            <artifactId>JettraServer</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
 </project>
