@@ -23,19 +23,20 @@ public class Tree extends Div {
             
             Div header = new Div();
             header.addClass("j-tree-header");
-            header.setStyle("display", "flex").setStyle("align-items", "center").setStyle("cursor", "pointer").setStyle("padding", "5px").setStyle("transition", "all 0.2s");
+            header.setStyle("display", "flex").setStyle("align-items", "center").setStyle("cursor", "pointer").setStyle("padding", "5px").setStyle("transition", "all 0.2s").setStyle("border-radius", "4px");
             
             toggleBtn = new Span("▶");
             toggleBtn.addClass("j-tree-toggle");
             toggleBtn.setStyle("margin-right", "8px").setStyle("transition", "transform 0.2s").setStyle("width", "16px").setStyle("display", "inline-block").setStyle("font-size", "10px").setStyle("color", "var(--jettra-accent)");
             
             labelSpan = new Span(label);
+            labelSpan.setStyle("font-size", "13px");
             
             header.add(toggleBtn).add(labelSpan);
             
             childrenContainer = new Div();
             childrenContainer.addClass("j-tree-content");
-            childrenContainer.setStyle("padding-left", "25px").setStyle("display", "none");
+            childrenContainer.setStyle("padding-left", "25px").setStyle("display", "none").setStyle("border-left", "1px solid rgba(0,255,255,0.1)");
             
             this.add(header).add(childrenContainer);
             
@@ -43,6 +44,25 @@ public class Tree extends Div {
             this.setId(id);
             
             header.setProperty("onclick", "toggleTreeItem('" + id + "')");
+            
+            // Add global toggle function if not exists
+            io.jettra.wui.components.Script script = new io.jettra.wui.components.Script("""
+                if (typeof toggleTreeItem === 'undefined') {
+                    window.toggleTreeItem = function(id) {
+                        const item = document.getElementById(id);
+                        const content = item.querySelector(':scope > .j-tree-content');
+                        const toggle = item.querySelector(':scope > .j-tree-header > .j-tree-toggle');
+                        if (content.style.display === 'none') {
+                            content.style.display = 'block';
+                            toggle.style.transform = 'rotate(90deg)';
+                        } else {
+                            content.style.display = 'none';
+                            toggle.style.transform = 'rotate(0deg)';
+                        }
+                    };
+                }
+            """);
+            this.add(script);
         }
 
         public TreeItem addItem(TreeItem item) {
@@ -51,9 +71,13 @@ public class Tree extends Div {
         }
 
         @Override
-        public UIComponent add(UIComponent component) {
+        public io.jettra.wui.core.UIComponent add(io.jettra.wui.core.UIComponent component) {
            if (component instanceof TreeItem) {
                return addItem((TreeItem) component);
+           }
+           if (component instanceof io.jettra.wui.components.Script) {
+               super.add(component);
+               return this;
            }
            childrenContainer.add(component);
            return this;
