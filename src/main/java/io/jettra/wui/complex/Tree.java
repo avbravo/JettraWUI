@@ -62,5 +62,16 @@ public class Tree extends Div {
         public Span getLabel() {
             return labelSpan;
         }
+
+        public TreeItem setExpanded(boolean expanded) {
+            if (expanded) {
+                childrenContainer.setStyle("display", "block");
+                toggleBtn.setStyle("transform", "rotate(90deg)");
+            } else {
+                childrenContainer.setStyle("display", "none");
+                toggleBtn.setStyle("transform", "rotate(0deg)");
+            }
+            return this;
+        }
     }
 }
