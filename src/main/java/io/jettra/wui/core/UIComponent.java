@@ -67,18 +67,20 @@ public abstract class UIComponent {
         return this;
     }
 
-    public void setContent(String content) {
+    public UIComponent setContent(String content) {
         this.content = content;
         this.rawContent = true;
+        return this;
     }
 
     /**
      * Sets content and escapes it for safety (XSS protection).
      * @param content the content to escape
      */
-    public void setEscapedContent(String content) {
+    public UIComponent setEscapedContent(String content) {
         this.content = content;
         this.rawContent = false;
+        return this;
     }
 
 

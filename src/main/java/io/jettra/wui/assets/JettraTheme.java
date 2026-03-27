@@ -299,6 +299,11 @@ public class JettraTheme {
              "}\n" +
              ".j-sync-actions button:first-child { background: var(--jettra-accent); color: #000; border: none; font-weight: bold; }\n" +
              ".j-sync-actions button:hover { transform: scale(1.05); filter: brightness(1.2); }\n" +
+             ".j-panel { margin-bottom: 20px; }\n" +
+             ".j-panel-column { display: flex; flex-direction: column; gap: 15px; min-height: 50px; }\n" +
+             ".j-tree { font-family: inherit; color: var(--jettra-text); }\n" +
+             ".j-tree-header:hover { background: rgba(0, 229, 255, 0.1); border-radius: 4px; }\n" +
+             ".j-tree-item { margin: 2px 0; }\n" +
              "</style>\n";
     }
     
@@ -432,6 +437,19 @@ public class JettraTheme {
             "    });\n" +
             "  }\n" +
             "});\n" +
-            "</script>\n";
+             "function toggleTreeItem(id) {\n" +
+             "  const item = document.getElementById(id);\n" +
+             "  if (!item) return;\n" +
+             "  const content = item.querySelector('.j-tree-content');\n" +
+             "  const toggle = item.querySelector('.j-tree-toggle');\n" +
+             "  if (content.style.display === 'none') {\n" +
+             "    content.style.display = 'block';\n" +
+             "    if (toggle) toggle.style.transform = 'rotate(90deg)';\n" +
+             "  } else {\n" +
+             "    content.style.display = 'none';\n" +
+             "    if (toggle) toggle.style.transform = 'rotate(0deg)';\n" +
+             "  }\n" +
+             "}\n" +
+             "</script>\n";
     }
 }
