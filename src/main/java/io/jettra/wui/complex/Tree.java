@@ -38,7 +38,8 @@ public class Tree extends Div {
             childrenContainer.addClass("j-tree-content");
             childrenContainer.setStyle("padding-left", "25px").setStyle("display", "none").setStyle("border-left", "1px solid rgba(0,255,255,0.1)");
             
-            this.add(header).add(childrenContainer);
+            super.add(header);
+            super.add(childrenContainer);
             
             String id = "tree-item-" + UUID.randomUUID().toString().substring(0, 8);
             this.setId(id);
@@ -62,7 +63,7 @@ public class Tree extends Div {
                     };
                 }
             """);
-            this.add(script);
+            super.add(script);
         }
 
         public TreeItem addItem(TreeItem item) {
