@@ -45,4 +45,14 @@ public class FolderSelector extends Div {
     public String getReferenceContent() {
         return referenceContent;
     }
+
+    private boolean excludeTarget = false;
+    public FolderSelector excludeTarget(boolean exclude) {
+        this.excludeTarget = exclude;
+        this.setProperty("data-exclude-target", String.valueOf(exclude));
+        return this;
+    }
+    public boolean isExcludeTarget() {
+        return excludeTarget;
+    }
 }
