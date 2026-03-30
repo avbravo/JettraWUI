@@ -129,12 +129,14 @@ public class FolderSelector extends Div {
                             "     var treeHtml = '<div style=\"max-height:250px; overflow-y:auto; text-align:left; background:rgba(0,0,0,0.4); padding:15px; border-radius:15px; border:1px solid rgba(0,255,255,0.2); margin:15px 0;\">';" +
                             "     for(var root in tree) treeHtml += renderNested(tree[root], root, 0);" +
                             "     treeHtml += '</div>';" +
+                            "     var displayMsg = '¿Quieres subir ' + files.length + ' archivos a este sitio web?';" +
                             "     if(window.show3DConfirm) {" +
-                            "       window.show3DConfirm(\"" + confirmTitle + "\", treeHtml, triggerChange);" +
-                            "     } else if(confirm(\"" + confirmMessage + "\")) {" +
+                            "       window.show3DConfirm(\"" + confirmTitle + "\", displayMsg + treeHtml, triggerChange);" +
+                            "     } else if(confirm(displayMsg)) {" +
                             "       triggerChange();" +
                             "     }" +
                             "   };" +
+
                             " })();" +
                             "</script>";
             return super.render() + script;

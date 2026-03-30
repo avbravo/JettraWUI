@@ -38,24 +38,47 @@ public class FileUpload extends Div {
         setupUploadLogic(id);
     }
 
+    private boolean confirmUpload = false;
+    private String confirmTitle = "Confirm Upload";
+
+    public FileUpload setConfirmUpload(boolean confirm, String title) {
+        this.confirmUpload = confirm;
+        if (title != null) this.confirmTitle = title;
+        return this;
+    }
+
     private void setupUploadLogic(String id) {
         // Simple JS to simulate/handle progress if possible via native fetch or XHR
         String js = "<script>" +
                     "(function() {" +
                     "  const btn = document.querySelector('#" + id + "').closest('.j-fileupload-container').querySelector('.j-btn-primary');" +
+                    "  const input = document.getElementById('" + id + "');" +
                     "  const pb = document.querySelector('#" + id + "').closest('.j-fileupload-container').querySelector('.j-progressbar-container');" +
                     "  const bar = pb.querySelector('.j-progressbar-fill');" +
-                    "  btn.addEventListener('click', () => {" +
+                    "  const lbl = pb.querySelector('.j-progressbar-label');" +
+                    "  " +
+                    "  function startProgress() {" +
                     "    pb.style.display = 'block';" +
                     "    let prog = 0;" +
                     "    const interval = setInterval(() => {" +
                     "      prog += 5;" +
                     "      bar.style.width = prog + '%';" +
+                    "      if(lbl) lbl.innerText = prog + '%';" +
                     "      if(prog >= 100) {" +
                     "        clearInterval(interval);" +
-                    "        setTimeout(() => pb.style.display = 'none', 1000);" +
+                    "        setTimeout(() => { pb.style.display = 'none'; bar.style.width='0%'; }, 1000);" +
                     "      }" +
                     "    }, 100);" +
+                    "  }" +
+                    "  " +
+                    "  btn.addEventListener('click', () => {" +
+                    "    if(!input.files || input.files.length === 0) return;" +
+                    "    if(" + confirmUpload + " && window.show3DConfirm) {" +
+                    "      const msg = '¿Quieres subir ' + input.files.length + ' archivos a este sitio web?';" +
+                    "      window.show3DConfirm('" + confirmTitle + "', msg, startProgress);" +
+                    "    } else {" +
+                    "      startProgress();" +
+                    "    }" +
                     "  });" +
                     "})();" +
                     "</script>";
@@ -66,6 +89,7 @@ public class FileUpload extends Div {
             }
         });
     }
+
 
 
     public FileUpload setMultiple(boolean multiple) {
