@@ -8,23 +8,65 @@ import io.jettra.wui.core.UIComponent;
 public class FileUpload extends Div {
     private UIComponent fileInput;
     private Button uploadBtn;
+    private ProgressBar progressBar;
 
     public FileUpload(String id) {
         super();
         this.addClass("j-fileupload-container");
-        this.setStyle("display", "flex").setStyle("gap", "10px").setStyle("align-items", "center");
+        this.setStyle("display", "flex").setStyle("flex-direction", "column").setStyle("gap", "10px");
+
+        Div controls = new Div();
+        controls.setStyle("display", "flex").setStyle("gap", "10px").setStyle("align-items", "center");
 
         this.fileInput = new UIComponent("input") {};
         this.fileInput.setProperty("type", "file");
         this.fileInput.setId(id);
         this.fileInput.addClass("j-input");
         this.fileInput.setStyle("margin-bottom", "0");
-        this.add(fileInput);
+        controls.add(fileInput);
 
         this.uploadBtn = new Button("Upload");
         this.uploadBtn.addClass("j-btn-primary");
-        this.add(uploadBtn);
+        controls.add(uploadBtn);
+        
+        this.add(controls);
+
+        this.progressBar = new ProgressBar();
+        this.progressBar.setStyle("display", "none").setStyle("margin-top", "5px");
+        this.add(progressBar);
+        
+        setupUploadLogic(id);
     }
+
+    private void setupUploadLogic(String id) {
+        // Simple JS to simulate/handle progress if possible via native fetch or XHR
+        String js = "<script>" +
+                    "(function() {" +
+                    "  const btn = document.querySelector('#" + id + "').closest('.j-fileupload-container').querySelector('.j-btn-primary');" +
+                    "  const pb = document.querySelector('#" + id + "').closest('.j-fileupload-container').querySelector('.j-progressbar-container');" +
+                    "  const bar = pb.querySelector('.j-progressbar-fill');" +
+                    "  btn.addEventListener('click', () => {" +
+                    "    pb.style.display = 'block';" +
+                    "    let prog = 0;" +
+                    "    const interval = setInterval(() => {" +
+                    "      prog += 5;" +
+                    "      bar.style.width = prog + '%';" +
+                    "      if(prog >= 100) {" +
+                    "        clearInterval(interval);" +
+                    "        setTimeout(() => pb.style.display = 'none', 1000);" +
+                    "      }" +
+                    "    }, 100);" +
+                    "  });" +
+                    "})();" +
+                    "</script>";
+        this.add(new UIComponent("div") {
+            @Override
+            public String render() {
+                return js;
+            }
+        });
+    }
+
 
     public FileUpload setMultiple(boolean multiple) {
         if (multiple) {

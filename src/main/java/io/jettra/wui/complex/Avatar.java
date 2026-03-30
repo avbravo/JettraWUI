@@ -9,9 +9,34 @@ public class Avatar extends UIComponent {
     public enum Shape { CIRCLE, ROUNDED }
     public enum Size { XS, SM, MD, LG, XL }
 
+    private String text;
+    private String icon;
+
     public Avatar() {
         super("div");
         addClass("j-avatar");
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public Avatar setText(String text) {
+        this.text = text;
+        this.addClass("j-avatar-label");
+        this.setContent(text);
+        return this;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public Avatar setIcon(String icon) {
+        this.icon = icon;
+        this.addClass("j-avatar-icon");
+        this.setContent(icon);
+        return this;
     }
 
     /**
@@ -32,8 +57,7 @@ public class Avatar extends UIComponent {
      */
     public static Avatar label(String text, String bgColor) {
         Avatar avatar = new Avatar();
-        avatar.addClass("j-avatar-label");
-        avatar.setContent(text);
+        avatar.setText(text);
         if (bgColor != null) avatar.setStyle("background-color", bgColor);
         return avatar;
     }
@@ -43,8 +67,7 @@ public class Avatar extends UIComponent {
      */
     public static Avatar icon(String iconContent) {
         Avatar avatar = new Avatar();
-        avatar.addClass("j-avatar-icon");
-        avatar.setContent(iconContent);
+        avatar.setIcon(iconContent);
         return avatar;
     }
 
@@ -70,3 +93,4 @@ public class Avatar extends UIComponent {
         return this;
     }
 }
+

@@ -62,6 +62,23 @@ public abstract class UIComponent {
         return this;
     }
 
+    public UIComponent removeClass(String className) {
+        if (properties.containsKey("class")) {
+            String classes = properties.get("class");
+            String[] parts = classes.split("\\s+");
+            StringBuilder sb = new StringBuilder();
+            for (String p : parts) {
+                if (!p.equals(className) && !p.isEmpty()) {
+                    if (sb.length() > 0) sb.append(" ");
+                    sb.append(p);
+                }
+            }
+            properties.put("class", sb.toString());
+        }
+        return this;
+    }
+
+
     public UIComponent add(UIComponent child) {
         children.add(child);
         return this;
