@@ -126,16 +126,41 @@ public class FolderSelector extends Div {
                             "       for(var key in node) if(key !== \"_files\") html += renderNested(node[key], key, depth+1);" +
                             "       return html;" +
                             "     }" +
-                            "     var treeHtml = '<div style=\"max-height:250px; overflow-y:auto; text-align:left; background:rgba(0,0,0,0.4); padding:15px; border-radius:15px; border:1px solid rgba(0,255,255,0.2); margin:15px 0;\">';" +
-                            "     for(var root in tree) treeHtml += renderNested(tree[root], root, 0);" +
-                            "     treeHtml += '</div>';" +
-                            "     var displayMsg = '¿Quieres subir ' + files.length + ' archivos a este sitio web?';" +
-                            "     if(window.show3DConfirm) {" +
-                            "       window.show3DConfirm(\"" + confirmTitle + "\", displayMsg + treeHtml, triggerChange);" +
-                            "     } else if(confirm(displayMsg)) {" +
-                            "       triggerChange();" +
-                            "     }" +
-                            "   };" +
+                                "     var treeHtml = '<div style=\"max-height:250px; overflow-y:auto; text-align:left; background:rgba(0,0,0,0.4); padding:15px; border-radius:15px; border:1px solid rgba(0,255,255,0.2); margin:15px 0;\">';" +
+                                "     for(var root in tree) treeHtml += renderNested(tree[root], root, 0);" +
+                                "     treeHtml += '</div>';" +
+                                "     var displayMsg = '¿Quieres subir ' + files.length + ' archivos a este sitio web?';" +
+                                "     var overlay = document.createElement('div');" +
+                                "     overlay.style.cssText = 'position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,10,0.8); backdrop-filter:blur(8px); display:flex; justify-content:center; align-items:center; z-index:99999; opacity:0; transition:opacity 0.3s ease; perspective:1000px;';" +
+                                "     var modal = document.createElement('div');" +
+                                "     modal.style.cssText = 'background:linear-gradient(135deg, rgba(20,35,55,0.95), rgba(10,15,30,0.95)); border:1px solid cyan; box-shadow:0 0 30px rgba(0,255,255,0.3), inset 0 0 20px rgba(0,255,255,0.1); border-radius:15px; padding:30px; width:450px; max-width:90%; color:white; font-family:sans-serif; transform:translateZ(-100px) rotateX(10deg); transition:transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);';" +
+                                "     modal.innerHTML = '<h3 style=\"margin-top:0; color:cyan; text-shadow:0 0 10px cyan; border-bottom:1px solid rgba(0,255,255,0.3); padding-bottom:10px;\">" + confirmTitle + "</h3>' + " +
+                                "                       '<p style=\"font-size:16px; margin:20px 0;\">' + displayMsg + '</p>' + " +
+                                "                       treeHtml + " +
+                                "                       '<div style=\"display:flex; justify-content:flex-end; gap:15px; margin-top:25px;\">' + " +
+                                "                         '<button id=\"btnCancel\" style=\"background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.2); color:white; padding:10px 20px; border-radius:5px; cursor:pointer; transition:all 0.2s;\" onmouseover=\"this.style.background=\\'rgba(255,255,255,0.1)\\'\" onmouseout=\"this.style.background=\\'rgba(255,255,255,0.05)\\'\">Cancelar</button>' + " +
+                                "                         '<button id=\"btnConfirm\" style=\"background:rgba(0,255,255,0.2); border:1px solid cyan; color:cyan; box-shadow:0 0 10px rgba(0,255,255,0.4); padding:10px 20px; border-radius:5px; cursor:pointer; font-weight:bold; transition:all 0.2s;\" onmouseover=\"this.style.background=\\'rgba(0,255,255,0.4)\\';this.style.boxShadow=\\'0 0 20px cyan\\'\" onmouseout=\"this.style.background=\\'rgba(0,255,255,0.2)\\';this.style.boxShadow=\\'0 0 10px rgba(0,255,255,0.4)\\'\">Subir Archivos</button>' + " +
+                                "                       '</div>';" +
+                                "     overlay.appendChild(modal);" +
+                                "     document.body.appendChild(overlay);" +
+                                "     requestAnimationFrame(() => {" +
+                                "       overlay.style.opacity = '1';" +
+                                "       modal.style.transform = 'translateZ(0) rotateX(0)';" +
+                                "     });" +
+                                "     var closeDialog = function() {" +
+                                "       overlay.style.opacity = '0';" +
+                                "       modal.style.transform = 'translateZ(-100px) rotateX(-10deg)';" +
+                                "       setTimeout(() => overlay.remove(), 300);" +
+                                "     };" +
+                                "     modal.querySelector('#btnCancel').onclick = function() {" +
+                                "       closeDialog();" +
+                                "       input.value = '';" +
+                                "     };" +
+                                "     modal.querySelector('#btnConfirm').onclick = function() {" +
+                                "       closeDialog();" +
+                                "       triggerChange();" +
+                                "     };" +
+                                "   };" +
 
                             " })();" +
                             "</script>";

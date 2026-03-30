@@ -73,3 +73,9 @@ The component uses global CSS classes:
 - `.j-avatar-circle`, `.j-avatar-rounded`: Shapes.
 - `.j-avatar-badge`: Positioning for the status badge.
 - `.j-avatar-group`: Negative margin and overlap effect on hover.
+
+
+# Listado de Iconos Unicode
+[https://marabelia.com/simbolos-web/](https://marabelia.com/simbolos-web/)
+
+Puedes copiar y pegarlos directamente.
