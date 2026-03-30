@@ -122,6 +122,17 @@ public abstract class UIComponent {
         return styles;
     }
 
+    protected String update = "";
+
+    public UIComponent setUpdate(String ids) {
+        this.update = ids;
+        return this;
+    }
+
+    public String getUpdate() {
+        return update;
+    }
+
     public String getTag() {
         return tag;
     }
@@ -129,6 +140,10 @@ public abstract class UIComponent {
     public String render() {
         StringBuilder builder = new StringBuilder();
         builder.append("<").append(tag);
+        
+        if (!update.isEmpty()) {
+            properties.put("data-update", update);
+        }
         
         // Ensure class property carries default styling logic
         if (!initialClasses.isEmpty() && !properties.containsKey("class")) {

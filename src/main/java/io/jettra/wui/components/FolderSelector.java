@@ -88,13 +88,25 @@ public class FolderSelector extends Div {
                             "   var triggerChange = function() { " + (originalOnChange != null ? originalOnChange : "") + " };" +
                             "   input.onchange = function(e) {" +
                             "     var files = e.target.files;" +
-                            "     var treeHtml = '<div style=\"max-height:200px; overflow-y:auto; text-align:left; background:rgba(0,0,0,0.3); padding:10px; border-radius:8px; margin:10px 0; font-family:monospace; font-size:12px;\">';" +
                             "     var tree = {};" +
-                            "     for(var i=0; i<Math.min(files.length, 50); i++) {" +
+                            "     for(var i=0; i<files.length; i++) {" +
                             "       var path = files[i].webkitRelativePath || files[i].name;" +
-                            "       treeHtml += '<div>📄 ' + path + '</div>';" +
+                            "       var parts = path.split('/');" +
+                            "       var curr = tree;" +
+                            "       for(var j=0; j<parts.length; j++) {" +
+                            "         var part = parts[j];" +
+                            "         if(!curr[part]) curr[part] = { _files: [] };" +
+                            "         curr = curr[part];" +
+                            "       }" +
                             "     }" +
-                            "     if(files.length > 50) treeHtml += '<div>... and ' + (files.length-50) + ' more files</div>';" +
+                            "     function renderNested(node, name, depth) {" +
+                            "       var html = '<div style=\"padding-left:' + (depth*15) + 'px; color:var(--jettra-accent); font-size:13px; line-height:1.5;\">';" +
+                            "       html += (Object.keys(node).length > 0 ? '📂 ' : '📄 ') + name + '</div>';" +
+                            "       for(var key in node) if(key !== \"_files\") html += renderNested(node[key], key, depth+1);" +
+                            "       return html;" +
+                            "     }" +
+                            "     var treeHtml = '<div style=\"max-height:250px; overflow-y:auto; text-align:left; background:rgba(0,0,0,0.4); padding:15px; border-radius:15px; border:1px solid rgba(0,255,255,0.2); margin:15px 0;\">';" +
+                            "     for(var root in tree) treeHtml += renderNested(tree[root], root, 0);" +
                             "     treeHtml += '</div>';" +
                             "     if(window.show3DConfirm) {" +
                             "       window.show3DConfirm('" + confirmTitle + "', treeHtml, triggerChange);" +
@@ -102,6 +114,7 @@ public class FolderSelector extends Div {
                             "       triggerChange();" +
                             "     }" +
                             "   };" +
+
                             " })();" +
                             "</script>";
             return super.render() + script;
