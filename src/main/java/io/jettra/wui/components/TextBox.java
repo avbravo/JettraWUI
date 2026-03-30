@@ -15,4 +15,10 @@ public class TextBox extends UIComponent {
         setProperty("value", value);
         return this;
     }
+
+    @Override
+    public TextBox setUpdate(String ids) {
+        super.setUpdate(ids);
+        return this;
+    }
 }

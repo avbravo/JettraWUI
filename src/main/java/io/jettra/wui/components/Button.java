@@ -12,6 +12,12 @@ public class Button extends UIComponent {
         return this;
     }
 
+    @Override
+    public Button setUpdate(String ids) {
+        super.setUpdate(ids);
+        return this;
+    }
+
     public Button addClass(String className) {
         super.addClass(className);
         return this;

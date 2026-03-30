@@ -10,7 +10,57 @@ public class Tree extends Div {
         super();
         this.addClass("j-tree");
         this.setStyle("font-family", "inherit").setStyle("color", "var(--jettra-text)");
+        
+        // Add global updateTree helper
+        this.add(new io.jettra.wui.components.Script("""
+            if (typeof jtUpdateTree === 'undefined') {
+                window.jtUpdateTree = function(targetId, files) {
+                    const target = document.getElementById(targetId);
+                    if (!target) return;
+                    
+                    const treeData = {};
+                    for (let i = 0; i < files.length; i++) {
+                        const path = files[i].webkitRelativePath || files[i].name;
+                        const parts = path.split('/');
+                        let curr = treeData;
+                        for (let j = 0; j < parts.length; j++) {
+                            const part = parts[j];
+                            if (!curr[part]) curr[part] = {};
+                            curr = curr[part];
+                        }
+                    }
+
+                    function renderToTree(node, name) {
+                        const keys = Object.keys(node);
+                        const isFile = keys.length === 0;
+                        const id = 'js-tree-' + Math.random().toString(36).substring(2, 9);
+                        
+                        let html = `
+                            <div class="j-tree-item" id="${id}">
+                                <div class="j-tree-header" style="display:flex; align-items:center; cursor:pointer; padding:5px; transition:all 0.2s; border-radius:4px" onclick="window.toggleTreeItem('${id}')">
+                                    <span class="j-tree-toggle" style="margin-right:8px; transition:transform 0.2s; width:16px; display:inline-block; font-size:10px; color:var(--jettra-accent); ${isFile ? 'opacity:0' : ''}">▶</span>
+                                    <span style="font-size:13px">${isFile ? '📄' : '📂'} ${name}</span>
+                                </div>
+                                <div class="j-tree-content" style="padding-left:25px; display:none; border-left:1px solid rgba(0,255,255,0.1)">
+                        `;
+                        
+                        for (const key of keys) {
+                            html += renderToTree(node[key], key);
+                        }
+                        html += `</div></div>`;
+                        return html;
+                    }
+
+                    let finalHtml = "";
+                    for (const root in treeData) {
+                        finalHtml += renderToTree(treeData[root], root);
+                    }
+                    target.innerHTML = finalHtml;
+                };
+            }
+        """));
     }
+
 
     public static class TreeItem extends Div {
         private Div childrenContainer;

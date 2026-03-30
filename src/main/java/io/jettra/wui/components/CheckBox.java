@@ -11,4 +11,11 @@ public class CheckBox extends UIComponent {
         this.setStyle("margin-right", "8px");
         this.setStyle("accent-color", "var(--jettra-accent)");
     }
+
+    @Override
+    public CheckBox setUpdate(String ids) {
+        super.setUpdate(ids);
+        return this;
+    }
+
 }
