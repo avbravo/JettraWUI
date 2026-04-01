@@ -1,10 +1,28 @@
 package io.jettra.wui.components;
 import io.jettra.wui.core.UIComponent;
 public class Button extends UIComponent {
+    private String text = "";
+    private String icon = "";
+
     public Button(String text) {
         super("button");
-        setContent(text);
+        this.text = text;
+        updateContent();
         this.initialClasses = "j-btn";
+    }
+
+    private void updateContent() {
+        if (icon != null && !icon.isEmpty()) {
+            setContent("<span class=\"j-btn-icon\">" + icon + "</span> " + text);
+        } else {
+            setContent(text);
+        }
+    }
+
+    public Button setIcon(String icon) {
+        this.icon = icon;
+        updateContent();
+        return this;
     }
 
     public Button id(String id) {

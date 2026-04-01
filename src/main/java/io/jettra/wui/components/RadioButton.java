@@ -11,4 +11,13 @@ public class RadioButton extends UIComponent {
         this.setStyle("margin-right", "8px");
         this.setStyle("accent-color", "var(--jettra-accent)");
     }
+
+    public RadioButton(String id, String value) {
+        super("input");
+        setProperty("type", "radio");
+        setProperty("id", id);
+        setProperty("value", value);
+        this.setStyle("margin-right", "8px");
+        this.setStyle("accent-color", "var(--jettra-accent)");
+    }
 }
