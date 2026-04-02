@@ -15,10 +15,24 @@ public class RadioGroupButton extends UIComponent {
     }
 
     public RadioGroupButton addRadio(UIComponent radioWrapperOrButton) {
-        // We can just add it, and assume the developer set the name properly or we find all RadioButtons inside
-        // For simplicity we just add the component and let the property handle itself, or we recursively find it?
-        // Let's just add it.
+        String groupName = this.getProperties().get("name");
+        if (groupName != null && !groupName.isEmpty()) {
+            setRadioNameRecursively(radioWrapperOrButton, groupName);
+        }
         add(radioWrapperOrButton);
         return this;
+    }
+
+    private void setRadioNameRecursively(UIComponent component, String groupName) {
+        if (component instanceof RadioButton) {
+            component.setProperty("name", groupName);
+        }
+        if (component.getChildren() != null) {
+            for (UIComponent child : component.getChildren()) {
+                if (child != null) {
+                    setRadioNameRecursively(child, groupName);
+                }
+            }
+        }
     }
 }
