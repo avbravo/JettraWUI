@@ -19,3 +19,5 @@ schedule.setValue("2026-04-10T15:30:00");
 - `setMin(String min)`: Sets the minimum datetime allowed.
 - `setMax(String max)`: Sets the maximum datetime allowed.
 - `setUpdate(String ids)`: Binds a visual update event when the time is modified.
+- `setShowTimeRemaining(boolean show)`: If true, it displays a real-time countdown next to the component remaining until the event triggers.
+- `setOnTimeReached(String script)`: Specifies custom Javascript to execute automatically when the time mathematically reaches zero.

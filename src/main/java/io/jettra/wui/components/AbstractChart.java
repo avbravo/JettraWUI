@@ -57,24 +57,11 @@ public abstract class AbstractChart extends UIComponent {
         StringBuilder js = new StringBuilder();
         String safeId = this.chartId.replaceAll("-", "_");
         
+        // Chart.js Extension (Offline Load)
+        js.append(ChartJSExtension.getInlineScript());
+        
         js.append("<script>\n");
-        js.append("if (typeof Chart === 'undefined') {\n");
-        js.append("  if (!window.jettraChartJsLoading) {\n");
-        js.append("    window.jettraChartJsLoading = true;\n");
-        js.append("    var s = document.createElement('script');\n");
-        js.append("    s.src = 'https://cdn.jsdelivr.net/npm/chart.js';\n");
-        js.append("    s.onload = function() {\n");
-        js.append("       window.jettraChartJsLoaded = true;\n");
-        js.append("       document.dispatchEvent(new Event('ChartJsLoaded'));\n");
-        js.append("       jettraInitChart_").append(safeId).append("();\n");
-        js.append("    };\n");
-        js.append("    document.head.appendChild(s);\n");
-        js.append("  } else {\n");
-        js.append("    document.addEventListener('ChartJsLoaded', function() { jettraInitChart_").append(safeId).append("(); });\n");
-        js.append("  }\n");
-        js.append("} else {\n");
-        js.append("  setTimeout(function() { jettraInitChart_").append(safeId).append("(); }, 100);\n");
-        js.append("}\n\n");
+        js.append("setTimeout(function() { jettraInitChart_").append(safeId).append("(); }, 100);\n");
         
         js.append("function jettraInitChart_").append(safeId).append("() {\n");
         js.append("  var el = document.getElementById('").append(this.chartId).append("');\n");
