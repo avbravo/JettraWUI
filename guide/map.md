@@ -17,6 +17,16 @@ locationMap.setCenter(40.7128, -74.0060, 13); // Nueva York
 locationMap.setMarker("JettraStack Headquarters");
 ```
 
+### Opciones Avanzadas
+El componente `Map` también permite la gestión de eventos de click, múltiples marcadores (waypoints), ruteos y búsquedas geocodificadas:
+
+```java
+locationMap.setEnableSearch(true); // Activa un pequeño widget de búsqueda en el mapa
+locationMap.addWaypoint(40.7308, -73.9973, "Washington Square Park"); // Añade un marcador
+locationMap.addRoute(40.7128, -74.0060, 40.7308, -73.9973); // Dibuja una línea de ruta
+locationMap.setOnMapClick("alert('Map clicked at: ' + lat + ', ' + lng);"); // Evento JS nativo
+```
+
 ### Personalización
 Puede modificar libremente las propiedades nativas de estilo, tales como las proporciones del div del mapa:
 ```java

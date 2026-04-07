@@ -41,6 +41,27 @@ public class Time extends UIComponent {
         getChildren().get(getChildren().size() - 1).setProperty("value", time);
         return this;
     }
+
+    public Time setEditable(boolean editable) {
+        if (!editable) {
+            getChildren().get(getChildren().size() - 1).setProperty("readonly", "readonly");
+            getChildren().get(getChildren().size() - 1).setStyle("background-color", "rgba(255,255,255,0.05)");
+        } else {
+            getChildren().get(getChildren().size() - 1).getProperties().remove("readonly");
+            getChildren().get(getChildren().size() - 1).getStyles().remove("background-color");
+        }
+        return this;
+    }
+
+    public Time setType(String type) {
+        getChildren().get(getChildren().size() - 1).setProperty("type", type);
+        return this;
+    }
+
+    public Time setFormat(String format) {
+        getChildren().get(getChildren().size() - 1).setProperty("data-format", format);
+        return this;
+    }
     
     public Time setOnChange(String jsFunction) {
         getChildren().get(getChildren().size() - 1).setProperty("onchange", jsFunction);

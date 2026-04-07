@@ -18,7 +18,11 @@ public class Schedule extends UIComponent {
     }
     
     public void addEvent(String title, String day, String startTime) {
-        events.add(new Event(title, day, startTime));
+        events.add(new Event(title, day, startTime, ""));
+    }
+
+    public void addEvent(String title, String day, String startTime, String onClickJs) {
+        events.add(new Event(title, day, startTime, onClickJs));
     }
     
     @Override
@@ -49,7 +53,9 @@ public class Schedule extends UIComponent {
                 // Add events for this slot
                 for(Event e : events) {
                     if (e.day.equalsIgnoreCase(days[d]) && e.startTime.startsWith(h+":")) {
-                        html.append("<div style='background:var(--jettra-accent); color:#fff; font-size:0.7rem; padding:2px 4px; margin:2px; border-radius:3px; cursor:pointer;'>")
+                        html.append("<div style='background:var(--jettra-accent); color:#fff; font-size:0.7rem; padding:2px 4px; margin:2px; border-radius:3px; cursor:pointer;' ")
+                            .append(e.onClickJs.isEmpty() ? "" : "onclick=\"" + e.onClickJs.replace("\"", "&quot;") + "\" ")
+                            .append(">")
                             .append(e.title).append("</div>");
                     }
                 }
@@ -64,9 +70,9 @@ public class Schedule extends UIComponent {
     }
     
     private static class Event {
-        String title, day, startTime;
-        Event(String title, String day, String startTime) {
-            this.title = title; this.day = day; this.startTime = startTime;
+        String title, day, startTime, onClickJs;
+        Event(String title, String day, String startTime, String onClickJs) {
+            this.title = title; this.day = day; this.startTime = startTime; this.onClickJs = onClickJs;
         }
     }
 }

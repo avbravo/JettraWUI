@@ -58,7 +58,9 @@ public class Organigram extends UIComponent {
         sb.append("<div class='org-node' ").append(isRoot ? "style='padding-top:0'" : "").append(">");
         
         // The Box
-        sb.append("<div class='org-box'>")
+        sb.append("<div class='org-box' ")
+          .append(n.onClickJs != null && !n.onClickJs.isEmpty() ? "style='cursor:pointer;' onclick=\"" + n.onClickJs.replace("\"", "&quot;") + "\"" : "")
+          .append(">")
           .append("<div style='font-weight:bold; color:var(--jettra-accent);'>").append(n.title).append("</div>")
           .append("<div style='font-size:0.8rem; color:var(--jettra-text);'>").append(n.subtitle).append("</div>")
           .append("</div>");
@@ -77,15 +79,25 @@ public class Organigram extends UIComponent {
     }
     
     public static class OrgNode {
-        public String title, subtitle;
+        public String title, subtitle, onClickJs;
         public List<OrgNode> children = new ArrayList<>();
         
         public OrgNode(String title, String subtitle) {
-            this.title = title; this.subtitle = subtitle;
+            this.title = title; this.subtitle = subtitle; this.onClickJs = "";
+        }
+
+        public OrgNode(String title, String subtitle, String onClickJs) {
+            this.title = title; this.subtitle = subtitle; this.onClickJs = onClickJs;
         }
         
         public OrgNode addChild(String t, String s) {
             OrgNode child = new OrgNode(t, s);
+            this.children.add(child);
+            return child;
+        }
+
+        public OrgNode addChild(String t, String s, String onClickJs) {
+            OrgNode child = new OrgNode(t, s, onClickJs);
             this.children.add(child);
             return child;
         }
