@@ -60,10 +60,9 @@ public class BarCode extends UIComponent {
     public String render() {
         StringBuilder js = new StringBuilder();
         
-        js.append("<script src=\"https://cdn.jsdelivr.net/npm/jsbarcode@3.11.0/dist/JsBarcode.all.min.js\"></script>\n");
         js.append("<script>\n");
-        js.append("document.addEventListener('DOMContentLoaded', function() {\n");
-        js.append("  setTimeout(function() {\n");
+        js.append("(function() {\n");
+        js.append("  function renderBc() {\n");
         js.append("    var el = document.getElementById('").append(bcId).append("');\n");
         js.append("    if(!el) return;\n");
         js.append("    try { \n");
@@ -76,8 +75,22 @@ public class BarCode extends UIComponent {
         js.append("        displayValue: ").append(displayValue).append("\n");
         js.append("      });\n");
         js.append("    } catch(e) { console.error('Error generating Barcode: ', e); }\n");
-        js.append("  }, 150);\n");
-        js.append("});\n");
+        js.append("  }\n");
+        js.append("  if (typeof JsBarcode === 'undefined') {\n");
+        js.append("    if (!document.getElementById('jsbarcode-lib')) {\n");
+        js.append("      var s = document.createElement('script');\n");
+        js.append("      s.id = 'jsbarcode-lib';\n");
+        js.append("      s.src = 'https://cdn.jsdelivr.net/npm/jsbarcode@3.11.0/dist/JsBarcode.all.min.js';\n");
+        js.append("      document.head.appendChild(s);\n");
+        js.append("    }\n");
+        js.append("    var checkInterval = setInterval(function() {\n");
+        js.append("      if (typeof JsBarcode !== 'undefined') {\n");
+        js.append("        clearInterval(checkInterval);\n");
+        js.append("        renderBc();\n");
+        js.append("      }\n");
+        js.append("    }, 50);\n");
+        js.append("  } else { renderBc(); }\n");
+        js.append("})();\n");
         js.append("</script>\n");
         
         return super.render() + js.toString();
