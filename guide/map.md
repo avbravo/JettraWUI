@@ -22,9 +22,10 @@ El componente `Map` también permite la gestión de eventos de click, múltiples
 
 ```java
 locationMap.setEnableSearch(true); // Activa un pequeño widget de búsqueda en el mapa
+locationMap.setEnableRelief(true); // Añade un selector de capas para alternar relieve (Topografía)
 locationMap.addWaypoint(40.7308, -73.9973, "Washington Square Park"); // Añade un marcador
 locationMap.addRoute(40.7128, -74.0060, 40.7308, -73.9973); // Dibuja una línea de ruta
-locationMap.setOnMapClick("alert('Map clicked at: ' + lat + ', ' + lng);"); // Evento JS nativo
+locationMap.setOnMapClick("L.marker([lat, lng]).addTo(window['map_' + this.id]); alert('Marcador: ' + lat + ', ' + lng);"); // Añadir marcadores al hacer clic
 ```
 
 ### Personalización

@@ -10,6 +10,7 @@ public class Map extends UIComponent {
     private String markerTitle = "Location";
     private String onClickJs = "";
     private boolean enableSearch = false;
+    private boolean enableRelief = false;
     private java.util.List<Waypoint> waypoints = new java.util.ArrayList<>();
     private java.util.List<Route> routes = new java.util.ArrayList<>();
 
@@ -58,6 +59,11 @@ public class Map extends UIComponent {
         return this;
     }
 
+    public Map setEnableRelief(boolean relief) {
+        this.enableRelief = relief;
+        return this;
+    }
+
     @Override
     public String render() {
         StringBuilder js = new StringBuilder();
@@ -86,9 +92,13 @@ public class Map extends UIComponent {
 
         js.append("     var map = L.map('").append(mapId).append("').setView([").append(lat).append(", ").append(lng).append("], ").append(zoom).append(");\n");
         js.append("     window['map_").append(mapId).append("'] = map;\n");
-        js.append("     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {\n");
-        js.append("         attribution: '&copy; OpenStreetMap contributors'\n");
-        js.append("     }).addTo(map);\n");
+        js.append("     var streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors' });\n");
+        js.append("     streetLayer.addTo(map);\n");
+        
+        if (enableRelief) {
+            js.append("     var reliefLayer = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { attribution: 'Map data: &copy; OpenStreetMap contributors, SRTM | Map style: &copy; OpenTopoMap (CC-BY-SA)' });\n");
+            js.append("     L.control.layers({'Streets': streetLayer, 'Relief': reliefLayer}).addTo(map);\n");
+        }
         
         js.append("     delete L.Icon.Default.prototype._getIconUrl;\n");
         js.append("     L.Icon.Default.mergeOptions({\n");
