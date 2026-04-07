@@ -8,6 +8,8 @@ El componente `Time` permite seleccionar horas y minutos utilizando el control d
 
 ### Uso Básico
 
+### Uso Básico
+
 ```java
 import io.jettra.wui.components.Time;
 
@@ -15,4 +17,11 @@ Time tp = new Time("hora_inicio", "Hora de Inicio");
 tp.setValue("14:30");
 tp.setMin("09:00");
 tp.setMax("18:00");
+tp.setMilitaryFormat(true); // Fija el formato de 24 horas (Militar)
+```
+
+Para establecer el formato normal o AM/PM (formato de 12 horas), utiliza:
+```java
+tp.setNormalFormat();
+// o alternativamente: tp.setMilitaryFormat(false);
 ```

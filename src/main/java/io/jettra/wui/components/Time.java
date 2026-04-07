@@ -58,6 +58,19 @@ public class Time extends UIComponent {
         return this;
     }
 
+    public Time setMilitaryFormat(boolean military) {
+        if (military) {
+            getChildren().get(getChildren().size() - 1).setProperty("lang", "en-GB");
+        } else {
+            getChildren().get(getChildren().size() - 1).setProperty("lang", "en-US");
+        }
+        return this;
+    }
+
+    public Time setNormalFormat() {
+        return setMilitaryFormat(false);
+    }
+
     public Time setFormat(String format) {
         getChildren().get(getChildren().size() - 1).setProperty("data-format", format);
         return this;
