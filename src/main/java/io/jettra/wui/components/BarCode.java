@@ -16,9 +16,8 @@ public class BarCode extends UIComponent {
     private String bcId;
 
     public BarCode(String id) {
-        super("svg"); // JsBarcode optimally works on SVG or Canvas (using SVG here for scalable crispness)
+        super("div"); // Wrapper div
         this.bcId = id;
-        setProperty("id", id);
     }
 
     public BarCode setText(String text) {
@@ -60,12 +59,15 @@ public class BarCode extends UIComponent {
     public String render() {
         StringBuilder js = new StringBuilder();
         
+        js.append("<svg id=\"").append(bcId).append("\"></svg>\n");
         js.append("<script>\n");
         js.append("(function() {\n");
         js.append("  function renderBc() {\n");
-        js.append("    var el = document.getElementById('").append(bcId).append("');\n");
-        js.append("    if(!el) return;\n");
-        js.append("    try { \n");
+        js.append("    var checkDom = setInterval(function() {\n");
+        js.append("      var el = document.getElementById('").append(bcId).append("');\n");
+        js.append("      if(el) {\n");
+        js.append("        clearInterval(checkDom);\n");
+        js.append("        try { \n");
         js.append("      JsBarcode(el, \"").append(text.replace("\"", "\\\"")).append("\", {\n");
         js.append("        format: \"").append(format).append("\",\n");
         js.append("        width: ").append(width).append(",\n");
@@ -74,13 +76,16 @@ public class BarCode extends UIComponent {
         js.append("        background: \"").append(background).append("\",\n");
         js.append("        displayValue: ").append(displayValue).append("\n");
         js.append("      });\n");
-        js.append("    } catch(e) { console.error('Error generating Barcode: ', e); }\n");
+        js.append("        } catch(e) { console.error('Error generating Barcode: ', e); }\n");
+        js.append("      }\n");
+        js.append("    }, 100);\n");
         js.append("  }\n");
         js.append("  if (typeof JsBarcode === 'undefined') {\n");
         js.append("    if (!document.getElementById('jsbarcode-lib')) {\n");
         js.append("      var s = document.createElement('script');\n");
         js.append("      s.id = 'jsbarcode-lib';\n");
-        js.append("      s.src = 'https://cdn.jsdelivr.net/npm/jsbarcode@3.11.0/dist/JsBarcode.all.min.js';\n");
+        js.append("      s.innerText = ");
+        js.append("\"").append(BarCodeExtension.JS_CODE.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "")).append("\";\n");
         js.append("      document.head.appendChild(s);\n");
         js.append("    }\n");
         js.append("    var checkInterval = setInterval(function() {\n");
@@ -93,6 +98,7 @@ public class BarCode extends UIComponent {
         js.append("})();\n");
         js.append("</script>\n");
         
-        return super.render() + js.toString();
+        setContent(js.toString());
+        return super.render();
     }
 }
