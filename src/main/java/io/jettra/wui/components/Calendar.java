@@ -60,7 +60,7 @@ public class Calendar extends UIComponent {
         html.append("      calHtml += \"  <select class='j-input' style='background:transparent; border:none; color:var(--jettra-accent); width:auto;' onchange='\"+apiName+\".setMonth(this.value)'>\";\n");
         html.append("      for(var i=0; i<12; i++) { calHtml += \"<option style='color:#000' value='\"+i+\"' \"+(i===month?'selected':'')+\">\"+monthNames[i]+\"</option>\"; }\n");
         html.append("      calHtml += \"  </select>\";\n");
-        html.append("      calHtml += \"  <input type='number' class='j-input' style='background:transparent; border:none; color:var(--jettra-accent); width:60px;' value='\"+year+\"' onchange='\"+apiName+\".setYear(this.value)'>\";\n");
+        html.append("      calHtml += \"  <input type='number' class='j-input' style='background:transparent; border:none; color:var(--jettra-accent); width:80px;' value='\"+year+\"' onchange='\"+apiName+\".setYear(this.value)'>\";\n");
         html.append("      calHtml += \"  <button type='button' class='j-btn' style='padding:2px 8px;' onclick='\"+apiName+\".nextMonth()'>&gt;</button>\";\n");
         html.append("      calHtml += \"</div>\";\n");
         

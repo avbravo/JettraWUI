@@ -89,7 +89,7 @@ public class BarCode extends UIComponent {
         js.append("        renderBc();\n");
         js.append("      }\n");
         js.append("    }, 50);\n");
-        js.append("  } else { renderBc(); }\n");
+        js.append("  } else { setTimeout(renderBc, 100); }\n");
         js.append("})();\n");
         js.append("</script>\n");
         
