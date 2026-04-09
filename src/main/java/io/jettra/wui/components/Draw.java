@@ -56,20 +56,28 @@ public class Draw extends UIComponent {
             "    }" +
             "    " +
             "    const App = () => {" +
+            "      const [excalidrawAPI, setExcalidrawAPI] = React.useState(null);" +
+            "      React.useEffect(() => {" +
+            "        if(excalidrawAPI) window['excalidrawAPI_" + this.containerId + "'] = excalidrawAPI;" +
+            "      }, [excalidrawAPI]);" +
+            "      " +
             "      return React.createElement(" +
             "        React.Fragment," +
             "        null," +
             "        React.createElement(" +
             "          'div'," +
             "          { style: { height: '100%', width: '100%' } }," +
-            "          React.createElement(ExcalidrawLib.Excalidraw, { key: '" + this.containerId + "_exc' })" +
+            "          React.createElement(ExcalidrawLib.Excalidraw, { " +
+            "             key: '" + this.containerId + "_exc', " +
+            "             excalidrawAPI: setExcalidrawAPI " +
+            "          })" +
             "        )" +
             "      );" +
             "    };" +
             "    " +
             "    const root = ReactDOM.createRoot(container);" +
             "    root.render(React.createElement(App));" +
-            "  }, 1000);" + // slight delay to ensure scripts loaded completely if network is slow
+            "  }, 1000);" +
             "});"
         );
         return script;

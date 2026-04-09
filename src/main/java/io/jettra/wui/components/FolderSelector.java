@@ -18,12 +18,16 @@ public class FolderSelector extends Div {
 
         this.folderInput = new UIComponent("input") {};
         this.folderInput.setProperty("type", "file");
-        this.folderInput.setProperty("webkitdirectory", "");
-        this.folderInput.setProperty("directory", "");
+        this.folderInput.setProperty("webkitdirectory", "true"); // Fixed: should be string "true" or empty
+        this.folderInput.setProperty("directory", "true");
         this.folderInput.setId(id + "_input");
         this.folderInput.addClass("j-input");
         this.folderInput.setStyle("margin-bottom", "0");
         this.add(folderInput);
+    }
+
+    public UIComponent getFolderInput() {
+        return folderInput;
     }
 
     public FolderSelector setReferenceLocation(String location) {
@@ -129,12 +133,12 @@ public class FolderSelector extends Div {
                                 "     var treeHtml = '<div style=\"max-height:250px; overflow-y:auto; text-align:left; background:rgba(0,0,0,0.4); padding:15px; border-radius:15px; border:1px solid rgba(0,255,255,0.2); margin:15px 0;\">';" +
                                 "     for(var root in tree) treeHtml += renderNested(tree[root], root, 0);" +
                                 "     treeHtml += '</div>';" +
-                                "     var displayMsg = '¿Quieres subir ' + files.length + ' archivos a este sitio web?';" +
+                                "     var displayMsg = '" + confirmMessage + "';" +
                                 "     var overlay = document.createElement('div');" +
-                                "     overlay.style.cssText = 'position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,10,0.8); backdrop-filter:blur(8px); display:flex; justify-content:center; align-items:center; z-index:99999; opacity:0; transition:opacity 0.3s ease; perspective:1000px;';" +
+                                "     overlay.style.cssText = 'position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,10,0.8); backdrop-filter:blur(8px); display:flex; justify-content:center; align-items:center; z-index:99999; opacity:0; transition:opacity 0.3s ease;';" +
                                 "     var modal = document.createElement('div');" +
-                                "     modal.style.cssText = 'background:linear-gradient(135deg, rgba(20,35,55,0.95), rgba(10,15,30,0.95)); border:1px solid cyan; box-shadow:0 0 30px rgba(0,255,255,0.3), inset 0 0 20px rgba(0,255,255,0.1); border-radius:15px; padding:30px; width:450px; max-width:90%; color:white; font-family:sans-serif; transform:translateZ(-100px) rotateX(10deg); transition:transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);';" +
-                                "     modal.innerHTML = '<h3 style=\"margin-top:0; color:cyan; text-shadow:0 0 10px cyan; border-bottom:1px solid rgba(0,255,255,0.3); padding-bottom:10px;\">" + confirmTitle + "</h3>' + " +
+                                "     modal.style.cssText = 'background:#1e293b; border:1px solid cyan; box-shadow:0 25px 50px rgba(0,0,0,0.5); border-radius:12px; padding:25px; width:450px; max-width:90%; color:white; font-family:sans-serif; transform:scale(0.9); transition:transform 0.3s ease;';" +
+                                "     modal.innerHTML = '<h3 style=\"margin-top:0; color:cyan; border-bottom:1px solid rgba(0,255,255,0.3); padding-bottom:10px;\">" + confirmTitle + "</h3>' + " +
                                 "                       '<p style=\"font-size:16px; margin:20px 0;\">' + displayMsg + '</p>' + " +
                                 "                       treeHtml + " +
                                 "                       '<div style=\"display:flex; justify-content:flex-end; gap:15px; margin-top:25px;\">' + " +
@@ -145,11 +149,11 @@ public class FolderSelector extends Div {
                                 "     document.body.appendChild(overlay);" +
                                 "     requestAnimationFrame(() => {" +
                                 "       overlay.style.opacity = '1';" +
-                                "       modal.style.transform = 'translateZ(0) rotateX(0)';" +
+                                "       modal.style.transform = 'scale(1)';" +
                                 "     });" +
                                 "     var closeDialog = function() {" +
                                 "       overlay.style.opacity = '0';" +
-                                "       modal.style.transform = 'translateZ(-100px) rotateX(-10deg)';" +
+                                "       modal.style.transform = 'scale(0.9)';" +
                                 "       setTimeout(() => overlay.remove(), 300);" +
                                 "     };" +
                                 "     modal.querySelector('#btnCancel').onclick = function() {" +

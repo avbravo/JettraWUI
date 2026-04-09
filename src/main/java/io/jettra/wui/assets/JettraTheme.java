@@ -1,6 +1,10 @@
 package io.jettra.wui.assets;
 
 public class JettraTheme {
+    /**
+     * Devuelve el CSS global con soporte para múltiples temas (3d, dark, white, material, futuristic, modern).
+     * @return String con el código CSS.
+     */
     public static String getCSS() {
         return "<style>\n" +
             ":root {\n" +
@@ -10,446 +14,145 @@ public class JettraTheme {
             "  --jettra-border: rgba(100, 200, 255, 0.2);\n" +
             "  --jettra-text: #e0f0ff;\n" +
             "  --jettra-accent: #00e5ff;\n" +
+            "  --jt-anim-duration: 0.3s;\n" +
+            "}\n" +
+            "body.theme-material {\n" +
+            "  --jettra-bg: #f5f5f7;\n" +
+            "  --jettra-glow: rgba(0, 0, 0, 0.1);\n" +
+            "  --jettra-glass: rgba(255, 255, 255, 0.9);\n" +
+            "  --jettra-border: rgba(0, 0, 0, 0.08);\n" +
+            "  --jettra-text: #1d1d1f;\n" +
+            "  --jettra-accent: #0071e3;\n" +
+            "}\n" +
+            "body.theme-futuristic {\n" +
+            "  --jettra-bg: #050510;\n" +
+            "  --jettra-glow: rgba(255, 0, 255, 0.6);\n" +
+            "  --jettra-glass: rgba(15, 15, 35, 0.8);\n" +
+            "  --jettra-border: rgba(255, 0, 255, 0.3);\n" +
+            "  --jettra-text: #fdf2f8;\n" +
+            "  --jettra-accent: #ff00ff;\n" +
+            "}\n" +
+            "body.theme-modern {\n" +
+            "  --jettra-bg: #000000;\n" +
+            "  --jettra-glow: rgba(16, 185, 129, 0.4);\n" +
+            "  --jettra-glass: rgba(20, 20, 20, 0.95);\n" +
+            "  --jettra-border: #333333;\n" +
+            "  --jettra-text: #ffffff;\n" +
+            "  --jettra-accent: #10b981;\n" +
             "}\n" +
             "body.theme-white {\n" +
-            "  --jettra-bg: #f5f7fa;\n" +
-            "  --jettra-glow: rgba(0, 100, 255, 0.1);\n" +
-            "  --jettra-glass: rgba(255, 255, 255, 0.9);\n" +
-            "  --jettra-border: rgba(0, 50, 150, 0.1);\n" +
-            "  --jettra-text: #2c3e50;\n" +
-            "  --jettra-accent: #3498db;\n" +
+            "  --jettra-bg: #f8fafc;\n" +
+            "  --jettra-glow: rgba(2, 132, 199, 0.2);\n" +
+            "  --jettra-glass: rgba(255, 255, 255, 0.95);\n" +
+            "  --jettra-border: rgba(2, 132, 199, 0.1);\n" +
+            "  --jettra-text: #0f172a;\n" +
+            "  --jettra-accent: #0284c7;\n" +
             "}\n" +
             "body.theme-dark {\n" +
-            "  --jettra-bg: #121212;\n" +
-            "  --jettra-glow: rgba(255, 255, 255, 0.05);\n" +
-            "  --jettra-glass: rgba(30, 30, 30, 0.8);\n" +
-            "  --jettra-border: rgba(255, 255, 255, 0.1);\n" +
-            "  --jettra-text: #e0e0e0;\n" +
-            "  --jettra-accent: #bb86fc;\n" +
+            "  --jettra-bg: #020617;\n" +
+            "  --jettra-glow: rgba(56, 189, 248, 0.3);\n" +
+            "  --jettra-glass: rgba(15, 23, 42, 0.9);\n" +
+            "  --jettra-border: rgba(56, 189, 248, 0.1);\n" +
+            "  --jettra-text: #f1f5f9;\n" +
+            "  --jettra-accent: #38bdf8;\n" +
             "}\n" +
             "body.theme-3d {\n" +
             "  --jettra-bg: #0a0a0f;\n" +
-            "  --jettra-glow: rgba(0, 240, 255, 0.4);\n" +
-            "  --jettra-glass: rgba(20, 25, 40, 0.6);\n" +
-            "  --jettra-border: rgba(100, 200, 255, 0.2);\n" +
+            "  --jettra-glow: rgba(0, 240, 255, 0.5);\n" +
+            "  --jettra-glass: rgba(20, 30, 50, 0.7);\n" +
+            "  --jettra-border: rgba(0, 255, 255, 0.3);\n" +
             "  --jettra-text: #e0f0ff;\n" +
             "  --jettra-accent: #00e5ff;\n" +
             "}\n" +
+            "@keyframes jtGlowPulse { 0% { box-shadow: 0 0 5px var(--jettra-glow); } 50% { box-shadow: 0 0 20px var(--jettra-glow); } 100% { box-shadow: 0 0 5px var(--jettra-glow); } }\n" +
             "body {\n" +
             "  background-color: var(--jettra-bg);\n" +
             "  color: var(--jettra-text);\n" +
-            "  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n" +
-            "  margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;\n" +
+            "  font-family: 'Inter', system-ui, -apple-system, sans-serif;\n" +
+            "  margin: 0; min-height: 100vh;\n" +
             "  overflow-x: hidden;\n" +
-            "  transition: background-color 0.5s ease, color 0.5s ease;\n" +
+            "  transition: background 0.5s ease, color 0.5s ease;\n" +
             "}\n" +
-            "body.theme-3d {\n" +
-            "  background-image: radial-gradient(circle at 50% 50%, #151525 0%, #0a0a0f 100%);\n" +
-            "}\n" +
-            "body.theme-white {\n" +
-            "  background-image: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);\n" +
-            "}\n" +
-            "body.theme-dark {\n" +
-            "  background-image: linear-gradient(180deg, #121212 0%, #1a1a1a 100%);\n" +
-            "}\n" +
-            ".jettra-viewport {\n" +
-            "  width: 100%; padding: 0; box-sizing: border-box;\n" +
-            "  perspective: 1000px;\n" +
-            "}\n" +
+            "body.theme-3d { background-image: radial-gradient(circle at 50% 50%, #1a1a2e 0%, #0a0a0f 100%); }\n" +
+            "body.theme-futuristic { background-image: radial-gradient(circle, #1a0a2a 0%, #050510 100%); }\n" +
+            "body.theme-dark { background-image: linear-gradient(to bottom, #0f172a, #020617); }\n" +
             ".j-dashboard {\n" +
-            "  position: relative;\n" +
-            "  display: grid;\n" +
-            "  grid-template-columns: 250px 1fr;\n" +
-            "  grid-template-rows: auto 1fr auto;\n" +
+            "  display: grid; grid-template-columns: 260px 1fr; grid-template-rows: 64px 1fr auto;\n" +
             "  grid-template-areas: 'top top' 'left center' 'footer footer';\n" +
-            "  min-height: 100vh; gap: 10px; padding: 10px; box-sizing: border-box;\n" +
-            "  width: 100%;\n" +
+            "  min-height: 100vh; gap: 12px; padding: 12px; box-sizing: border-box; width: 100%;\n" +
             "}\n" +
-            ".j-hamburger {\n" +
-            "  display: none;\n" +
-            "  font-size: 28px;\n" +
-            "  color: var(--jettra-accent);\n" +
-            "  cursor: pointer;\n" +
-            "  position: absolute;\n" +
-            "  top: 20px;\n" +
-            "  left: 20px;\n" +
-            "  z-index: 1001;\n" +
-            "  background: var(--jettra-glass);\n" +
-            "  border: 1px solid var(--jettra-border);\n" +
-            "  border-radius: 8px;\n" +
-            "  width: 45px; height: 45px;\n" +
-            "  text-align: center; line-height: 45px;\n" +
-            "  box-shadow: 0 0 10px var(--jettra-glow);\n" +
-            "}\n" +
-            ".show-on-low-res {\n" +
-            "  display: none !important;\n" +
-            "}\n" +
-            ".hide-on-low-res {\n" +
-            "  display: inline-block !important;\n" +
-            "}\n" +
+            ".j-top { grid-area: top; display: flex; justify-content: space-between; align-items: center; padding: 0 20px !important; backdrop-filter: blur(20px); border: 1px solid var(--jettra-border); border-radius: 12px; z-index: 2000; background: var(--jettra-glass); }\n" +
+            ".j-left { grid-area: left; background: var(--jettra-glass); border: 1px solid var(--jettra-border); border-radius: 12px; backdrop-filter: blur(15px); overflow-y: auto; }\n" +
+            ".j-center { grid-area: center; background: var(--jettra-glass); border: 1px solid var(--jettra-border); border-radius: 12px; padding: 20px; backdrop-filter: blur(10px); min-height: 500px; }\n" +
+            ".j-footer { grid-area: footer; text-align: center; padding: 15px; background: var(--jettra-glass); border: 1px solid var(--jettra-border); border-radius: 12px; font-size: 0.85rem; opacity: 0.8; }\n" +
+            ".j-3d-effect { transition: all var(--jt-anim-duration); }\n" +
+            ".j-3d-effect:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }\n" +
+            ".j-btn { cursor: pointer; border-radius: 8px; padding: 10px 20px; border: 1px solid var(--jettra-border); background: rgba(255,255,255,0.05); color: var(--jettra-text); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.3s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }\n" +
+            ".j-btn:hover { background: rgba(255,255,255,0.1); border-color: var(--jettra-accent); box-shadow: 0 0 10px var(--jettra-glow); transform: translateY(-2px); }\n" +
+            ".j-btn-primary { background: linear-gradient(135deg, var(--jettra-accent), #0891b2); color: #000; border: none; box-shadow: 0 4px 15px rgba(0,255,255,0.3); }\n" +
+            ".j-input { background: rgba(0,0,0,0.3); border: 1px solid var(--jettra-border); color: var(--jettra-text); padding: 12px 16px; border-radius: 8px; width: 100%; transition: all 0.3s; }\n" +
+            ".j-input:focus { border-color: var(--jettra-accent); box-shadow: 0 0 10px var(--jettra-glow); outline: none; }\n" +
+            ".j-table { width: 100%; border-collapse: separate; border-spacing: 0; }\n" +
+            ".j-table th { background: rgba(0,255,255,0.05); color: var(--jettra-accent); text-align: left; padding: 15px; font-weight: 700; border-bottom: 2px solid var(--jettra-border); }\n" +
+            ".j-table td { padding: 15px; border-bottom: 1px solid var(--jettra-border); transition: background 0.2s; }\n" +
+            ".j-table tr:hover td { background: rgba(255,255,255,0.02); }\n" +
+            ".j-avatar { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--jettra-accent); overflow: hidden; display: flex; align-items: center; justify-content: center; background: #000; cursor: pointer; transition: all 0.3s; }\n" +
+            ".j-avatar:hover { transform: scale(1.1); box-shadow: 0 0 15px var(--jettra-glow); }\n" +
+            ".j-avatar img { width: 100%; height: 100%; object-fit: cover; }\n" +
+            ".j-avatar-dropdown { position: absolute; top: 70px; right: 20px; background: var(--jettra-glass); backdrop-filter: blur(25px); border: 1px solid var(--jettra-border); border-radius: 12px; min-width: 180px; display: none; z-index: 5000; box-shadow: 0 20px 50px rgba(0,0,0,0.5); overflow: hidden; }\n" +
+            ".j-avatar-dropdown a { display: block; padding: 12px 20px; color: var(--jettra-text); text-decoration: none; transition: background 0.2s; border-bottom: 1px solid rgba(255,255,255,0.05); }\n" +
+            ".j-avatar-dropdown a:hover { background: rgba(0,255,255,0.1); color: var(--jettra-accent); }\n" +
+            ".j-select-icon-trigger { cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 20px; background: rgba(0,0,0,0.4); border: 1px solid var(--jettra-border); transition: all 0.3s; }\n" +
+            ".j-select-icon-trigger:hover { border-color: var(--jettra-accent); box-shadow: 0 0 10px var(--jettra-glow); }\n" +
+            ".j-select-icon-dropdown { position: absolute; top: calc(100% + 10px); right: 0; background: var(--jettra-glass); backdrop-filter: blur(25px); border: 1px solid var(--jettra-border); border-radius: 12px; padding: 8px; display: none; min-width: 160px; z-index: 5000; box-shadow: 0 15px 40px rgba(0,0,0,0.5); }\n" +
+            ".j-select-icon-item { padding: 10px 15px; border-radius: 8px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 12px; }\n" +
+            ".j-select-icon-item:hover { background: rgba(0,255,255,0.1); transform: translateX(5px); }\n" +
+            ".j-toggle-slider { width: 44px; height: 22px; background: #333; border-radius: 11px; position: relative; cursor: pointer; border: 1px solid var(--jettra-border); transition: 0.3s; }\n" +
+            ".j-toggle-slider:before { content: ''; position: absolute; width: 16px; height: 16px; left: 2px; bottom: 2px; background: #fff; border-radius: 50%; transition: 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }\n" +
+            "input:checked + .j-toggle-slider { background: var(--jettra-accent); }\n" +
+            "input:checked + .j-toggle-slider:before { transform: translateX(22px); }\n" +
+            "/* Mobile Styles */\n" +
             "@media (max-width: 768px) {\n" +
-            "  .j-dashboard {\n" +
-            "    grid-template-columns: 1fr;\n" +
-            "    grid-template-areas: 'top' 'center' 'footer';\n" +
-            "    padding: 10px;\n" +
-            "    gap: 10px;\n" +
-            "  }\n" +
-            "  .j-top {\n" +
-            "    margin-left: 55px;\n" + /* Space for hamburger */
-            "    flex-direction: row;\n" +
-            "    flex-wrap: wrap;\n" +
-            "    justify-content: space-between;\n" +
-            "    padding: 2px 8px;\n" +
-            "    gap: 5px;\n" +
-            "  }\n" +
-            "  .j-top .j-btn {\n" +
-            "    padding: 4px 8px !important;\n" +
-            "    height: 30px !important;\n" +
-            "    width: auto !important;\n" +
-            "    min-width: 30px;\n" +
-            "  }\n" +
-            "  .j-top h2 {\n" +
-            "    font-size: 0.9rem;\n" +
-            "    margin: 0;\n" +
-            "    width: auto;\n" +
-            "    white-space: nowrap;\n" +
-            "  }\n" +
-            "  .j-top-right {\n" +
-            "    width: 100%;\n" +
-            "    justify-content: flex-end;\n" +
-            "  }\n" +
-            "  .hide-mobile {\n" +
-            "    display: none !important;\n" +
-            "  }\n" +
-            "  .j-footer {\n" +
-            "    font-size: 0.8rem;\n" +
-            "    padding: 10px;\n" +
-            "  }\n" +
-            "  .show-on-low-res {\n" +
-            "    display: inline-block !important;\n" +
-            "  }\n" +
-            "  .hide-on-low-res {\n" +
-            "    display: none !important;\n" +
-            "  }\n" +
-            "  .j-hamburger {\n" +
-            "    display: block;\n" +
-            "    top: 15px; left: 15px;\n" +
-            "    width: 40px; height: 40px; line-height: 40px;\n" +
-            "  }\n" +
-            "  .j-left {\n" +
-            "    position: fixed;\n" +
-            "    top: 65px;\n" +
-            "    left: -300px;\n" +
-            "    width: 250px;\n" +
-            "    max-height: calc(100vh - 80px);\n" +
-            "    z-index: 1000;\n" +
-            "    transition: left 0.3s ease-in-out;\n" +
-            "    overflow-y: auto;\n" +
-            "  }\n" +
-            "  .j-left.active {\n" +
-            "    left: 10px;\n" +
-            "  }\n" +
+            "  .j-dashboard { grid-template-columns: 1fr; grid-template-areas: 'top' 'center' 'footer'; }\n" +
+            "  .j-left { position: fixed; left: -280px; width: 260px; height: calc(100vh - 40px); top: 20px; z-index: 3000; transition: left 0.4s cubic-bezier(0.19, 1, 0.22, 1); }\n" +
+            "  .j-left.active { left: 12px; }\n" +
+            "  .j-top { margin-left: 0; padding: 0 15px !important; }\n" +
+            "  .hide-on-mobile { display: none !important; }\n" +
             "}\n" +
-            ".j-top { grid-area: top; display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 2px 10px !important; overflow: visible; z-index: 2000; position: relative; }\n" +
-            ".j-left { grid-area: left; }\n" +
-            ".j-center { grid-area: center; }\n" +
-            ".j-footer { grid-area: footer; text-align: center; padding: 10px; }\n" +
-            ".j-component, .j-top, .j-left, .j-center, .j-footer {\n" +
-            "  background: var(--jettra-glass);\n" +
-            "  border: 1px solid var(--jettra-border);\n" +
-            "  border-radius: 12px;\n" +
-            "  padding: 8px 12px;\n" +
-            "  backdrop-filter: blur(10px);\n" +
-            "  box-shadow: 0 8px 32px 0 rgba(0,0,0,0.37), inset 0 0 10px rgba(0,255,255,0.05);\n" +
-            "  transition: transform 0.2s ease-out, box-shadow 0.3s ease;\n" +
-            "  transform-style: preserve-3d;\n" +
-            "  will-change: transform;\n" +
-            "}\n" +
-            ".j-btn {\n" +
-            "  background: linear-gradient(135deg, rgba(0,229,255,0.2) 0%, rgba(0,100,255,0.2) 100%);\n" +
-            "  color: var(--jettra-accent);\n" +
-            "  border: 1px solid var(--jettra-accent);\n" +
-            "  padding: 10px 20px; border-radius: 8px; cursor: pointer;\n" +
-            "  text-transform: uppercase; font-weight: bold; letter-spacing: 1px;\n" +
-            "  box-shadow: 0 0 10px var(--jettra-glow);\n" +
-            "  transition: all 0.3s ease;\n" +
-            "}\n" +
-            ".j-btn:hover {\n" +
-            "  background: var(--jettra-accent);\n" +
-            "  color: #000; box-shadow: 0 0 20px var(--jettra-glow), 0 0 40px var(--jettra-accent);\n" +
-            "  transform: translateZ(10px);\n" +
-            "}\n" +
-            ".j-btn-primary { background: linear-gradient(135deg, #007bff 0%, #0056b3 100%) !important; color: #fff !important; border-color: #004085 !important; }\n" +
-            ".j-btn-secondary { background: linear-gradient(135deg, #6c757d 0%, #495057 100%) !important; color: #fff !important; border-color: #343a40 !important; }\n" +
-            ".j-btn-help { background: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%) !important; color: #fff !important; border-color: #6b21a8 !important; }\n" +
-            ".j-btn-danger { background: linear-gradient(135deg, #dc3545 0%, #a71d2a 100%) !important; color: #fff !important; border-color: #721c24 !important; }\n" +
-            ".j-btn-info { background: linear-gradient(135deg, #0dcaf0 0%, #0aa2c0 100%) !important; color: #fff !important; border-color: #055160 !important; }\n" +
-            ".j-btn-warning { background: linear-gradient(135deg, #ffc107 0%, #d39e00 100%) !important; color: #212529 !important; border-color: #856404 !important; }\n" +
-            ".j-input {\n" +
-            "  background: rgba(0,0,0,0.5);\n" +
-            "  border: 1px solid var(--jettra-border);\n" +
-            "  color: var(--jettra-text);\n" +
-            "  padding: 12px; border-radius: 6px; width: 100%; box-sizing: border-box;\n" +
-            "  outline: none; margin-top: 5px; margin-bottom: 15px;\n" +
-            "  transition: all 0.2s;\n" +
-            "}\n" +
-            ".j-input:focus {\n" +
-            "  border-color: var(--jettra-accent);\n" +
-            "  box-shadow: inset 0 0 8px var(--jettra-glow);\n" +
-            "}\n" +
-            ".j-table-container {\n" +
-            "  width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch;\n" +
-            "}\n" +
-            ".j-avatar {\n" +
-            "  position: relative; display: inline-flex; align-items: center; justify-content: center;\n" +
-            "  background: var(--jettra-glass); border: 1px solid var(--jettra-border);\n" +
-            "  box-shadow: 0 0 10px var(--jettra-glow); color: var(--jettra-text);\n" +
-            "  overflow: visible; font-weight: bold; transition: all 0.3s ease;\n" +
-            "}\n" +
-            ".j-avatar img {\n" +
-            "  width: 100%; height: 100%; object-fit: cover;\n" +
-            "}\n" +
-            ".j-avatar-circle, .j-avatar-circle img {\n" +
-            "  border-radius: 50%;\n" +
-            "}\n" +
-            ".j-avatar-rounded, .j-avatar-rounded img {\n" +
-            "  border-radius: 8px;\n" +
-            "}\n" +
-            ".j-avatar-xs { width: 24px; height: 24px; font-size: 0.6rem; }\n" +
-            ".j-avatar-sm { width: 32px; height: 32px; font-size: 0.8rem; }\n" +
-            ".j-avatar-md { width: 48px; height: 48px; font-size: 1rem; }\n" +
-            ".j-avatar-lg { width: 64px; height: 64px; font-size: 1.5rem; }\n" +
-            ".j-avatar-xl { width: 96px; height: 96px; font-size: 2rem; }\n" +
-            ".j-avatar-badge {\n" +
-            "  position: absolute; bottom: 2px; right: 2px; width: 25%; height: 25%;\n" +
-            "  min-width: 8px; min-height: 8px; border-radius: 50%; border: 2px solid var(--jettra-bg);\n" +
-            "  background-color: #22c55e; z-index: 10;\n" +
-            "}\n" +
-            ".j-avatar-group {\n" +
-            "  display: flex; align-items: center;\n" +
-            "}\n" +
-            ".j-avatar-group .j-avatar {\n" +
-            "  margin-left: -15px; border: 2px solid var(--jettra-bg);\n" +
-            "}\n" +
-            ".j-avatar-group .j-avatar:first-child {\n" +
-            "  margin-left: 0;\n" +
-            "}\n" +
-            ".j-avatar-group .j-avatar:hover {\n" +
-            "  transform: scale(1.1) translateZ(20px);\n" +
-            "  z-index: 100; box-shadow: 0 0 20px var(--jettra-accent);\n" +
-            "}\n" +
-            ".j-avatar-wrapper { position: relative; display: inline-block; cursor: pointer; }\n" +
-            ".j-avatar-dropdown {\n" +
-            "  position: absolute; top: calc(100% + 10px); right: 0;\n" +
-            "  min-width: 150px; background: var(--jettra-glass);\n" +
-            "  border: 1px solid var(--jettra-border); border-radius: 8px;\n" +
-            "  backdrop-filter: blur(10px); box-shadow: 0 10px 25px rgba(0,0,0,0.5);\n" +
-            "  display: none; flex-direction: column; overflow: visible; z-index: 1000;\n" +
-            "}\n" +
-            ".j-avatar-dropdown.active { display: flex; }\n" +
-            ".j-avatar-dropdown a, .j-avatar-dropdown-item {\n" +
-            "  padding: 10px 15px; color: var(--jettra-text); text-decoration: none;\n" +
-            "  font-size: 0.9rem; transition: background 0.2s; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--jettra-border);\n" +
-            "}\n" +
-            ".j-avatar-dropdown a:last-child, .j-avatar-dropdown-item:last-child { border-bottom: none; }\n" +
-            ".j-avatar-dropdown a:hover, .j-avatar-dropdown-item:hover { background: rgba(0, 229, 255, 0.1); color: var(--jettra-accent); }\n" +
-            ".j-toggle { position: relative; display: inline-flex; align-items: center; cursor: pointer; margin-left: auto; }\n" +
-            ".j-toggle-input { opacity: 0; width: 0; height: 0; position: absolute; }\n" +
-            ".j-toggle-slider { position: relative; width: 44px; height: 24px; background-color: rgba(20, 30, 50, 0.6); transition: .3s; border-radius: 24px; border: 1px solid var(--jettra-border); box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: space-between; padding: 0 5px; font-size: 10px; font-weight: bold; color: var(--jettra-text); overflow: hidden; }\n" +
-            ".j-toggle-slider:before { position: absolute; content: ''; height: 18px; width: 18px; left: 2px; bottom: 2px; background-color: #888; transition: .3s; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.5); z-index: 2; }\n" +
-            ".j-toggle-input:checked + .j-toggle-slider { background-color: rgba(0, 229, 255, 0.1); border-color: var(--jettra-accent); }\n" +
-            ".j-toggle-input:checked + .j-toggle-slider:before { transform: translateX(20px); background-color: var(--jettra-accent); box-shadow: 0 0 10px var(--jettra-accent); }\n" +
-            ".j-toggle-on { opacity: 0; transform: translateX(-10px); transition: .3s; color: var(--jettra-accent); pointer-events: none; }\n" +
-            ".j-toggle-off { opacity: 1; transform: translateX(0); transition: .3s; color: #888; pointer-events: none; }\n" +
-            ".j-toggle-input:checked + .j-toggle-slider .j-toggle-on { opacity: 1; transform: translateX(0); }\n" +
-            ".j-toggle-input:checked + .j-toggle-slider .j-toggle-off { opacity: 0; transform: translateX(10px); }\n" +
-             "/* Sync Popup 3D */\n" +
-             ".j-sync-popup-3d {\n" +
-             "  position: fixed;\n" +
-             "  bottom: 20px;\n" +
-             "  right: 20px;\n" +
-             "  z-index: 10000;\n" +
-             "  background: var(--jettra-glass);\n" +
-             "  backdrop-filter: blur(10px);\n" +
-             "  border: 1px solid var(--jettra-accent);\n" +
-             "  border-radius: 12px;\n" +
-             "  padding: 15px;\n" +
-             "  box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 15px rgba(0,255,255,0.1);\n" +
-             "  transform: perspective(1000px) rotateY(-10deg);\n" +
-             "  transition: transform 0.3s ease, opacity 0.3s ease;\n" +
-             "  max-width: 300px;\n" +
-             "  animation: jSyncFadeIn 0.5s ease-out;\n" +
-             "}\n" +
-             ".j-sync-popup-3d:hover { transform: perspective(1000px) rotateY(0deg); }\n" +
-             "@keyframes jSyncFadeIn { from { opacity: 0; transform: translateY(20px) perspective(1000px) rotateY(-10deg); } to { opacity: 1; transform: translateY(0) perspective(1000px) rotateY(-10deg); } }\n" +
-             ".j-sync-content { display: flex; align-items: flex-start; gap: 12px; }\n" +
-             ".j-sync-icon { font-size: 1.5rem; }\n" +
-             ".j-sync-text strong { display: block; color: var(--jettra-accent); margin-bottom: 5px; }\n" +
-             ".j-sync-text p { margin: 0; font-size: 0.85rem; color: var(--jettra-text); }\n" +
-             ".j-sync-actions { display: flex; gap: 8px; margin-top: 12px; justify-content: flex-end; }\n" +
-             ".j-sync-actions button {\n" +
-             "  background: rgba(0,255,255,0.1);\n" +
-             "  border: 1px solid var(--jettra-border);\n" +
-             "  color: #fff;\n" +
-             "  padding: 4px 10px;\n" +
-             "  border-radius: 4px;\n" +
-             "  cursor: pointer;\n" +
-             "  font-size: 0.8rem;\n" +
-             "  transition: all 0.2s;\n" +
-             "}\n" +
-             ".j-sync-actions button:first-child { background: var(--jettra-accent); color: #000; border: none; font-weight: bold; }\n" +
-             ".j-sync-actions button:hover { transform: scale(1.05); filter: brightness(1.2); }\n" +
-             ".j-panel { margin-bottom: 20px; }\n" +
-             ".j-panel-column { display: flex; flex-direction: column; gap: 15px; min-height: 50px; }\n" +
-             ".j-tree { font-family: inherit; color: var(--jettra-text); }\n" +
-             ".j-tree-header:hover { background: rgba(0, 229, 255, 0.1); border-radius: 4px; }\n" +
-             ".j-tree-item { margin: 2px 0; }\n" +
-             "</style>\n";
+            "</style>";
     }
-    
+
+    /**
+     * Devuelve el JavaScript necesario para manejar cambios de tema y efectos 3D en el cliente.
+     * @return String con el código JS.
+     */
     public static String getJS() {
         return "<script>\n" +
-            "function jtFire(id) {\n" +
-            "  const form = document.querySelector('form');\n" +
-            "  if (form) {\n" +
-            "    let input = form.querySelector('input[name=\"_jtEvent\"]');\n" +
-            "    if (!input) {\n" +
-            "      input = document.createElement('input');\n" +
-            "      input.type = 'hidden';\n" +
-            "      input.name = '_jtEvent';\n" +
-            "      form.appendChild(input);\n" +
-            "    }\n" +
-            "    input.value = id;\n" +
-            "    form.submit();\n" +
-            "  } else {\n" +
-            "    const url = new URL(window.location.href);\n" +
-            "    url.searchParams.set('_jtEvent', id);\n" +
-            "    window.location.href = url.toString();\n" +
-            "  }\n" +
-            "}\n" +
-            "window.jettraAnimated = localStorage.getItem('jettra-animated') === null ? null : localStorage.getItem('jettra-animated') === 'true';\n" +
-            "function toggleJettraAnimation(checked) {\n" +
-            "  window.jettraAnimated = checked;\n" +
-            "  localStorage.setItem('jettra-animated', checked);\n" +
-            "  if (!checked) {\n" +
-            "    document.querySelectorAll('.j-component, .j-top, .j-left, .j-center, .j-footer').forEach(c => {\n" +
-            "       c.style.transform = 'none';\n" +
-            "       c.style.boxShadow = 'none';\n" +
-            "    });\n" +
-            "  } else {\n" +
-            "    document.querySelectorAll('.j-component, .j-top, .j-left, .j-center, .j-footer').forEach(c => {\n" +
-            "       c.style.transform = '';\n" +
-            "       c.style.boxShadow = '';\n" +
-            "    });\n" +
-            "  }\n" +
-            "}\n" +
-            "function toggleAvatarMenu() {\n" +
-            "  const menu = document.getElementById('user-avatar-dropdown');\n" +
-            "  if (menu) menu.classList.toggle('active');\n" +
-            "}\n" +
             "function changeTheme(theme) {\n" +
             "  document.body.className = 'theme-' + theme;\n" +
             "  localStorage.setItem('jettra-theme', theme);\n" +
+            "  window.location.reload();\n" +
+            "}\n" +
+            "function toggleAvatarMenu() {\n" +
+            "  const menu = document.getElementById('user-avatar-dropdown');\n" +
+            "  if(menu) menu.style.display = menu.style.display === 'block' ? 'none' : 'block';\n" +
+            "}\n" +
+            "function toggleSelectIcon(id) {\n" +
+            "  const d = document.getElementById(id + '_dropdown');\n" +
+            "  if(d) d.style.display = d.style.display === 'block' ? 'none' : 'block';\n" +
             "}\n" +
             "document.addEventListener('DOMContentLoaded', () => {\n" +
             "  const savedTheme = localStorage.getItem('jettra-theme') || '3d';\n" +
-            "  changeTheme(savedTheme);\n" +
-            "  const dash = document.querySelector('.j-dashboard');\n" +
-            "  if (dash && !document.querySelector('.j-hamburger')) {\n" +
-            "    const hm = document.createElement('div');\n" +
-            "    hm.className = 'j-hamburger';\n" +
-            "    hm.innerHTML = '&#9776;';\n" +
-            "    hm.onclick = () => {\n" +
-            "       document.querySelector('.j-left')?.classList.toggle('active');\n" +
-            "    };\n" +
-            "    dash.prepend(hm);\n" +
-            "  }\n" +
-            "  const cb = document.getElementById('anim-toggle');\n" +
-            "  if (window.jettraAnimated === null) {\n" +
-            "    window.jettraAnimated = cb ? cb.hasAttribute('checked') : true;\n" +
-            "    localStorage.setItem('jettra-animated', window.jettraAnimated);\n" +
-            "  }\n" +
-            "  if (cb) {\n" +
-            "    cb.checked = window.jettraAnimated;\n" +
-            "  }\n" +
-            "  if (!window.jettraAnimated) {\n" +
-            "    document.querySelectorAll('.j-component, .j-top, .j-left, .j-center, .j-footer').forEach(c => {\n" +
-            "       c.style.transform = 'none';\n" +
-            "       c.style.boxShadow = 'none';\n" +
-            "    });\n" +
-            "  }\n" +
+            "  document.body.className = 'theme-' + savedTheme;\n" +
             "  document.addEventListener('click', (e) => {\n" +
-            "    const wrapper = document.querySelector('.j-avatar-wrapper');\n" +
-            "    const menu = document.getElementById('user-avatar-dropdown');\n" +
-            "    if (wrapper && !wrapper.contains(e.target)) {\n" +
-            "      if (menu) menu.classList.remove('active');\n" +
+            "    if(!e.target.closest('.j-avatar-wrapper')) {\n" +
+            "      const m = document.getElementById('user-avatar-dropdown'); if(m) m.style.display = 'none';\n" +
+            "    }\n" +
+            "    if(!e.target.closest('.j-select-icon-trigger')) {\n" +
+            "      document.querySelectorAll('.j-select-icon-dropdown').forEach(d => d.style.display='none');\n" +
             "    }\n" +
             "  });\n" +
-            "  \n" +
-            "  const interactiveSelector = 'button, a, input, select, textarea, .j-btn, .j-toggle-slider, .j-select-icon-trigger, .j-select-icon-options, .j-avatar-wrapper, .j-avatar-dropdown, label';\n" +
-            "  \n" +
-            "  function applyTilt(e) {\n" +
-            "    if (!window.jettraAnimated) return;\n" +
-            "    const card = e.currentTarget;\n" +
-            "    const isInteractive = e.target.closest(interactiveSelector);\n" +
-            "    \n" +
-            "    if (isInteractive) {\n" +
-            "      card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(5px)';\n" +
-            "      return;\n" +
-            "    }\n" +
-            "    \n" +
-            "    const rect = card.getBoundingClientRect();\n" +
-            "    const x = e.clientX - rect.left;\n" +
-            "    const y = e.clientY - rect.top;\n" +
-            "    const centerX = rect.width / 2;\n" +
-            "    const centerY = rect.height / 2;\n" +
-            "    const rotateX = ((centerY - y) / centerY) * 5;\n" +
-            "    const rotateY = ((x - centerX) / centerX) * 5;\n" +
-            "    \n" +
-            "    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(10px)`;\n" +
-            "    card.style.boxShadow = '0 15px 40px rgba(0,255,255,0.2), inset 0 0 20px rgba(0,255,255,0.1)';\n" +
-            "  }\n" +
-            "  \n" +
-            "  function resetTilt(e) {\n" +
-            "    const card = e.currentTarget;\n" +
-            "    card.style.transform = '';\n" +
-            "    card.style.boxShadow = '';\n" +
-            "  }\n" +
-            "  \n" +
-            "  function initAnimations() {\n" +
-            "    const cards = document.querySelectorAll('.j-component, .j-top, .j-left, .j-center, .j-footer');\n" +
-            "    cards.forEach(card => {\n" +
-            "      card.removeEventListener('mousemove', applyTilt);\n" +
-            "      card.removeEventListener('mouseleave', resetTilt);\n" +
-            "      if (window.jettraAnimated) {\n" +
-            "        card.addEventListener('mousemove', applyTilt);\n" +
-            "        card.addEventListener('mouseleave', resetTilt);\n" +
-            "      }\n" +
-            "    });\n" +
-            "  }\n" +
-            "  \n" +
-            "  initAnimations();\n" +
-            "  // Re-init if animations are toggled\n" +
-            "  const animToggle = document.getElementById('anim-toggle');\n" +
-            "  if (animToggle) {\n" +
-            "    animToggle.addEventListener('change', () => {\n" +
-            "      setTimeout(initAnimations, 100);\n" +
-            "    });\n" +
-            "  }\n" +
             "});\n" +
-             "function toggleTreeItem(id) {\n" +
-             "  const item = document.getElementById(id);\n" +
-             "  if (!item) return;\n" +
-             "  const content = item.querySelector('.j-tree-content');\n" +
-             "  const toggle = item.querySelector('.j-tree-toggle');\n" +
-             "  if (content.style.display === 'none') {\n" +
-             "    content.style.display = 'block';\n" +
-             "    if (toggle) toggle.style.transform = 'rotate(90deg)';\n" +
-             "  } else {\n" +
-             "    content.style.display = 'none';\n" +
-             "    if (toggle) toggle.style.transform = 'rotate(0deg)';\n" +
-             "  }\n" +
-             "}\n" +
-             "</script>\n";
+            "</script>";
     }
 }

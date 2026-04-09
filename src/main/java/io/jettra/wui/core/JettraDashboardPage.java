@@ -137,10 +137,19 @@ public abstract class JettraDashboardPage extends Page {
         themeSelect.addOption("3d", "", "🚀");
         themeSelect.addOption("dark", "", "🌙");
         themeSelect.addOption("white", "", "☀️");
+        themeSelect.addOption("material", "", "🎨");
+        themeSelect.addOption("futuristic", "", "✨");
+        themeSelect.addOption("modern", "", "🔳");
         
         String themeVal = defaultConfigTheme.toLowerCase();
-        themeSelect.setSelectedValue(themeVal, "", 
-            themeVal.equals("3d") ? "🚀" : (themeVal.equals("dark") ? "🌙" : "☀️"));
+        String themeIcon = "🚀";
+        if (themeVal.equals("dark")) themeIcon = "🌙";
+        else if (themeVal.equals("white")) themeIcon = "☀️";
+        else if (themeVal.equals("material")) themeIcon = "🎨";
+        else if (themeVal.equals("futuristic")) themeIcon = "✨";
+        else if (themeVal.equals("modern")) themeIcon = "🔳";
+        
+        themeSelect.setSelectedValue(themeVal, "", themeIcon);
             
         rightSection.add(themeSelect).add(langSelect);
         
@@ -306,31 +315,28 @@ public abstract class JettraDashboardPage extends Page {
         
         String modalHtml = "<style>" +
                            "  @keyframes dashModalAppear {" +
-                           "    from { opacity:0; transform:translate(-50%,-30%) scale(0.8) rotateX(-25deg); }" +
-                           "    to { opacity:1; transform:translate(-50%,-50%) scale(1) rotateX(0); }" +
+                           "    from { opacity:0; transform:translate(-50%,-45%); }" +
+                           "    to { opacity:1; transform:translate(-50%,-50%); }" +
                            "  }" +
                            "  .dash-modal-3d {" +
-                           "    transform-style: preserve-3d;" +
-                           "    perspective: 2000px;" +
-                           "    animation: dashModalAppear 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);" +
-                           "    background: linear-gradient(135deg, rgba(30,50,80,0.98), rgba(15,25,45,1));" +
-                           "    backdrop-filter: blur(25px);" +
-                           "    border: 1px solid rgba(0,255,255,0.5);" +
-                           "    border-radius: 20px;" +
-                           "    box-shadow: 0 40px 100px -20px rgba(0,0,0,0.8), inset 0 2px 2px 0 rgba(255,255,255,0.2), 0 0 30px rgba(0,255,255,0.3);" +
+                           "    animation: dashModalAppear 0.3s ease-out;" +
+                           "    background: #1e293b;" +
+                           "    border: 1px solid var(--jettra-accent);" +
+                           "    border-radius: 12px;" +
+                           "    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);" +
                            "  }" +
                            "  .dash-btn-3d {" +
-                           "    background: linear-gradient(135deg, var(--jettra-accent), #0891b2);" +
-                           "    color: #000; border: none; padding: 8px 16px; border-radius: 8px; font-weight: bold; cursor: pointer;" +
-                           "    box-shadow: 0 4px 0 #044e5e, 0 8px 15px rgba(0,0,0,0.4);" +
-                           "    transform: translateZ(20px); transition: all 0.1s;" +
+                           "    background: var(--jettra-accent);" +
+                           "    color: #000; border: none; padding: 8px 20px; border-radius: 6px; font-weight: bold; cursor: pointer;" +
+                           "    transition: background 0.2s;" +
                            "  }" +
-                           "  .dash-btn-3d:active { box-shadow: 0 2px 0 #044e5e, 0 4px 8px rgba(0,0,0,0.4); transform: translateY(2px) translateZ(10px); }" +
+                           "  .dash-btn-3d:hover { background: #0891b2; }" +
+                           "  .dash-btn-3d:active { transform: translateY(1px); }" +
                            "</style>" +
-                           "<div class='dash-modal-3d' style='position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); padding:30px; min-width:350px; color:#fff; text-align:center;'>" +
-                           "<h3 id='global-3d-title' style='margin-top:0; color:var(--jettra-accent); text-shadow:0 0 15px rgba(0,255,255,0.6); font-weight:800; transform:translateZ(30px);'>Message</h3>" +
-                           "<p id='global-3d-body' style='margin-bottom:30px; font-size:16px; color:#cbd5e1; transform:translateZ(20px);'></p>" +
-                           "<div style='text-align:center;'><button class='dash-btn-3d' onclick='document.getElementById(\"global-3d-message-modal\").style.display=\"none\"'>Aceptar</button></div>" +
+                           "<div class='dash-modal-3d' style='position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); padding:25px; min-width:320px; color:#fff; text-align:center;'>" +
+                           "<h3 id='global-3d-title' style='margin-top:0; color:var(--jettra-accent); font-weight:700;'>Message</h3>" +
+                           "<p id='global-3d-body' style='margin-bottom:25px; font-size:15px; color:#cbd5e1;'></p>" +
+                           "<div><button class='dash-btn-3d' onclick='document.getElementById(\"global-3d-message-modal\").style.display=\"none\"'>Aceptar</button></div>" +
                            "</div>" +
                            "<script>" +
                            " window.show3DMessage = function(title, body) {" +

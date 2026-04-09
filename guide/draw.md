@@ -1,26 +1,57 @@
 # Draw Component
 
-The `Draw` component integrates Excalidraw, a powerful whiteboard and sketching tool, directly into your JettraWUI application. It provides users with a complete interface including a drawing palette, history state, and the ability to save or load their sketches.
+The `Draw` component provides an advanced, interactive sketching and diagramming canvas based on the Excalidraw engine. It is designed for creating flowcharts, wireframes, and freehand drawings with a modern 3D aesthetic.
 
-**Component Info**
-- **Class:** `io.jettra.wui.components.Draw`
-- **Category:** Tools / Design
+## Features
 
-## Usage
+- **Multi-tool Support**: Rectangle, Diamond, Ellipse, Arrow, Line, Draw (Freehand), and Text.
+- **Excalidraw API Integration**: Full access to the underlying canvas state and elements.
+- **Dynamic Palette**: Support for drag-and-drop tool selection and customizable toolsets.
+- **Persistence**: Save and load diagrams using the `.jdraw` (JSON) format.
+- **Responsiveness**: Auto-scaling canvas that fits within JettraWUI layouts.
 
-Create a new instance of the `Draw` component by passing a unique DOM ID, width, and height. The width and height define the container size. Note that Excalidraw behaves best when using pixels or full viewport sizing.
+## Basic Usage
 
 ```java
-Draw designBoard = new Draw("main-diagram-board", 800, 600);
-content.add(designBoard);
+import io.jettra.wui.components.Draw;
+
+// Create a new drawing canvas
+Draw sketchpad = new Draw("my-sketch", 1200, 800);
+sketchpad.setStyle("width", "100%").setStyle("height", "500px");
+
+// Add to center
+center.add(sketchpad);
 ```
 
-## Features Supported by Default
+## Integration with JettraWUI Palette
 
-Because this component wraps Excalidraw, it natively includes:
-- **Palette**: Pens, rectangles, ellipses, arrows, text, and library import capabilities.
-- **Export & Import**: Native ability (via the built-in Excalidraw menu) to save to disk (`.excalidraw` or `.png`) and load existing `.excalidraw` documents.
-- **Dark Mode**: Works beautifully on dark themes.
+To allow drag-and-drop interaction from a custom palette, use the `handleToolDrop` Javascript helper:
 
-## Important Note regarding Dependencies
-The `Draw` component relies on external CDNs (unpkg) to fetch React, ReactDOM, and `@excalidraw/excalidraw`. To work correctly in production, make sure the client's network can access `unpkg.com`. To host it entirely offline, you would need to download the bundled JS files and modify the `Draw` component to load them directly from `JettraServer` static resources.
+```javascript
+function handleToolDrop(event) {
+  event.preventDefault();
+  const toolType = event.dataTransfer.getData('tool');
+  const api = window['excalidrawAPI_my-sketch'];
+  if(api) {
+    api.updateScene({ appState: { activeTool: { type: toolType } } });
+  }
+}
+```
+
+## Save and Load Logic
+
+The component interacts with the `excalidrawAPI_[id]` global object:
+
+```javascript
+// Save diagram
+const elements = api.getSceneElements();
+const data = JSON.stringify({ elements });
+// ... save to file ...
+
+// Load diagram
+api.updateScene({ elements: jsonData.elements });
+```
+
+## Styling
+
+The `Draw` component is fully compatible with JettraWUI themes. It supports glassmorphism effects and 3D transitions when wrapped in a `.j-card` or `.j-3d-effect` container.
