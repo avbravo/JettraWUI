@@ -162,7 +162,7 @@ public class FolderSelector extends Div {
                                 "     };" +
                                 "     modal.querySelector('#btnConfirm').onclick = function() {" +
                                 "       closeDialog();" +
-                                "       triggerChange();" +
+                                "       triggerChange.call(input);" +
                                 "     };" +
                                 "   };" +
 

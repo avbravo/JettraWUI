@@ -12,6 +12,7 @@ public class SelectMany extends UIComponent {
     private Div dropdownContainer;
     private Div displayArea;
     private String selectId;
+    private boolean isInline = false;
     
     public SelectMany(String name) {
         super("div");
@@ -78,7 +79,7 @@ public class SelectMany extends UIComponent {
                          .setStyle("box-shadow", "0 40px 100px rgba(0,0,0,0.8), 0 0 20px rgba(0,255,255,0.1)");
 
         // Evento toggle via JavaScript
-        String toggleScript = "var d = document.getElementById('" + selectId + "_dropdown" + "');" +
+        String toggleScript = "if(" + isInline + ") return; var d = document.getElementById('" + selectId + "_dropdown" + "');" +
                               "if(d) { " +
                               "  const isHidden = d.style.display === 'none';" +
                               "  d.style.display = isHidden ? 'block' : 'none';" +
@@ -111,7 +112,7 @@ public class SelectMany extends UIComponent {
             "    } else {" +
             "       let html = '';" +
             "       selected.forEach(s => {" +
-            "         html += '<span style=\"background:var(--jettra-accent); color:#000; padding:4px 12px; border-radius:15px; font-size:11px; font-weight:700; border:1px solid rgba(255,255,255,0.2); box-shadow:0 4px 10px rgba(0,255,255,0.2); display:flex; align-items:center;\">' + s + '</span>';" +
+            "         html += '<span style=\"background:rgba(0,255,255,0.15); color:var(--jettra-accent); padding:4px 12px; border-radius:8px; font-size:11px; font-weight:700; border:1px solid var(--jettra-accent); box-shadow:0 0 10px var(--jettra-glow); display:flex; align-items:center; backdrop-filter:blur(5px);\">' + s + '</span>';" +
             "       });" +
             "       html += '<span style=\"position:absolute; right:15px; top:50%; transform:translateY(-50%); color:var(--jettra-accent); font-size:20px; pointer-events:none;\">▾</span>';" +
             "       disp.innerHTML = html;" +
@@ -125,13 +126,27 @@ public class SelectMany extends UIComponent {
         super.add(globalScript);
     }
 
+    public SelectMany setInline(boolean inline) {
+        this.isInline = inline;
+        if (inline) {
+            dropdownContainer.setStyle("display", "block")
+                             .setStyle("position", "relative")
+                             .setStyle("top", "0")
+                             .setStyle("margin-top", "15px")
+                             .setStyle("box-shadow", "none")
+                             .setStyle("background", "rgba(0,0,0,0.2)");
+            displayArea.setStyle("cursor", "default");
+        }
+        return this;
+    }
+
     public SelectMany addOption(String value, String label) {
         Div row = new Div();
         row.setStyle("display", "flex").setStyle("align-items", "center").setStyle("gap", "12px").setStyle("padding", "10px")
            .setStyle("border-radius", "8px").setStyle("cursor", "pointer").setStyle("transition", "all 0.2s");
         
-        row.setProperty("onmouseover", "this.style.background='rgba(0,255,255,0.1)'");
-        row.setProperty("onmouseout", "this.style.background='transparent'");
+        row.setProperty("onmouseover", "this.style.background='rgba(0,255,255,0.05)'; this.style.transform='translateX(5px)'");
+        row.setProperty("onmouseout", "this.style.background='transparent'; this.style.transform='translateX(0)'");
 
         UIComponent cb = new UIComponent("input") {};
         cb.setProperty("type", "checkbox");

@@ -135,6 +135,9 @@ public abstract class JettraDashboardPage extends Page {
         SelectOneIcon themeSelect = new SelectOneIcon("theme","");
         themeSelect.setShowLabelInTrigger(false);
         themeSelect.addOption("3d", "", "🚀");
+        themeSelect.addOption("cyberpunk", "", "🧬");
+        themeSelect.addOption("neon", "", "🧪");
+        themeSelect.addOption("glass", "", "🧊");
         themeSelect.addOption("dark", "", "🌙");
         themeSelect.addOption("white", "", "☀️");
         themeSelect.addOption("material", "", "🎨");
@@ -143,7 +146,10 @@ public abstract class JettraDashboardPage extends Page {
         
         String themeVal = defaultConfigTheme.toLowerCase();
         String themeIcon = "🚀";
-        if (themeVal.equals("dark")) themeIcon = "🌙";
+        if (themeVal.equals("cyberpunk")) themeIcon = "🧬";
+        else if (themeVal.equals("neon")) themeIcon = "🧪";
+        else if (themeVal.equals("glass")) themeIcon = "🧊";
+        else if (themeVal.equals("dark")) themeIcon = "🌙";
         else if (themeVal.equals("white")) themeIcon = "☀️";
         else if (themeVal.equals("material")) themeIcon = "🎨";
         else if (themeVal.equals("futuristic")) themeIcon = "✨";

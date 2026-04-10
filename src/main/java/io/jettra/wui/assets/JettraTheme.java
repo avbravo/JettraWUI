@@ -64,6 +64,30 @@ public class JettraTheme {
             "  --jettra-text: #e0f0ff;\n" +
             "  --jettra-accent: #00e5ff;\n" +
             "}\n" +
+            "body.theme-cyberpunk {\n" +
+            "  --jettra-bg: #0b0114;\n" +
+            "  --jettra-glow: rgba(255, 0, 85, 0.6);\n" +
+            "  --jettra-glass: rgba(20, 0, 40, 0.85);\n" +
+            "  --jettra-border: #ff0055;\n" +
+            "  --jettra-text: #00f2ff;\n" +
+            "  --jettra-accent: #ff0055;\n" +
+            "}\n" +
+            "body.theme-neon {\n" +
+            "  --jettra-bg: #000;\n" +
+            "  --jettra-glow: rgba(57, 255, 20, 0.6);\n" +
+            "  --jettra-glass: rgba(0, 20, 0, 0.9);\n" +
+            "  --jettra-border: #39ff14;\n" +
+            "  --jettra-text: #fff;\n" +
+            "  --jettra-accent: #39ff14;\n" +
+            "}\n" +
+            "body.theme-glass {\n" +
+            "  --jettra-bg: q-gradient(linear, left top, left bottom, from(#1e293b), to(#0f172a));\n" +
+            "  --jettra-glow: rgba(255, 255, 255, 0.1);\n" +
+            "  --jettra-glass: rgba(255, 255, 255, 0.05);\n" +
+            "  --jettra-border: rgba(255, 255, 255, 0.1);\n" +
+            "  --jettra-text: #fff;\n" +
+            "  --jettra-accent: rgba(255, 255, 255, 0.8);\n" +
+            "}\n" +
             "@keyframes jtGlowPulse { 0% { box-shadow: 0 0 5px var(--jettra-glow); } 50% { box-shadow: 0 0 20px var(--jettra-glow); } 100% { box-shadow: 0 0 5px var(--jettra-glow); } }\n" +
             "body {\n" +
             "  background-color: var(--jettra-bg);\n" +
@@ -75,6 +99,8 @@ public class JettraTheme {
             "}\n" +
             "body.theme-3d { background-image: radial-gradient(circle at 50% 50%, #1a1a2e 0%, #0a0a0f 100%); }\n" +
             "body.theme-futuristic { background-image: radial-gradient(circle, #1a0a2a 0%, #050510 100%); }\n" +
+            "body.theme-cyberpunk { background-image: radial-gradient(circle, #2a0134 0%, #0b0114 100%); }\n" +
+            "body.theme-neon { background-image: linear-gradient(135deg, #000 0%, #051a05 100%); }\n" +
             "body.theme-dark { background-image: linear-gradient(to bottom, #0f172a, #020617); }\n" +
             ".j-dashboard {\n" +
             "  display: grid; grid-template-columns: 260px 1fr; grid-template-rows: 64px 1fr auto;\n" +
