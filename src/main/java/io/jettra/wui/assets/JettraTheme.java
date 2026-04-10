@@ -138,13 +138,21 @@ public class JettraTheme {
             "input:checked + .j-toggle-slider { background: var(--jettra-accent); }\n" +
             "input:checked + .j-toggle-slider:before { transform: translateX(22px); }\n" +
             "/* Mobile Styles */\n" +
-            "@media (max-width: 768px) {\n" +
-            "  .j-dashboard { grid-template-columns: 1fr; grid-template-areas: 'top' 'center' 'footer'; }\n" +
-            "  .j-left { position: fixed; left: -280px; width: 260px; height: calc(100vh - 40px); top: 20px; z-index: 3000; transition: left 0.4s cubic-bezier(0.19, 1, 0.22, 1); }\n" +
-            "  .j-left.active { left: 12px; }\n" +
-            "  .j-top { margin-left: 0; padding: 0 15px !important; }\n" +
-            "  .hide-on-mobile { display: none !important; }\n" +
-            "}\n" +
+            "  .show-on-mobile { display: none !important; }\n" +
+            "  .show-on-low-res { display: none !important; }\n" +
+            "  .j-menu-toggle { cursor: pointer; display: none; align-items: center; justify-content: center; width: 40px; height: 40px; color: var(--jettra-accent); font-size: 24px; }\n" +
+            "  /* Mobile Styles */\n" +
+            "  @media (max-width: 768px) {\n" +
+            "    .j-dashboard { grid-template-columns: 1fr; grid-template-areas: 'top' 'center' 'footer'; }\n" +
+            "    .j-left { position: fixed; left: -280px; width: 260px; height: calc(100vh - 40px); top: 20px; z-index: 3000; transition: left 0.4s cubic-bezier(0.19, 1, 0.22, 1); background: var(--jettra-glass); backdrop-filter: blur(25px); }\n" +
+            "    .j-left.active { left: 12px; box-shadow: 0 0 50px rgba(0,0,0,0.8); }\n" +
+            "    .j-top { margin-left: 0; padding: 0 15px !important; }\n" +
+            "    .hide-on-mobile { display: none !important; }\n" +
+            "    .show-on-mobile { display: flex !important; }\n" +
+            "    .j-menu-toggle { display: flex !important; }\n" +
+            "    .hide-on-low-res { display: none !important; }\n" +
+            "    .show-on-low-res { display: inline-block !important; }\n" +
+            "  }\n" +
             "</style>";
     }
 
@@ -158,6 +166,10 @@ public class JettraTheme {
             "  document.body.className = 'theme-' + theme;\n" +
             "  localStorage.setItem('jettra-theme', theme);\n" +
             "  window.location.reload();\n" +
+            "}\n" +
+            "function toggleMobileMenu() {\n" +
+            "  const menu = document.querySelector('.j-left');\n" +
+            "  if(menu) menu.classList.toggle('active');\n" +
             "}\n" +
             "function toggleAvatarMenu() {\n" +
             "  const menu = document.getElementById('user-avatar-dropdown');\n" +
@@ -176,6 +188,13 @@ public class JettraTheme {
             "    }\n" +
             "    if(!e.target.closest('.j-select-icon-trigger')) {\n" +
             "      document.querySelectorAll('.j-select-icon-dropdown').forEach(d => d.style.display='none');\n" +
+            "    }\n" +
+            "    // Close mobile menu when clicking outside or on a link\n" +
+            "    if (window.innerWidth <= 768) {\n" +
+            "      const menu = document.querySelector('.j-left');\n" +
+            "      if (menu && menu.classList.contains('active') && !e.target.closest('.j-left') && !e.target.closest('.show-on-mobile')) {\n" +
+            "        menu.classList.remove('active');\n" +
+            "      }\n" +
             "    }\n" +
             "  });\n" +
             "});\n" +

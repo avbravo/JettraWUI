@@ -101,6 +101,12 @@ public abstract class JettraDashboardPage extends Page {
         if (fullTitle == null) fullTitle = "Jettra Global Dashboard";
         if (shortTitle == null) shortTitle = fullTitle.substring(0, 1);
 
+        io.jettra.wui.components.Button menuBtn = new io.jettra.wui.components.Button("\\u2630");
+        menuBtn.addClass("j-menu-toggle").addClass("show-on-mobile");
+        menuBtn.setProperty("type", "button");
+        menuBtn.setProperty("onclick", "toggleMobileMenu()");
+        top.add(menuBtn);
+
         io.jettra.wui.components.Header title = new io.jettra.wui.components.Header(2, "");
         title.setContent("<span class='hide-on-low-res'>" + fullTitle + "</span><span class='show-on-low-res'>" + shortTitle + "</span>");
         title.setStyle("margin", "0").setStyle("font-size", "1.1rem");
@@ -121,39 +127,39 @@ public abstract class JettraDashboardPage extends Page {
         // Language Selector
         SelectOneIcon langSelect = new SelectOneIcon("lang","");
         langSelect.setShowLabelInTrigger(false);
-        langSelect.addOption("en", "", "🇺🇸");
-        langSelect.addOption("es", "", "🇪🇸");
+        langSelect.addOption("en", "", "\uD83C\uDDFA\uD83C\uDDF8");
+        langSelect.addOption("es", "", "\uD83C\uDDEA\uD83C\uDDF8");
         
         String currentLang = params.getOrDefault("lang", defaultConfigLang).trim();
         if ("es".equals(currentLang)) {
-            langSelect.setSelectedValue("es", "", "🇪🇸");
+            langSelect.setSelectedValue("es", "", "\uD83C\uDDEA\uD83C\uDDF8");
         } else {
-            langSelect.setSelectedValue("en", "", "🇺🇸");
+            langSelect.setSelectedValue("en", "", "\uD83C\uDDFA\uD83C\uDDF8");
         }
         
         // Theme Selector
         SelectOneIcon themeSelect = new SelectOneIcon("theme","");
         themeSelect.setShowLabelInTrigger(false);
-        themeSelect.addOption("3d", "", "🚀");
-        themeSelect.addOption("cyberpunk", "", "🧬");
-        themeSelect.addOption("neon", "", "🧪");
-        themeSelect.addOption("glass", "", "🧊");
-        themeSelect.addOption("dark", "", "🌙");
-        themeSelect.addOption("white", "", "☀️");
-        themeSelect.addOption("material", "", "🎨");
-        themeSelect.addOption("futuristic", "", "✨");
-        themeSelect.addOption("modern", "", "🔳");
+        themeSelect.addOption("3d", "", "\uD83D\uDE80");
+        themeSelect.addOption("cyberpunk", "", "\uD83E\uDDEC");
+        themeSelect.addOption("neon", "", "\uD83E\uDDEA");
+        themeSelect.addOption("glass", "", "\uD83E\uDDC3");
+        themeSelect.addOption("dark", "", "\uD83C\uDF19");
+        themeSelect.addOption("white", "", "\u2600\uFE0F");
+        themeSelect.addOption("material", "", "\uD83C\uDFA8");
+        themeSelect.addOption("futuristic", "", "\u2728");
+        themeSelect.addOption("modern", "", "\uD83D\uDD33");
         
         String themeVal = defaultConfigTheme.toLowerCase();
-        String themeIcon = "🚀";
-        if (themeVal.equals("cyberpunk")) themeIcon = "🧬";
-        else if (themeVal.equals("neon")) themeIcon = "🧪";
-        else if (themeVal.equals("glass")) themeIcon = "🧊";
-        else if (themeVal.equals("dark")) themeIcon = "🌙";
-        else if (themeVal.equals("white")) themeIcon = "☀️";
-        else if (themeVal.equals("material")) themeIcon = "🎨";
-        else if (themeVal.equals("futuristic")) themeIcon = "✨";
-        else if (themeVal.equals("modern")) themeIcon = "🔳";
+        String themeIcon = "\uD83D\uDE80";
+        if (themeVal.equals("cyberpunk")) themeIcon = "\uD83E\uDDEC";
+        else if (themeVal.equals("neon")) themeIcon = "\uD83E\uDDEA";
+        else if (themeVal.equals("glass")) themeIcon = "\uD83E\uDDC3";
+        else if (themeVal.equals("dark")) themeIcon = "\uD83C\uDF19";
+        else if (themeVal.equals("white")) themeIcon = "\u2600\uFE0F";
+        else if (themeVal.equals("material")) themeIcon = "\uD83C\uDFA8";
+        else if (themeVal.equals("futuristic")) themeIcon = "\u2728";
+        else if (themeVal.equals("modern")) themeIcon = "\uD83D\uDD33";
         
         themeSelect.setSelectedValue(themeVal, "", themeIcon);
             
@@ -253,11 +259,11 @@ public abstract class JettraDashboardPage extends Page {
                 .append("    const arrow = el.querySelector('span:last-child');\n")
                 .append("    if (content.style.display === 'none') {\n")
                 .append("      content.style.display = 'block';\n")
-                .append("      arrow.innerHTML = '▼';\n")
+                .append("      arrow.innerHTML = '\u25BC';\n")
                 .append("      el.style.opacity = '1';\n")
                 .append("    } else {\n")
                 .append("      content.style.display = 'none';\n")
-                .append("      arrow.innerHTML = '▶';\n")
+                .append("      arrow.innerHTML = '\u25B6';\n")
                 .append("      el.style.opacity = '0.6';\n")
                 .append("    }\n")
                 .append("  }\n")
@@ -282,7 +288,7 @@ public abstract class JettraDashboardPage extends Page {
 
     protected void addCategory(String name, String[] comps, String compIcon) {
         String categoryStyle = "color:#0ff; margin:15px 0 8px 0; font-weight:600; text-transform:uppercase; font-size:12px; letter-spacing:1px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; opacity:0.8; transition:opacity 0.2s;";
-        menuHtmlBuilder.append("<div style='").append(categoryStyle).append("' onclick='toggleCategory(this)'><span>").append(name).append("</span> <span>▼</span></div>");
+        menuHtmlBuilder.append("<div style='").append(categoryStyle).append("' onclick='toggleCategory(this)'><span>").append(name).append("</span> <span>\u25BC</span></div>");
         menuHtmlBuilder.append("<div class='menu-category-content' style='display:none;'>");
         for (String comp : comps) {
             appendMenuItem(comp, "/" + comp.toLowerCase(), compIcon);
@@ -299,7 +305,7 @@ public abstract class JettraDashboardPage extends Page {
     }
 
     protected void setupFooter(Footer footer) {
-        footer.setContent("<p>JettraStack © 2026. Data connection secure.</p>");
+        footer.setContent("<p>JettraStack \u00A9 2026. Data connection secure.</p>");
     }
 
     protected void setupAdditionalComponents() {

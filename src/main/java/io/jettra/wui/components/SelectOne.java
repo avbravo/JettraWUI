@@ -7,6 +7,8 @@ import io.jettra.wui.core.UIComponent;
  */
 public class SelectOne extends UIComponent {
     
+    private String defaultValue;
+    
     public SelectOne(String name) {
         super("select");
         setProperty("name", name);
@@ -23,6 +25,11 @@ public class SelectOne extends UIComponent {
             .setStyle("transition", "all 0.3s ease");
     }
 
+    public SelectOne setDefault(String value) {
+        this.defaultValue = value;
+        return this;
+    }
+
     /**
      * Agrega una opción al selector.
      * @param value el valor interno de la opción.
@@ -35,5 +42,36 @@ public class SelectOne extends UIComponent {
         option.setContent(label);
         add(option);
         return this;
+    }
+
+    @Override
+    public String render() {
+        if (!getChildren().isEmpty()) {
+            boolean found = false;
+            if (defaultValue != null) {
+                for (UIComponent child : getChildren()) {
+                    if (child.getTag().equals("option")) {
+                        String val = child.getProperties().get("value");
+                        if (defaultValue.equals(val)) {
+                            child.setProperty("selected", "selected");
+                            found = true;
+                        } else {
+                            child.getProperties().remove("selected");
+                        }
+                    }
+                }
+            }
+            
+            if (!found) {
+                // Select first option by default
+                for (UIComponent child : getChildren()) {
+                    if (child.getTag().equals("option")) {
+                        child.setProperty("selected", "selected");
+                        break;
+                    }
+                }
+            }
+        }
+        return super.render();
     }
 }
