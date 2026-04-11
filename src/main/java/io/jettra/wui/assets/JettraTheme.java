@@ -48,6 +48,38 @@ public class JettraTheme {
             "  --jettra-text: #0f172a;\n" +
             "  --jettra-accent: #0284c7;\n" +
             "}\n" +
+            "body.theme-material-plain {\n" +
+            "  --jettra-bg: #fdfdfd;\n" +
+            "  --jettra-glow: rgba(0, 0, 0, 0);\n" +
+            "  --jettra-glass: #ffffff;\n" +
+            "  --jettra-border: #e0e0e0;\n" +
+            "  --jettra-text: #202124;\n" +
+            "  --jettra-accent: #1a73e8;\n" +
+            "}\n" +
+            "body.theme-plain {\n" +
+            "  --jettra-bg: #fff;\n" +
+            "  --jettra-glow: transparent;\n" +
+            "  --jettra-glass: #fff;\n" +
+            "  --jettra-border: #ccc;\n" +
+            "  --jettra-text: #333;\n" +
+            "  --jettra-accent: #000;\n" +
+            "}\n" +
+            "body.theme-tailwindcss {\n" +
+            "  --jettra-bg: #f3f4f6;\n" +
+            "  --jettra-glow: transparent;\n" +
+            "  --jettra-glass: #ffffff;\n" +
+            "  --jettra-border: #e5e7eb;\n" +
+            "  --jettra-text: #1f2937;\n" +
+            "  --jettra-accent: #3b82f6;\n" +
+            "}\n" +
+            "body.theme-tailwindcss-3d {\n" +
+            "  --jettra-bg: #1e293b;\n" +
+            "  --jettra-glow: rgba(56, 189, 248, 0.4);\n" +
+            "  --jettra-glass: rgba(15, 23, 42, 0.8);\n" +
+            "  --jettra-border: #334155;\n" +
+            "  --jettra-text: #f8fafc;\n" +
+            "  --jettra-accent: #38bdf8;\n" +
+            "}\n" +
             "body.theme-dark {\n" +
             "  --jettra-bg: #020617;\n" +
             "  --jettra-glow: rgba(56, 189, 248, 0.3);\n" +
@@ -102,6 +134,13 @@ public class JettraTheme {
             "body.theme-cyberpunk { background-image: radial-gradient(circle, #2a0134 0%, #0b0114 100%); }\n" +
             "body.theme-neon { background-image: linear-gradient(135deg, #000 0%, #051a05 100%); }\n" +
             "body.theme-dark { background-image: linear-gradient(to bottom, #0f172a, #020617); }\n" +
+            "body.theme-material-plain { background: #fdfdfd; }\n" +
+            "body.theme-plain { background: #fff; }\n" +
+            "body.theme-tailwindcss { background: #f3f4f6; }\n" +
+            "body.theme-tailwindcss-3d { background-image: linear-gradient(to bottom right, #1e293b, #0f172a); }\n" +
+            "/* Tailwind helpers embedded */\n" +
+            "body.theme-tailwindcss .j-center, body.theme-tailwindcss .j-left, body.theme-tailwindcss .j-top, body.theme-tailwindcss .j-footer { box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1),0 1px 2px 0 rgba(0,0,0,0.06); border-radius: 0.5rem; border: none; }\n" +
+            "body.theme-material-plain .j-3d-effect, body.theme-plain .j-3d-effect, body.theme-tailwindcss .j-3d-effect, body.theme-white .j-3d-effect { box-shadow: none !important; transform: none !important; }\n" +
             ".j-dashboard {\n" +
             "  display: grid; grid-template-columns: 260px 1fr; grid-template-rows: 64px 1fr auto;\n" +
             "  grid-template-areas: 'top top' 'left center' 'footer footer';\n" +
