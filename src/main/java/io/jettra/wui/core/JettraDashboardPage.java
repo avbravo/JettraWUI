@@ -101,7 +101,7 @@ public abstract class JettraDashboardPage extends Page {
         if (fullTitle == null) fullTitle = "Jettra Global Dashboard";
         if (shortTitle == null) shortTitle = fullTitle.substring(0, 1);
 
-        io.jettra.wui.components.Button menuBtn = new io.jettra.wui.components.Button("\\u2630");
+        io.jettra.wui.components.Button menuBtn = new io.jettra.wui.components.Button("\u2630");
         menuBtn.addClass("j-menu-toggle").addClass("show-on-mobile");
         menuBtn.setProperty("type", "button");
         menuBtn.setProperty("onclick", "toggleMobileMenu()");

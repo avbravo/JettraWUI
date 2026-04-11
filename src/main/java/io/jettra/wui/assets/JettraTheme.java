@@ -141,8 +141,8 @@ public class JettraTheme {
             "  .show-on-mobile { display: none !important; }\n" +
             "  .show-on-low-res { display: none !important; }\n" +
             "  .j-menu-toggle { cursor: pointer; display: none; align-items: center; justify-content: center; width: 40px; height: 40px; color: var(--jettra-accent); font-size: 24px; }\n" +
-            "  /* Mobile Styles */\n" +
-            "  @media (max-width: 768px) {\n" +
+            "  /* Mobile & Tablet Styles */\n" +
+            "  @media (max-width: 1024px) {\n" +
             "    .j-dashboard { grid-template-columns: 1fr; grid-template-areas: 'top' 'center' 'footer'; }\n" +
             "    .j-left { position: fixed; left: -280px; width: 260px; height: calc(100vh - 40px); top: 20px; z-index: 3000; transition: left 0.4s cubic-bezier(0.19, 1, 0.22, 1); background: var(--jettra-glass); backdrop-filter: blur(25px); }\n" +
             "    .j-left.active { left: 12px; box-shadow: 0 0 50px rgba(0,0,0,0.8); }\n" +
@@ -190,7 +190,7 @@ public class JettraTheme {
             "      document.querySelectorAll('.j-select-icon-dropdown').forEach(d => d.style.display='none');\n" +
             "    }\n" +
             "    // Close mobile menu when clicking outside or on a link\n" +
-            "    if (window.innerWidth <= 768) {\n" +
+            "    if (window.innerWidth <= 1024) {\n" +
             "      const menu = document.querySelector('.j-left');\n" +
             "      if (menu && menu.classList.contains('active') && !e.target.closest('.j-left') && !e.target.closest('.show-on-mobile')) {\n" +
             "        menu.classList.remove('active');\n" +
