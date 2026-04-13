@@ -201,6 +201,25 @@ public class JettraTheme {
      */
     public static String getJS() {
         return "<script>\n" +
+            "function jtFire(id) {\n" +
+            "  const el = document.getElementById(id);\n" +
+            "  const form = el ? el.closest('form') : null;\n" +
+            "  if (form) {\n" +
+            "    let input = form.querySelector('input[name=\"_jtEvent\"]');\n" +
+            "    if (!input) {\n" +
+            "      input = document.createElement('input');\n" +
+            "      input.type = 'hidden';\n" +
+            "      input.name = '_jtEvent';\n" +
+            "      form.appendChild(input);\n" +
+            "    }\n" +
+            "    input.value = id;\n" +
+            "    form.submit();\n" +
+            "  } else {\n" +
+            "    const url = new URL(window.location.href);\n" +
+            "    url.searchParams.set('_jtEvent', id);\n" +
+            "    window.location.href = url.href;\n" +
+            "  }\n" +
+            "}\n" +
             "function changeTheme(theme) {\n" +
             "  document.body.className = 'theme-' + theme;\n" +
             "  localStorage.setItem('jettra-theme', theme);\n" +
