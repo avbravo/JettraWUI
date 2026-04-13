@@ -24,6 +24,8 @@ public abstract class Page extends UIComponent implements HttpHandler {
         this.title = title;
         // Initialize ViewModels with @InjectViewModel
         JettraMVC.initializeViewModels(this);
+        // Initialize Dependencies with @Inject
+        JettraMVC.injectDependencies(this);
     }
 
     protected Object get(Scope scope, String key) {

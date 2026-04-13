@@ -2,6 +2,7 @@ package io.jettra.wui.mvc;
 
 import io.jettra.wui.core.Page;
 import io.jettra.wui.core.UIComponent;
+import io.jettra.wui.core.annotations.Inject;
 import io.jettra.wui.core.annotations.InjectViewModel;
 import io.jettra.wui.core.annotations.JettraViewModel;
 import io.jettra.wui.core.annotations.InjectProperties;
@@ -16,6 +17,36 @@ import java.util.Properties;
  * Utility class to handle MVC binding between ViewModels and UIComponents.
  */
 public class JettraMVC {
+
+    /**
+     * Inyecta dependencias marcadas con @Inject.
+     */
+    public static void injectDependencies(Page page) {
+        for (Field field : page.getClass().getDeclaredFields()) {
+            if (field.isAnnotationPresent(Inject.class)) {
+                try {
+                    field.setAccessible(true);
+                    if (field.get(page) == null) {
+                        Class<?> type = field.getType();
+                        Class<?> implClass = type;
+                        if (type.isInterface()) {
+                            try {
+                                // Convención simple: Interface + Impl
+                                implClass = Class.forName(type.getName() + "Impl");
+                            } catch (ClassNotFoundException e) {
+                                System.err.println("Implementation not found for interface " + type.getName());
+                                continue;
+                            }
+                        }
+                        Object instance = implClass.getDeclaredConstructor().newInstance();
+                        field.set(page, instance);
+                    }
+                } catch (Exception e) {
+                    System.err.println("Error injecting dependency into " + field.getName() + ": " + e.getMessage());
+                }
+            }
+        }
+    }
 
     /**
      * Scans a page for @InjectViewModel fields and initializes them.
