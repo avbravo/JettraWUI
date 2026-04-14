@@ -97,7 +97,15 @@ public class Datatable extends UIComponent {
     public Datatable setPrevIcon(String icon) { this.prevIcon = icon; return this; }
     public Datatable setNextIcon(String icon) { this.nextIcon = icon; return this; }
 
-    public void addHeaderRow(io.jettra.wui.components.Row row) {
+    public Datatable addHeaderRow(String... headers) {
+        io.jettra.wui.components.Row row = new io.jettra.wui.components.Row();
+        for (String h : headers) {
+            row.add(new io.jettra.wui.components.TD(h));
+        }
+        return addHeaderRow(row);
+    }
+
+    public Datatable addHeaderRow(io.jettra.wui.components.Row row) {
         row.setStyle("border-bottom", "2px solid var(--jettra-accent)");
         row.setStyle("background", "rgba(0,255,255,0.1)");
         for (UIComponent child : row.getChildren()) {
@@ -112,9 +120,10 @@ public class Datatable extends UIComponent {
         try {
             getChildren().get(1).getChildren().get(0).getChildren().get(0).add(row);
         } catch (Exception e) {}
+        return this;
     }
 
-    public void addRow(io.jettra.wui.components.Row row) {
+    public Datatable addRow(io.jettra.wui.components.Row row) {
         row.setStyle("border-bottom", "1px solid var(--jettra-border)");
         for (UIComponent child : row.getChildren()) {
             child.setStyle("padding", "12px");
@@ -123,6 +132,7 @@ public class Datatable extends UIComponent {
         try {
             getChildren().get(1).getChildren().get(0).getChildren().get(1).add(row);
         } catch (Exception e) {}
+        return this;
     }
 
     @Override

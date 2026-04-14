@@ -18,11 +18,14 @@ import io.jettra.wui.complex.Datatable;
 
 Datatable dt = new Datatable();
 
-// 1. Agregar Encabezado
-Row header = new Row(new TD("ID"), new TD("Nombre"), new TD("Rol"));
-dt.addHeaderRow(header);
+// 1. Agregar Encabezado (Sintaxis simplificada y fluida)
+dt.addHeaderRow("ID", "Nombre", "Rol");
+
+// Opcional: Sintaxis con Row y TD si deseas aplicar estilos especiales al encabezado
+// dt.addHeaderRow(new Row(new TD("ID"), new TD("Nombre"), new TD("Rol")));
 
 // 2. Agregar Filas
+
 for (int i = 0; i < usuarios.size(); i++) {
     Row row = new Row();
     row.add(new TD(usuarios.get(i).getId()));
@@ -31,7 +34,19 @@ for (int i = 0; i < usuarios.size(); i++) {
     
     dt.addRow(row);
 }
+
+// Opcionalmente, se puede utilizar el estilo Fluent API:
+// new Datatable()
+//     .addHeaderRow("ID", "Nombre")
+//     .addRow(new Row(new TD("1"), new TD("John Doe")));
 ```
+
+### Editor Web (WebDesignerPage)
+En el Jettra Web Designer, el componente `Datatable` permite diseño "Drag & Drop" intuitivo:
+1. Arrastra `Datatable` al Canvas.
+2. Usando el panel inspector, añade, nombra y elimina tantas columnas como desees (p. ej. "Col 1", "Col 2").
+3. Directamente dentro del Canvas, se ha habilitado que las áreas de las celdas (dentro de las filas generadas automáticamente) admitan soltar componentes visuales con facilidad. ¡Puedes arrastrar `Button`, `SelectOne`, `TextBox`, `CheckBox` y cualquier otro componente para introducirlos fácilmente dentro de las filas! El generador automáticamente creará el código `java` anidándolos dentro de `TD`.
+
 
 ### Funciones Interactivas Automáticas
 
