@@ -35,4 +35,58 @@ public class RadioGroupButton extends UIComponent {
             }
         }
     }
+
+    @Override
+    public RadioGroupButton setId(String id) {
+        super.setId(id);
+        return this;
+    }
+
+    @Override
+    public RadioGroupButton setProperty(String key, String value) {
+        super.setProperty(key, value);
+        return this;
+    }
+
+    @Override
+    public RadioGroupButton setStyle(String key, String value) {
+        super.setStyle(key, value);
+        return this;
+    }
+
+    @Override
+    public RadioGroupButton addClass(String className) {
+        super.addClass(className);
+        return this;
+    }
+
+    @Override
+    public RadioGroupButton removeClass(String className) {
+        super.removeClass(className);
+        return this;
+    }
+
+    @Override
+    public RadioGroupButton setContent(String content) {
+        super.setContent(content);
+        return this;
+    }
+
+    @Override
+    public RadioGroupButton setUpdate(String ids) {
+        super.setUpdate(ids);
+        return this;
+    }
+
+    @Override
+    public RadioGroupButton addClickListener(io.jettra.wui.events.ClickListener listener) {
+        super.addClickListener(listener);
+        return this;
+    }
+
+    @Override
+    public RadioGroupButton add(io.jettra.wui.core.UIComponent child) {
+        super.add(child);
+        return this;
+    }
 }

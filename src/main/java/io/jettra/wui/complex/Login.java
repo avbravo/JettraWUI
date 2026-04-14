@@ -25,4 +25,58 @@ public class Login extends Form {
         submit.setStyle("margin-top", "20px");
         add(submit);
     }
+
+    @Override
+    public Login setId(String id) {
+        super.setId(id);
+        return this;
+    }
+
+    @Override
+    public Login setProperty(String key, String value) {
+        super.setProperty(key, value);
+        return this;
+    }
+
+    @Override
+    public Login setStyle(String key, String value) {
+        super.setStyle(key, value);
+        return this;
+    }
+
+    @Override
+    public Login addClass(String className) {
+        super.addClass(className);
+        return this;
+    }
+
+    @Override
+    public Login removeClass(String className) {
+        super.removeClass(className);
+        return this;
+    }
+
+    @Override
+    public Login setContent(String content) {
+        super.setContent(content);
+        return this;
+    }
+
+    @Override
+    public Login setUpdate(String ids) {
+        super.setUpdate(ids);
+        return this;
+    }
+
+    @Override
+    public Login addClickListener(io.jettra.wui.events.ClickListener listener) {
+        super.addClickListener(listener);
+        return this;
+    }
+
+    @Override
+    public Login add(io.jettra.wui.core.UIComponent child) {
+        super.add(child);
+        return this;
+    }
 }

@@ -132,4 +132,58 @@ public class ProgressBar extends Div {
         // Simple internal style injector for component-specific animations
         this.add(new Style(css));
     }
+
+    @Override
+    public ProgressBar setId(String id) {
+        super.setId(id);
+        return this;
+    }
+
+    @Override
+    public ProgressBar setProperty(String key, String value) {
+        super.setProperty(key, value);
+        return this;
+    }
+
+    @Override
+    public ProgressBar setStyle(String key, String value) {
+        super.setStyle(key, value);
+        return this;
+    }
+
+    @Override
+    public ProgressBar addClass(String className) {
+        super.addClass(className);
+        return this;
+    }
+
+    @Override
+    public ProgressBar removeClass(String className) {
+        super.removeClass(className);
+        return this;
+    }
+
+    @Override
+    public ProgressBar setContent(String content) {
+        super.setContent(content);
+        return this;
+    }
+
+    @Override
+    public ProgressBar setUpdate(String ids) {
+        super.setUpdate(ids);
+        return this;
+    }
+
+    @Override
+    public ProgressBar addClickListener(io.jettra.wui.events.ClickListener listener) {
+        super.addClickListener(listener);
+        return this;
+    }
+
+    @Override
+    public ProgressBar add(io.jettra.wui.core.UIComponent child) {
+        super.add(child);
+        return this;
+    }
 }

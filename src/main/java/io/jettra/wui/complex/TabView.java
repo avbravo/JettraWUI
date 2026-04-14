@@ -144,4 +144,58 @@ public class TabView extends UIComponent {
 
         return super.render() + css + js;
     }
+
+    @Override
+    public TabView setId(String id) {
+        super.setId(id);
+        return this;
+    }
+
+    @Override
+    public TabView setProperty(String key, String value) {
+        super.setProperty(key, value);
+        return this;
+    }
+
+    @Override
+    public TabView setStyle(String key, String value) {
+        super.setStyle(key, value);
+        return this;
+    }
+
+    @Override
+    public TabView addClass(String className) {
+        super.addClass(className);
+        return this;
+    }
+
+    @Override
+    public TabView removeClass(String className) {
+        super.removeClass(className);
+        return this;
+    }
+
+    @Override
+    public TabView setContent(String content) {
+        super.setContent(content);
+        return this;
+    }
+
+    @Override
+    public TabView setUpdate(String ids) {
+        super.setUpdate(ids);
+        return this;
+    }
+
+    @Override
+    public TabView addClickListener(io.jettra.wui.events.ClickListener listener) {
+        super.addClickListener(listener);
+        return this;
+    }
+
+    @Override
+    public TabView add(io.jettra.wui.core.UIComponent child) {
+        super.add(child);
+        return this;
+    }
 }

@@ -53,4 +53,58 @@ public class LeafletExtension extends UIComponent {
         }
         return "<style>\n" + cachedLeafletCss + "\n</style>\n<script>\n" + cachedLeafletJs + "\n</script>\n";
     }
+
+    @Override
+    public LeafletExtension setId(String id) {
+        super.setId(id);
+        return this;
+    }
+
+    @Override
+    public LeafletExtension setProperty(String key, String value) {
+        super.setProperty(key, value);
+        return this;
+    }
+
+    @Override
+    public LeafletExtension setStyle(String key, String value) {
+        super.setStyle(key, value);
+        return this;
+    }
+
+    @Override
+    public LeafletExtension addClass(String className) {
+        super.addClass(className);
+        return this;
+    }
+
+    @Override
+    public LeafletExtension removeClass(String className) {
+        super.removeClass(className);
+        return this;
+    }
+
+    @Override
+    public LeafletExtension setContent(String content) {
+        super.setContent(content);
+        return this;
+    }
+
+    @Override
+    public LeafletExtension setUpdate(String ids) {
+        super.setUpdate(ids);
+        return this;
+    }
+
+    @Override
+    public LeafletExtension addClickListener(io.jettra.wui.events.ClickListener listener) {
+        super.addClickListener(listener);
+        return this;
+    }
+
+    @Override
+    public LeafletExtension add(io.jettra.wui.core.UIComponent child) {
+        super.add(child);
+        return this;
+    }
 }

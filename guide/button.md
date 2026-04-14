@@ -22,7 +22,7 @@ Configure the button in a single chain of method calls:
 
 ```java
 Button btn = new Button("Eliminar")
-    .id("delBtn")
+    .setId("delBtn")
     .addClass("custom-padding")
     .setStyle("margin-top", "10px")
     .addClickListener(() -> {
@@ -56,7 +56,7 @@ Button helpBtn = new Button("Ver Guía")
 
 | Method | Description | Returns |
 | --- | --- | --- |
-| `.id(String)` | Sets the component ID. | `Button` |
+| `.setId(String)` | Sets the component ID. | `Button` |
 | `.setIcon(String)` | Sets an icon text/emoji. | `Button` |
 | `.addClass(String)` | Appends a CSS class. | `Button` |
 | `.setStyle(String, String)` | Sets an inline CSS style. | `Button` |

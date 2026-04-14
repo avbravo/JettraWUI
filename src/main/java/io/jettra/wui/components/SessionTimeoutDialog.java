@@ -81,4 +81,58 @@ public class SessionTimeoutDialog extends UIComponent {
         
         return builder.toString();
     }
+
+    @Override
+    public SessionTimeoutDialog setId(String id) {
+        super.setId(id);
+        return this;
+    }
+
+    @Override
+    public SessionTimeoutDialog setProperty(String key, String value) {
+        super.setProperty(key, value);
+        return this;
+    }
+
+    @Override
+    public SessionTimeoutDialog setStyle(String key, String value) {
+        super.setStyle(key, value);
+        return this;
+    }
+
+    @Override
+    public SessionTimeoutDialog addClass(String className) {
+        super.addClass(className);
+        return this;
+    }
+
+    @Override
+    public SessionTimeoutDialog removeClass(String className) {
+        super.removeClass(className);
+        return this;
+    }
+
+    @Override
+    public SessionTimeoutDialog setContent(String content) {
+        super.setContent(content);
+        return this;
+    }
+
+    @Override
+    public SessionTimeoutDialog setUpdate(String ids) {
+        super.setUpdate(ids);
+        return this;
+    }
+
+    @Override
+    public SessionTimeoutDialog addClickListener(io.jettra.wui.events.ClickListener listener) {
+        super.addClickListener(listener);
+        return this;
+    }
+
+    @Override
+    public SessionTimeoutDialog add(io.jettra.wui.core.UIComponent child) {
+        super.add(child);
+        return this;
+    }
 }

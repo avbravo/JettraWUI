@@ -122,7 +122,7 @@ public class Tree extends Div {
         }
 
         @Override
-        public io.jettra.wui.core.UIComponent add(io.jettra.wui.core.UIComponent component) {
+        public TreeItem add(io.jettra.wui.core.UIComponent component) {
            if (component instanceof TreeItem) {
                return addItem((TreeItem) component);
            }
@@ -148,5 +148,107 @@ public class Tree extends Div {
             }
             return this;
         }
+
+        @Override
+        public TreeItem setId(String id) {
+            super.setId(id);
+            return this;
+        }
+
+        @Override
+        public TreeItem setProperty(String key, String value) {
+            super.setProperty(key, value);
+            return this;
+        }
+
+        @Override
+        public TreeItem setStyle(String key, String value) {
+            super.setStyle(key, value);
+            return this;
+        }
+
+        @Override
+        public TreeItem addClass(String className) {
+            super.addClass(className);
+            return this;
+        }
+
+        @Override
+        public TreeItem removeClass(String className) {
+            super.removeClass(className);
+            return this;
+        }
+
+        @Override
+        public TreeItem setContent(String content) {
+            super.setContent(content);
+            return this;
+        }
+
+        @Override
+        public TreeItem setUpdate(String ids) {
+            super.setUpdate(ids);
+            return this;
+        }
+
+        @Override
+        public TreeItem addClickListener(io.jettra.wui.events.ClickListener listener) {
+            super.addClickListener(listener);
+            return this;
+        }
+    }
+
+    @Override
+    public Tree setId(String id) {
+        super.setId(id);
+        return this;
+    }
+
+    @Override
+    public Tree setProperty(String key, String value) {
+        super.setProperty(key, value);
+        return this;
+    }
+
+    @Override
+    public Tree setStyle(String key, String value) {
+        super.setStyle(key, value);
+        return this;
+    }
+
+    @Override
+    public Tree addClass(String className) {
+        super.addClass(className);
+        return this;
+    }
+
+    @Override
+    public Tree removeClass(String className) {
+        super.removeClass(className);
+        return this;
+    }
+
+    @Override
+    public Tree setContent(String content) {
+        super.setContent(content);
+        return this;
+    }
+
+    @Override
+    public Tree setUpdate(String ids) {
+        super.setUpdate(ids);
+        return this;
+    }
+
+    @Override
+    public Tree addClickListener(io.jettra.wui.events.ClickListener listener) {
+        super.addClickListener(listener);
+        return this;
+    }
+
+    @Override
+    public Tree add(io.jettra.wui.core.UIComponent child) {
+        super.add(child);
+        return this;
     }
 }

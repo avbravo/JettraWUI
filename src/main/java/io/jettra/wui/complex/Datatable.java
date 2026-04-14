@@ -222,4 +222,58 @@ public class Datatable extends UIComponent {
         
         return baseHtml + script;
     }
+
+    @Override
+    public Datatable setId(String id) {
+        super.setId(id);
+        return this;
+    }
+
+    @Override
+    public Datatable setProperty(String key, String value) {
+        super.setProperty(key, value);
+        return this;
+    }
+
+    @Override
+    public Datatable setStyle(String key, String value) {
+        super.setStyle(key, value);
+        return this;
+    }
+
+    @Override
+    public Datatable addClass(String className) {
+        super.addClass(className);
+        return this;
+    }
+
+    @Override
+    public Datatable removeClass(String className) {
+        super.removeClass(className);
+        return this;
+    }
+
+    @Override
+    public Datatable setContent(String content) {
+        super.setContent(content);
+        return this;
+    }
+
+    @Override
+    public Datatable setUpdate(String ids) {
+        super.setUpdate(ids);
+        return this;
+    }
+
+    @Override
+    public Datatable addClickListener(io.jettra.wui.events.ClickListener listener) {
+        super.addClickListener(listener);
+        return this;
+    }
+
+    @Override
+    public Datatable add(io.jettra.wui.core.UIComponent child) {
+        super.add(child);
+        return this;
+    }
 }

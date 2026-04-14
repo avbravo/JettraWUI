@@ -101,4 +101,58 @@ public class Spinner extends UIComponent {
         String debugEntry = "<!-- Spinner: " + name + " (initial: " + value + ") -->\n";
         return debugEntry + super.render() + js;
     }
+
+    @Override
+    public Spinner setId(String id) {
+        super.setId(id);
+        return this;
+    }
+
+    @Override
+    public Spinner setProperty(String key, String value) {
+        super.setProperty(key, value);
+        return this;
+    }
+
+    @Override
+    public Spinner setStyle(String key, String value) {
+        super.setStyle(key, value);
+        return this;
+    }
+
+    @Override
+    public Spinner addClass(String className) {
+        super.addClass(className);
+        return this;
+    }
+
+    @Override
+    public Spinner removeClass(String className) {
+        super.removeClass(className);
+        return this;
+    }
+
+    @Override
+    public Spinner setContent(String content) {
+        super.setContent(content);
+        return this;
+    }
+
+    @Override
+    public Spinner setUpdate(String ids) {
+        super.setUpdate(ids);
+        return this;
+    }
+
+    @Override
+    public Spinner addClickListener(io.jettra.wui.events.ClickListener listener) {
+        super.addClickListener(listener);
+        return this;
+    }
+
+    @Override
+    public Spinner add(io.jettra.wui.core.UIComponent child) {
+        super.add(child);
+        return this;
+    }
 }

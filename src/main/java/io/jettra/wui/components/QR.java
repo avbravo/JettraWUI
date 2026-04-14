@@ -73,4 +73,58 @@ public class QR extends UIComponent {
         
         return super.render() + js.toString();
     }
+
+    @Override
+    public QR setId(String id) {
+        super.setId(id);
+        return this;
+    }
+
+    @Override
+    public QR setProperty(String key, String value) {
+        super.setProperty(key, value);
+        return this;
+    }
+
+    @Override
+    public QR setStyle(String key, String value) {
+        super.setStyle(key, value);
+        return this;
+    }
+
+    @Override
+    public QR addClass(String className) {
+        super.addClass(className);
+        return this;
+    }
+
+    @Override
+    public QR removeClass(String className) {
+        super.removeClass(className);
+        return this;
+    }
+
+    @Override
+    public QR setContent(String content) {
+        super.setContent(content);
+        return this;
+    }
+
+    @Override
+    public QR setUpdate(String ids) {
+        super.setUpdate(ids);
+        return this;
+    }
+
+    @Override
+    public QR addClickListener(io.jettra.wui.events.ClickListener listener) {
+        super.addClickListener(listener);
+        return this;
+    }
+
+    @Override
+    public QR add(io.jettra.wui.core.UIComponent child) {
+        super.add(child);
+        return this;
+    }
 }

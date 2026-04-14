@@ -20,4 +20,58 @@ public class RadioButton extends UIComponent {
         this.setStyle("margin-right", "8px");
         this.setStyle("accent-color", "var(--jettra-accent)");
     }
+
+    @Override
+    public RadioButton setId(String id) {
+        super.setId(id);
+        return this;
+    }
+
+    @Override
+    public RadioButton setProperty(String key, String value) {
+        super.setProperty(key, value);
+        return this;
+    }
+
+    @Override
+    public RadioButton setStyle(String key, String value) {
+        super.setStyle(key, value);
+        return this;
+    }
+
+    @Override
+    public RadioButton addClass(String className) {
+        super.addClass(className);
+        return this;
+    }
+
+    @Override
+    public RadioButton removeClass(String className) {
+        super.removeClass(className);
+        return this;
+    }
+
+    @Override
+    public RadioButton setContent(String content) {
+        super.setContent(content);
+        return this;
+    }
+
+    @Override
+    public RadioButton setUpdate(String ids) {
+        super.setUpdate(ids);
+        return this;
+    }
+
+    @Override
+    public RadioButton addClickListener(io.jettra.wui.events.ClickListener listener) {
+        super.addClickListener(listener);
+        return this;
+    }
+
+    @Override
+    public RadioButton add(io.jettra.wui.core.UIComponent child) {
+        super.add(child);
+        return this;
+    }
 }

@@ -75,4 +75,58 @@ public class Schedule extends UIComponent {
             this.title = title; this.day = day; this.startTime = startTime; this.onClickJs = onClickJs;
         }
     }
+
+    @Override
+    public Schedule setId(String id) {
+        super.setId(id);
+        return this;
+    }
+
+    @Override
+    public Schedule setProperty(String key, String value) {
+        super.setProperty(key, value);
+        return this;
+    }
+
+    @Override
+    public Schedule setStyle(String key, String value) {
+        super.setStyle(key, value);
+        return this;
+    }
+
+    @Override
+    public Schedule addClass(String className) {
+        super.addClass(className);
+        return this;
+    }
+
+    @Override
+    public Schedule removeClass(String className) {
+        super.removeClass(className);
+        return this;
+    }
+
+    @Override
+    public Schedule setContent(String content) {
+        super.setContent(content);
+        return this;
+    }
+
+    @Override
+    public Schedule setUpdate(String ids) {
+        super.setUpdate(ids);
+        return this;
+    }
+
+    @Override
+    public Schedule addClickListener(io.jettra.wui.events.ClickListener listener) {
+        super.addClickListener(listener);
+        return this;
+    }
+
+    @Override
+    public Schedule add(io.jettra.wui.core.UIComponent child) {
+        super.add(child);
+        return this;
+    }
 }

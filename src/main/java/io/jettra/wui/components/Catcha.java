@@ -72,4 +72,58 @@ public class Catcha extends UIComponent {
         
         return super.render() + js.toString();
     }
+
+    @Override
+    public Catcha setId(String id) {
+        super.setId(id);
+        return this;
+    }
+
+    @Override
+    public Catcha setProperty(String key, String value) {
+        super.setProperty(key, value);
+        return this;
+    }
+
+    @Override
+    public Catcha setStyle(String key, String value) {
+        super.setStyle(key, value);
+        return this;
+    }
+
+    @Override
+    public Catcha addClass(String className) {
+        super.addClass(className);
+        return this;
+    }
+
+    @Override
+    public Catcha removeClass(String className) {
+        super.removeClass(className);
+        return this;
+    }
+
+    @Override
+    public Catcha setContent(String content) {
+        super.setContent(content);
+        return this;
+    }
+
+    @Override
+    public Catcha setUpdate(String ids) {
+        super.setUpdate(ids);
+        return this;
+    }
+
+    @Override
+    public Catcha addClickListener(io.jettra.wui.events.ClickListener listener) {
+        super.addClickListener(listener);
+        return this;
+    }
+
+    @Override
+    public Catcha add(io.jettra.wui.core.UIComponent child) {
+        super.add(child);
+        return this;
+    }
 }

@@ -184,6 +184,54 @@ public class FolderSelector extends Div {
     public boolean isExcludeTarget() {
         return excludeTarget;
     }
+
+    @Override
+    public FolderSelector setId(String id) {
+        super.setId(id);
+        return this;
+    }
+
+    @Override
+    public FolderSelector setProperty(String key, String value) {
+        super.setProperty(key, value);
+        return this;
+    }
+
+    @Override
+    public FolderSelector setStyle(String key, String value) {
+        super.setStyle(key, value);
+        return this;
+    }
+
+    @Override
+    public FolderSelector addClass(String className) {
+        super.addClass(className);
+        return this;
+    }
+
+    @Override
+    public FolderSelector removeClass(String className) {
+        super.removeClass(className);
+        return this;
+    }
+
+    @Override
+    public FolderSelector setContent(String content) {
+        super.setContent(content);
+        return this;
+    }
+
+    @Override
+    public FolderSelector addClickListener(io.jettra.wui.events.ClickListener listener) {
+        super.addClickListener(listener);
+        return this;
+    }
+
+    @Override
+    public FolderSelector add(io.jettra.wui.core.UIComponent child) {
+        super.add(child);
+        return this;
+    }
 }
 
 

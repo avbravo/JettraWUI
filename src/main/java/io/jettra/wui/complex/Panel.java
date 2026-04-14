@@ -32,12 +32,60 @@ public class Panel extends Div {
     }
     
     @Override
-    public UIComponent add(UIComponent component) {
+    public Panel add(UIComponent component) {
         if (!columns.isEmpty()) {
             columns.get(0).add(component);
         } else {
             super.add(component);
         }
+        return this;
+    }
+
+    @Override
+    public Panel setId(String id) {
+        super.setId(id);
+        return this;
+    }
+
+    @Override
+    public Panel setProperty(String key, String value) {
+        super.setProperty(key, value);
+        return this;
+    }
+
+    @Override
+    public Panel setStyle(String key, String value) {
+        super.setStyle(key, value);
+        return this;
+    }
+
+    @Override
+    public Panel addClass(String className) {
+        super.addClass(className);
+        return this;
+    }
+
+    @Override
+    public Panel removeClass(String className) {
+        super.removeClass(className);
+        return this;
+    }
+
+    @Override
+    public Panel setContent(String content) {
+        super.setContent(content);
+        return this;
+    }
+
+    @Override
+    public Panel setUpdate(String ids) {
+        super.setUpdate(ids);
+        return this;
+    }
+
+    @Override
+    public Panel addClickListener(io.jettra.wui.events.ClickListener listener) {
+        super.addClickListener(listener);
         return this;
     }
 }

@@ -23,4 +23,58 @@ public class Menu extends UIComponent {
         a.setProperty("onmouseout", "this.style.color='var(--jettra-text)'; this.style.textShadow='none'");
         add(a);
     }
+
+    @Override
+    public Menu setId(String id) {
+        super.setId(id);
+        return this;
+    }
+
+    @Override
+    public Menu setProperty(String key, String value) {
+        super.setProperty(key, value);
+        return this;
+    }
+
+    @Override
+    public Menu setStyle(String key, String value) {
+        super.setStyle(key, value);
+        return this;
+    }
+
+    @Override
+    public Menu addClass(String className) {
+        super.addClass(className);
+        return this;
+    }
+
+    @Override
+    public Menu removeClass(String className) {
+        super.removeClass(className);
+        return this;
+    }
+
+    @Override
+    public Menu setContent(String content) {
+        super.setContent(content);
+        return this;
+    }
+
+    @Override
+    public Menu setUpdate(String ids) {
+        super.setUpdate(ids);
+        return this;
+    }
+
+    @Override
+    public Menu addClickListener(io.jettra.wui.events.ClickListener listener) {
+        super.addClickListener(listener);
+        return this;
+    }
+
+    @Override
+    public Menu add(io.jettra.wui.core.UIComponent child) {
+        super.add(child);
+        return this;
+    }
 }

@@ -80,4 +80,58 @@ public class Time extends UIComponent {
         getChildren().get(getChildren().size() - 1).setProperty("onchange", jsFunction);
         return this;
     }
+
+    @Override
+    public Time setId(String id) {
+        super.setId(id);
+        return this;
+    }
+
+    @Override
+    public Time setProperty(String key, String value) {
+        super.setProperty(key, value);
+        return this;
+    }
+
+    @Override
+    public Time setStyle(String key, String value) {
+        super.setStyle(key, value);
+        return this;
+    }
+
+    @Override
+    public Time addClass(String className) {
+        super.addClass(className);
+        return this;
+    }
+
+    @Override
+    public Time removeClass(String className) {
+        super.removeClass(className);
+        return this;
+    }
+
+    @Override
+    public Time setContent(String content) {
+        super.setContent(content);
+        return this;
+    }
+
+    @Override
+    public Time setUpdate(String ids) {
+        super.setUpdate(ids);
+        return this;
+    }
+
+    @Override
+    public Time addClickListener(io.jettra.wui.events.ClickListener listener) {
+        super.addClickListener(listener);
+        return this;
+    }
+
+    @Override
+    public Time add(io.jettra.wui.core.UIComponent child) {
+        super.add(child);
+        return this;
+    }
 }

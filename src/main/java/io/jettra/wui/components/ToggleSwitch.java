@@ -31,12 +31,60 @@ public class ToggleSwitch extends UIComponent {
     }
     
     @Override
-    public UIComponent setProperty(String key, String value) {
+    public ToggleSwitch setProperty(String key, String value) {
         if ("onchange".equals(key) || "checked".equals(key) || "disabled".equals(key)) {
             input.setProperty(key, value);
         } else {
             super.setProperty(key, value);
         }
+        return this;
+    }
+
+    @Override
+    public ToggleSwitch setId(String id) {
+        super.setId(id);
+        return this;
+    }
+
+    @Override
+    public ToggleSwitch setStyle(String key, String value) {
+        super.setStyle(key, value);
+        return this;
+    }
+
+    @Override
+    public ToggleSwitch addClass(String className) {
+        super.addClass(className);
+        return this;
+    }
+
+    @Override
+    public ToggleSwitch removeClass(String className) {
+        super.removeClass(className);
+        return this;
+    }
+
+    @Override
+    public ToggleSwitch setContent(String content) {
+        super.setContent(content);
+        return this;
+    }
+
+    @Override
+    public ToggleSwitch setUpdate(String ids) {
+        super.setUpdate(ids);
+        return this;
+    }
+
+    @Override
+    public ToggleSwitch addClickListener(io.jettra.wui.events.ClickListener listener) {
+        super.addClickListener(listener);
+        return this;
+    }
+
+    @Override
+    public ToggleSwitch add(io.jettra.wui.core.UIComponent child) {
+        super.add(child);
         return this;
     }
 }

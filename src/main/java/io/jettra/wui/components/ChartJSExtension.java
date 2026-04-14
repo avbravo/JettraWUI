@@ -43,4 +43,58 @@ public class ChartJSExtension extends UIComponent {
         }
         return "<script>\n" + cachedChartJs + "\n</script>\n";
     }
+
+    @Override
+    public ChartJSExtension setId(String id) {
+        super.setId(id);
+        return this;
+    }
+
+    @Override
+    public ChartJSExtension setProperty(String key, String value) {
+        super.setProperty(key, value);
+        return this;
+    }
+
+    @Override
+    public ChartJSExtension setStyle(String key, String value) {
+        super.setStyle(key, value);
+        return this;
+    }
+
+    @Override
+    public ChartJSExtension addClass(String className) {
+        super.addClass(className);
+        return this;
+    }
+
+    @Override
+    public ChartJSExtension removeClass(String className) {
+        super.removeClass(className);
+        return this;
+    }
+
+    @Override
+    public ChartJSExtension setContent(String content) {
+        super.setContent(content);
+        return this;
+    }
+
+    @Override
+    public ChartJSExtension setUpdate(String ids) {
+        super.setUpdate(ids);
+        return this;
+    }
+
+    @Override
+    public ChartJSExtension addClickListener(io.jettra.wui.events.ClickListener listener) {
+        super.addClickListener(listener);
+        return this;
+    }
+
+    @Override
+    public ChartJSExtension add(io.jettra.wui.core.UIComponent child) {
+        super.add(child);
+        return this;
+    }
 }

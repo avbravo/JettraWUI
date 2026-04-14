@@ -143,4 +143,58 @@ public class Map extends UIComponent {
         public double lat1, lng1, lat2, lng2;
         public Route(double lat1, double lng1, double lat2, double lng2) { this.lat1 = lat1; this.lng1 = lng1; this.lat2 = lat2; this.lng2 = lng2; }
     }
+
+    @Override
+    public Map setId(String id) {
+        super.setId(id);
+        return this;
+    }
+
+    @Override
+    public Map setProperty(String key, String value) {
+        super.setProperty(key, value);
+        return this;
+    }
+
+    @Override
+    public Map setStyle(String key, String value) {
+        super.setStyle(key, value);
+        return this;
+    }
+
+    @Override
+    public Map addClass(String className) {
+        super.addClass(className);
+        return this;
+    }
+
+    @Override
+    public Map removeClass(String className) {
+        super.removeClass(className);
+        return this;
+    }
+
+    @Override
+    public Map setContent(String content) {
+        super.setContent(content);
+        return this;
+    }
+
+    @Override
+    public Map setUpdate(String ids) {
+        super.setUpdate(ids);
+        return this;
+    }
+
+    @Override
+    public Map addClickListener(io.jettra.wui.events.ClickListener listener) {
+        super.addClickListener(listener);
+        return this;
+    }
+
+    @Override
+    public Map add(io.jettra.wui.core.UIComponent child) {
+        super.add(child);
+        return this;
+    }
 }

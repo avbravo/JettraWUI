@@ -49,4 +49,58 @@ public class Alert extends UIComponent {
         this.setStyle("display", "none");
         this.setContent("");
     }
+
+    @Override
+    public Alert setId(String id) {
+        super.setId(id);
+        return this;
+    }
+
+    @Override
+    public Alert setProperty(String key, String value) {
+        super.setProperty(key, value);
+        return this;
+    }
+
+    @Override
+    public Alert setStyle(String key, String value) {
+        super.setStyle(key, value);
+        return this;
+    }
+
+    @Override
+    public Alert addClass(String className) {
+        super.addClass(className);
+        return this;
+    }
+
+    @Override
+    public Alert removeClass(String className) {
+        super.removeClass(className);
+        return this;
+    }
+
+    @Override
+    public Alert setContent(String content) {
+        super.setContent(content);
+        return this;
+    }
+
+    @Override
+    public Alert setUpdate(String ids) {
+        super.setUpdate(ids);
+        return this;
+    }
+
+    @Override
+    public Alert addClickListener(io.jettra.wui.events.ClickListener listener) {
+        super.addClickListener(listener);
+        return this;
+    }
+
+    @Override
+    public Alert add(io.jettra.wui.core.UIComponent child) {
+        super.add(child);
+        return this;
+    }
 }

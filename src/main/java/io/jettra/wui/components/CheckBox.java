@@ -18,4 +18,52 @@ public class CheckBox extends UIComponent {
         return this;
     }
 
+
+    @Override
+    public CheckBox setId(String id) {
+        super.setId(id);
+        return this;
+    }
+
+    @Override
+    public CheckBox setProperty(String key, String value) {
+        super.setProperty(key, value);
+        return this;
+    }
+
+    @Override
+    public CheckBox setStyle(String key, String value) {
+        super.setStyle(key, value);
+        return this;
+    }
+
+    @Override
+    public CheckBox addClass(String className) {
+        super.addClass(className);
+        return this;
+    }
+
+    @Override
+    public CheckBox removeClass(String className) {
+        super.removeClass(className);
+        return this;
+    }
+
+    @Override
+    public CheckBox setContent(String content) {
+        super.setContent(content);
+        return this;
+    }
+
+    @Override
+    public CheckBox addClickListener(io.jettra.wui.events.ClickListener listener) {
+        super.addClickListener(listener);
+        return this;
+    }
+
+    @Override
+    public CheckBox add(io.jettra.wui.core.UIComponent child) {
+        super.add(child);
+        return this;
+    }
 }

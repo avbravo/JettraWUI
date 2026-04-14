@@ -125,4 +125,58 @@ public class ErrorPage extends Page {
         container.add(card);
         this.add(container);
     }
+
+    @Override
+    public ErrorPage setId(String id) {
+        super.setId(id);
+        return this;
+    }
+
+    @Override
+    public ErrorPage setProperty(String key, String value) {
+        super.setProperty(key, value);
+        return this;
+    }
+
+    @Override
+    public ErrorPage setStyle(String key, String value) {
+        super.setStyle(key, value);
+        return this;
+    }
+
+    @Override
+    public ErrorPage addClass(String className) {
+        super.addClass(className);
+        return this;
+    }
+
+    @Override
+    public ErrorPage removeClass(String className) {
+        super.removeClass(className);
+        return this;
+    }
+
+    @Override
+    public ErrorPage setContent(String content) {
+        super.setContent(content);
+        return this;
+    }
+
+    @Override
+    public ErrorPage setUpdate(String ids) {
+        super.setUpdate(ids);
+        return this;
+    }
+
+    @Override
+    public ErrorPage addClickListener(io.jettra.wui.events.ClickListener listener) {
+        super.addClickListener(listener);
+        return this;
+    }
+
+    @Override
+    public ErrorPage add(io.jettra.wui.core.UIComponent child) {
+        super.add(child);
+        return this;
+    }
 }

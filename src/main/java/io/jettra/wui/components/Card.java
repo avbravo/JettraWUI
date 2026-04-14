@@ -99,4 +99,52 @@ public class Card extends UIComponent {
         this.setContent(innerHtml.toString());
         return super.render();
     }
+
+    @Override
+    public Card setId(String id) {
+        super.setId(id);
+        return this;
+    }
+
+    @Override
+    public Card setProperty(String key, String value) {
+        super.setProperty(key, value);
+        return this;
+    }
+
+    @Override
+    public Card setStyle(String key, String value) {
+        super.setStyle(key, value);
+        return this;
+    }
+
+    @Override
+    public Card addClass(String className) {
+        super.addClass(className);
+        return this;
+    }
+
+    @Override
+    public Card removeClass(String className) {
+        super.removeClass(className);
+        return this;
+    }
+
+    @Override
+    public Card setUpdate(String ids) {
+        super.setUpdate(ids);
+        return this;
+    }
+
+    @Override
+    public Card addClickListener(io.jettra.wui.events.ClickListener listener) {
+        super.addClickListener(listener);
+        return this;
+    }
+
+    @Override
+    public Card add(io.jettra.wui.core.UIComponent child) {
+        super.add(child);
+        return this;
+    }
 }

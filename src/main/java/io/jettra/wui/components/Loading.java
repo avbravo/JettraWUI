@@ -58,4 +58,58 @@ public class Loading extends UIComponent {
 
         setContent(svg);
     }
+
+    @Override
+    public Loading setId(String id) {
+        super.setId(id);
+        return this;
+    }
+
+    @Override
+    public Loading setProperty(String key, String value) {
+        super.setProperty(key, value);
+        return this;
+    }
+
+    @Override
+    public Loading setStyle(String key, String value) {
+        super.setStyle(key, value);
+        return this;
+    }
+
+    @Override
+    public Loading addClass(String className) {
+        super.addClass(className);
+        return this;
+    }
+
+    @Override
+    public Loading removeClass(String className) {
+        super.removeClass(className);
+        return this;
+    }
+
+    @Override
+    public Loading setContent(String content) {
+        super.setContent(content);
+        return this;
+    }
+
+    @Override
+    public Loading setUpdate(String ids) {
+        super.setUpdate(ids);
+        return this;
+    }
+
+    @Override
+    public Loading addClickListener(io.jettra.wui.events.ClickListener listener) {
+        super.addClickListener(listener);
+        return this;
+    }
+
+    @Override
+    public Loading add(io.jettra.wui.core.UIComponent child) {
+        super.add(child);
+        return this;
+    }
 }

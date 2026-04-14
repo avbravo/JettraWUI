@@ -27,4 +27,58 @@ public class ViewMedia extends UIComponent {
         }
         return this;
     }
+
+    @Override
+    public ViewMedia setId(String id) {
+        super.setId(id);
+        return this;
+    }
+
+    @Override
+    public ViewMedia setProperty(String key, String value) {
+        super.setProperty(key, value);
+        return this;
+    }
+
+    @Override
+    public ViewMedia setStyle(String key, String value) {
+        super.setStyle(key, value);
+        return this;
+    }
+
+    @Override
+    public ViewMedia addClass(String className) {
+        super.addClass(className);
+        return this;
+    }
+
+    @Override
+    public ViewMedia removeClass(String className) {
+        super.removeClass(className);
+        return this;
+    }
+
+    @Override
+    public ViewMedia setContent(String content) {
+        super.setContent(content);
+        return this;
+    }
+
+    @Override
+    public ViewMedia setUpdate(String ids) {
+        super.setUpdate(ids);
+        return this;
+    }
+
+    @Override
+    public ViewMedia addClickListener(io.jettra.wui.events.ClickListener listener) {
+        super.addClickListener(listener);
+        return this;
+    }
+
+    @Override
+    public ViewMedia add(io.jettra.wui.core.UIComponent child) {
+        super.add(child);
+        return this;
+    }
 }

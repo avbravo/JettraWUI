@@ -74,4 +74,58 @@ public class SelectOne extends UIComponent {
         }
         return super.render();
     }
+
+    @Override
+    public SelectOne setId(String id) {
+        super.setId(id);
+        return this;
+    }
+
+    @Override
+    public SelectOne setProperty(String key, String value) {
+        super.setProperty(key, value);
+        return this;
+    }
+
+    @Override
+    public SelectOne setStyle(String key, String value) {
+        super.setStyle(key, value);
+        return this;
+    }
+
+    @Override
+    public SelectOne addClass(String className) {
+        super.addClass(className);
+        return this;
+    }
+
+    @Override
+    public SelectOne removeClass(String className) {
+        super.removeClass(className);
+        return this;
+    }
+
+    @Override
+    public SelectOne setContent(String content) {
+        super.setContent(content);
+        return this;
+    }
+
+    @Override
+    public SelectOne setUpdate(String ids) {
+        super.setUpdate(ids);
+        return this;
+    }
+
+    @Override
+    public SelectOne addClickListener(io.jettra.wui.events.ClickListener listener) {
+        super.addClickListener(listener);
+        return this;
+    }
+
+    @Override
+    public SelectOne add(io.jettra.wui.core.UIComponent child) {
+        super.add(child);
+        return this;
+    }
 }

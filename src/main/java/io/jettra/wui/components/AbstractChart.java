@@ -128,4 +128,58 @@ public abstract class AbstractChart extends UIComponent {
 
         return super.render() + js.toString();
     }
+
+    @Override
+    public AbstractChart setId(String id) {
+        super.setId(id);
+        return this;
+    }
+
+    @Override
+    public AbstractChart setProperty(String key, String value) {
+        super.setProperty(key, value);
+        return this;
+    }
+
+    @Override
+    public AbstractChart setStyle(String key, String value) {
+        super.setStyle(key, value);
+        return this;
+    }
+
+    @Override
+    public AbstractChart addClass(String className) {
+        super.addClass(className);
+        return this;
+    }
+
+    @Override
+    public AbstractChart removeClass(String className) {
+        super.removeClass(className);
+        return this;
+    }
+
+    @Override
+    public AbstractChart setContent(String content) {
+        super.setContent(content);
+        return this;
+    }
+
+    @Override
+    public AbstractChart setUpdate(String ids) {
+        super.setUpdate(ids);
+        return this;
+    }
+
+    @Override
+    public AbstractChart addClickListener(io.jettra.wui.events.ClickListener listener) {
+        super.addClickListener(listener);
+        return this;
+    }
+
+    @Override
+    public AbstractChart add(io.jettra.wui.core.UIComponent child) {
+        super.add(child);
+        return this;
+    }
 }

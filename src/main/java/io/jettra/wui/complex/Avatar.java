@@ -92,5 +92,59 @@ public class Avatar extends UIComponent {
         add(badge);
         return this;
     }
+
+    @Override
+    public Avatar setId(String id) {
+        super.setId(id);
+        return this;
+    }
+
+    @Override
+    public Avatar setProperty(String key, String value) {
+        super.setProperty(key, value);
+        return this;
+    }
+
+    @Override
+    public Avatar setStyle(String key, String value) {
+        super.setStyle(key, value);
+        return this;
+    }
+
+    @Override
+    public Avatar addClass(String className) {
+        super.addClass(className);
+        return this;
+    }
+
+    @Override
+    public Avatar removeClass(String className) {
+        super.removeClass(className);
+        return this;
+    }
+
+    @Override
+    public Avatar setContent(String content) {
+        super.setContent(content);
+        return this;
+    }
+
+    @Override
+    public Avatar setUpdate(String ids) {
+        super.setUpdate(ids);
+        return this;
+    }
+
+    @Override
+    public Avatar addClickListener(io.jettra.wui.events.ClickListener listener) {
+        super.addClickListener(listener);
+        return this;
+    }
+
+    @Override
+    public Avatar add(io.jettra.wui.core.UIComponent child) {
+        super.add(child);
+        return this;
+    }
 }
 

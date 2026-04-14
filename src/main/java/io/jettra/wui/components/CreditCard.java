@@ -150,4 +150,58 @@ public class CreditCard extends UIComponent {
         this.setContent(html.toString());
         return super.render();
     }
+
+    @Override
+    public CreditCard setId(String id) {
+        super.setId(id);
+        return this;
+    }
+
+    @Override
+    public CreditCard setProperty(String key, String value) {
+        super.setProperty(key, value);
+        return this;
+    }
+
+    @Override
+    public CreditCard setStyle(String key, String value) {
+        super.setStyle(key, value);
+        return this;
+    }
+
+    @Override
+    public CreditCard addClass(String className) {
+        super.addClass(className);
+        return this;
+    }
+
+    @Override
+    public CreditCard removeClass(String className) {
+        super.removeClass(className);
+        return this;
+    }
+
+    @Override
+    public CreditCard setContent(String content) {
+        super.setContent(content);
+        return this;
+    }
+
+    @Override
+    public CreditCard setUpdate(String ids) {
+        super.setUpdate(ids);
+        return this;
+    }
+
+    @Override
+    public CreditCard addClickListener(io.jettra.wui.events.ClickListener listener) {
+        super.addClickListener(listener);
+        return this;
+    }
+
+    @Override
+    public CreditCard add(io.jettra.wui.core.UIComponent child) {
+        super.add(child);
+        return this;
+    }
 }

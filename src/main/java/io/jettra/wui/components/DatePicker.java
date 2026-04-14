@@ -67,4 +67,58 @@ public class DatePicker extends UIComponent {
         getChildren().get(getChildren().size() - 1).setProperty("onchange", jsFunction);
         return this;
     }
+
+    @Override
+    public DatePicker setId(String id) {
+        super.setId(id);
+        return this;
+    }
+
+    @Override
+    public DatePicker setProperty(String key, String value) {
+        super.setProperty(key, value);
+        return this;
+    }
+
+    @Override
+    public DatePicker setStyle(String key, String value) {
+        super.setStyle(key, value);
+        return this;
+    }
+
+    @Override
+    public DatePicker addClass(String className) {
+        super.addClass(className);
+        return this;
+    }
+
+    @Override
+    public DatePicker removeClass(String className) {
+        super.removeClass(className);
+        return this;
+    }
+
+    @Override
+    public DatePicker setContent(String content) {
+        super.setContent(content);
+        return this;
+    }
+
+    @Override
+    public DatePicker setUpdate(String ids) {
+        super.setUpdate(ids);
+        return this;
+    }
+
+    @Override
+    public DatePicker addClickListener(io.jettra.wui.events.ClickListener listener) {
+        super.addClickListener(listener);
+        return this;
+    }
+
+    @Override
+    public DatePicker add(io.jettra.wui.core.UIComponent child) {
+        super.add(child);
+        return this;
+    }
 }

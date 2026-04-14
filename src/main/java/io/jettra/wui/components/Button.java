@@ -74,4 +74,34 @@ public class Button extends UIComponent {
     public Button warning() {
         return addClass("j-btn-warning");
     }
+
+    @Override
+    public Button setId(String id) {
+        super.setId(id);
+        return this;
+    }
+
+    @Override
+    public Button setProperty(String key, String value) {
+        super.setProperty(key, value);
+        return this;
+    }
+
+    @Override
+    public Button removeClass(String className) {
+        super.removeClass(className);
+        return this;
+    }
+
+    @Override
+    public Button setContent(String content) {
+        super.setContent(content);
+        return this;
+    }
+
+    @Override
+    public Button add(io.jettra.wui.core.UIComponent child) {
+        super.add(child);
+        return this;
+    }
 }

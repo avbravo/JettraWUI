@@ -9,36 +9,25 @@ El componente `Datatable` de JettraWUI es una tabla avanzada que permite la inte
 
 Para utilizar `Datatable`, apóyate en las clases estructurales `Row` (fila - `<tr>`) y `TD` (celda - `<td>`).
 
-### Instanciación y Estructura
+### Instanciación y Estructura (Fluent API)
 
 ```java
 import io.jettra.wui.components.Row;
 import io.jettra.wui.components.TD;
 import io.jettra.wui.complex.Datatable;
 
-Datatable dt = new Datatable();
+Datatable dt = new Datatable()
+    .addHeaderRow("ID", "Nombre", "Rol", "Acciones")
+    .setId("userTable");
 
-// 1. Agregar Encabezado (Sintaxis simplificada y fluida)
-dt.addHeaderRow("ID", "Nombre", "Rol");
-
-// Opcional: Sintaxis con Row y TD si deseas aplicar estilos especiales al encabezado
-// dt.addHeaderRow(new Row(new TD("ID"), new TD("Nombre"), new TD("Rol")));
-
-// 2. Agregar Filas
-
-for (int i = 0; i < usuarios.size(); i++) {
-    Row row = new Row();
-    row.add(new TD(usuarios.get(i).getId()));
-    row.add(new TD(usuarios.get(i).getFileName()));
-    row.add(new TD(usuarios.get(i).getRole()));
-    
-    dt.addRow(row);
+for (Usuario u : usuarios) {
+    dt.addRow(new Row(
+        new TD(u.getId()),
+        new TD(u.getName()),
+        new TD(u.getRole()),
+        new TD().add(new Button("Edit").addClass("j-btn"))
+    ));
 }
-
-// Opcionalmente, se puede utilizar el estilo Fluent API:
-// new Datatable()
-//     .addHeaderRow("ID", "Nombre")
-//     .addRow(new Row(new TD("1"), new TD("John Doe")));
 ```
 
 ### Editor Web (WebDesignerPage)

@@ -139,4 +139,58 @@ public class FileUpload extends Div {
     public Button getUploadButton() {
         return uploadBtn;
     }
+
+    @Override
+    public FileUpload setId(String id) {
+        super.setId(id);
+        return this;
+    }
+
+    @Override
+    public FileUpload setProperty(String key, String value) {
+        super.setProperty(key, value);
+        return this;
+    }
+
+    @Override
+    public FileUpload setStyle(String key, String value) {
+        super.setStyle(key, value);
+        return this;
+    }
+
+    @Override
+    public FileUpload addClass(String className) {
+        super.addClass(className);
+        return this;
+    }
+
+    @Override
+    public FileUpload removeClass(String className) {
+        super.removeClass(className);
+        return this;
+    }
+
+    @Override
+    public FileUpload setContent(String content) {
+        super.setContent(content);
+        return this;
+    }
+
+    @Override
+    public FileUpload setUpdate(String ids) {
+        super.setUpdate(ids);
+        return this;
+    }
+
+    @Override
+    public FileUpload addClickListener(io.jettra.wui.events.ClickListener listener) {
+        super.addClickListener(listener);
+        return this;
+    }
+
+    @Override
+    public FileUpload add(io.jettra.wui.core.UIComponent child) {
+        super.add(child);
+        return this;
+    }
 }

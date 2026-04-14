@@ -100,4 +100,52 @@ public class ScheduleControl extends UIComponent {
 
         return sb.toString();
     }
+
+    @Override
+    public ScheduleControl setId(String id) {
+        super.setId(id);
+        return this;
+    }
+
+    @Override
+    public ScheduleControl setProperty(String key, String value) {
+        super.setProperty(key, value);
+        return this;
+    }
+
+    @Override
+    public ScheduleControl setStyle(String key, String value) {
+        super.setStyle(key, value);
+        return this;
+    }
+
+    @Override
+    public ScheduleControl addClass(String className) {
+        super.addClass(className);
+        return this;
+    }
+
+    @Override
+    public ScheduleControl removeClass(String className) {
+        super.removeClass(className);
+        return this;
+    }
+
+    @Override
+    public ScheduleControl setContent(String content) {
+        super.setContent(content);
+        return this;
+    }
+
+    @Override
+    public ScheduleControl addClickListener(io.jettra.wui.events.ClickListener listener) {
+        super.addClickListener(listener);
+        return this;
+    }
+
+    @Override
+    public ScheduleControl add(io.jettra.wui.core.UIComponent child) {
+        super.add(child);
+        return this;
+    }
 }

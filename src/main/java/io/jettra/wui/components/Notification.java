@@ -89,4 +89,58 @@ public class Notification extends UIComponent {
         this.setStyle("display", "block");
         this.setStyle("opacity", "0"); // Starts invisible, script fades it in
     }
+
+    @Override
+    public Notification setId(String id) {
+        super.setId(id);
+        return this;
+    }
+
+    @Override
+    public Notification setProperty(String key, String value) {
+        super.setProperty(key, value);
+        return this;
+    }
+
+    @Override
+    public Notification setStyle(String key, String value) {
+        super.setStyle(key, value);
+        return this;
+    }
+
+    @Override
+    public Notification addClass(String className) {
+        super.addClass(className);
+        return this;
+    }
+
+    @Override
+    public Notification removeClass(String className) {
+        super.removeClass(className);
+        return this;
+    }
+
+    @Override
+    public Notification setContent(String content) {
+        super.setContent(content);
+        return this;
+    }
+
+    @Override
+    public Notification setUpdate(String ids) {
+        super.setUpdate(ids);
+        return this;
+    }
+
+    @Override
+    public Notification addClickListener(io.jettra.wui.events.ClickListener listener) {
+        super.addClickListener(listener);
+        return this;
+    }
+
+    @Override
+    public Notification add(io.jettra.wui.core.UIComponent child) {
+        super.add(child);
+        return this;
+    }
 }

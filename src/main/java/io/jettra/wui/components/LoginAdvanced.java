@@ -54,4 +54,58 @@ public class LoginAdvanced extends Form {
     public Button getForgotPasswordButton() {
         return forgotPasswordButton;
     }
+
+    @Override
+    public LoginAdvanced setId(String id) {
+        super.setId(id);
+        return this;
+    }
+
+    @Override
+    public LoginAdvanced setProperty(String key, String value) {
+        super.setProperty(key, value);
+        return this;
+    }
+
+    @Override
+    public LoginAdvanced setStyle(String key, String value) {
+        super.setStyle(key, value);
+        return this;
+    }
+
+    @Override
+    public LoginAdvanced addClass(String className) {
+        super.addClass(className);
+        return this;
+    }
+
+    @Override
+    public LoginAdvanced removeClass(String className) {
+        super.removeClass(className);
+        return this;
+    }
+
+    @Override
+    public LoginAdvanced setContent(String content) {
+        super.setContent(content);
+        return this;
+    }
+
+    @Override
+    public LoginAdvanced setUpdate(String ids) {
+        super.setUpdate(ids);
+        return this;
+    }
+
+    @Override
+    public LoginAdvanced addClickListener(io.jettra.wui.events.ClickListener listener) {
+        super.addClickListener(listener);
+        return this;
+    }
+
+    @Override
+    public LoginAdvanced add(io.jettra.wui.core.UIComponent child) {
+        super.add(child);
+        return this;
+    }
 }

@@ -79,4 +79,58 @@ public class OTPValidator extends UIComponent {
         
         return super.render() + js.toString();
     }
+
+    @Override
+    public OTPValidator setId(String id) {
+        super.setId(id);
+        return this;
+    }
+
+    @Override
+    public OTPValidator setProperty(String key, String value) {
+        super.setProperty(key, value);
+        return this;
+    }
+
+    @Override
+    public OTPValidator setStyle(String key, String value) {
+        super.setStyle(key, value);
+        return this;
+    }
+
+    @Override
+    public OTPValidator addClass(String className) {
+        super.addClass(className);
+        return this;
+    }
+
+    @Override
+    public OTPValidator removeClass(String className) {
+        super.removeClass(className);
+        return this;
+    }
+
+    @Override
+    public OTPValidator setContent(String content) {
+        super.setContent(content);
+        return this;
+    }
+
+    @Override
+    public OTPValidator setUpdate(String ids) {
+        super.setUpdate(ids);
+        return this;
+    }
+
+    @Override
+    public OTPValidator addClickListener(io.jettra.wui.events.ClickListener listener) {
+        super.addClickListener(listener);
+        return this;
+    }
+
+    @Override
+    public OTPValidator add(io.jettra.wui.core.UIComponent child) {
+        super.add(child);
+        return this;
+    }
 }

@@ -23,4 +23,58 @@ public class ChartsBar extends AbstractChart {
         super.addDataset(label, data, bgColors, borderColors);
         return this;
     }
+
+    @Override
+    public ChartsBar setId(String id) {
+        super.setId(id);
+        return this;
+    }
+
+    @Override
+    public ChartsBar setProperty(String key, String value) {
+        super.setProperty(key, value);
+        return this;
+    }
+
+    @Override
+    public ChartsBar setStyle(String key, String value) {
+        super.setStyle(key, value);
+        return this;
+    }
+
+    @Override
+    public ChartsBar addClass(String className) {
+        super.addClass(className);
+        return this;
+    }
+
+    @Override
+    public ChartsBar removeClass(String className) {
+        super.removeClass(className);
+        return this;
+    }
+
+    @Override
+    public ChartsBar setContent(String content) {
+        super.setContent(content);
+        return this;
+    }
+
+    @Override
+    public ChartsBar setUpdate(String ids) {
+        super.setUpdate(ids);
+        return this;
+    }
+
+    @Override
+    public ChartsBar addClickListener(io.jettra.wui.events.ClickListener listener) {
+        super.addClickListener(listener);
+        return this;
+    }
+
+    @Override
+    public ChartsBar add(io.jettra.wui.core.UIComponent child) {
+        super.add(child);
+        return this;
+    }
 }

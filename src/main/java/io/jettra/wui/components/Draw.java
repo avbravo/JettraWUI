@@ -82,4 +82,58 @@ public class Draw extends UIComponent {
         );
         return script;
     }
+
+    @Override
+    public Draw setId(String id) {
+        super.setId(id);
+        return this;
+    }
+
+    @Override
+    public Draw setProperty(String key, String value) {
+        super.setProperty(key, value);
+        return this;
+    }
+
+    @Override
+    public Draw setStyle(String key, String value) {
+        super.setStyle(key, value);
+        return this;
+    }
+
+    @Override
+    public Draw addClass(String className) {
+        super.addClass(className);
+        return this;
+    }
+
+    @Override
+    public Draw removeClass(String className) {
+        super.removeClass(className);
+        return this;
+    }
+
+    @Override
+    public Draw setContent(String content) {
+        super.setContent(content);
+        return this;
+    }
+
+    @Override
+    public Draw setUpdate(String ids) {
+        super.setUpdate(ids);
+        return this;
+    }
+
+    @Override
+    public Draw addClickListener(io.jettra.wui.events.ClickListener listener) {
+        super.addClickListener(listener);
+        return this;
+    }
+
+    @Override
+    public Draw add(io.jettra.wui.core.UIComponent child) {
+        super.add(child);
+        return this;
+    }
 }

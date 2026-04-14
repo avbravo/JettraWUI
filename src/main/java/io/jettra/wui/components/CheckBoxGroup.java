@@ -35,4 +35,58 @@ public class CheckBoxGroup extends UIComponent {
             }
         }
     }
+
+    @Override
+    public CheckBoxGroup setId(String id) {
+        super.setId(id);
+        return this;
+    }
+
+    @Override
+    public CheckBoxGroup setProperty(String key, String value) {
+        super.setProperty(key, value);
+        return this;
+    }
+
+    @Override
+    public CheckBoxGroup setStyle(String key, String value) {
+        super.setStyle(key, value);
+        return this;
+    }
+
+    @Override
+    public CheckBoxGroup addClass(String className) {
+        super.addClass(className);
+        return this;
+    }
+
+    @Override
+    public CheckBoxGroup removeClass(String className) {
+        super.removeClass(className);
+        return this;
+    }
+
+    @Override
+    public CheckBoxGroup setContent(String content) {
+        super.setContent(content);
+        return this;
+    }
+
+    @Override
+    public CheckBoxGroup setUpdate(String ids) {
+        super.setUpdate(ids);
+        return this;
+    }
+
+    @Override
+    public CheckBoxGroup addClickListener(io.jettra.wui.events.ClickListener listener) {
+        super.addClickListener(listener);
+        return this;
+    }
+
+    @Override
+    public CheckBoxGroup add(io.jettra.wui.core.UIComponent child) {
+        super.add(child);
+        return this;
+    }
 }

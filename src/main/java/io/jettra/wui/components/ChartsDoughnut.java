@@ -23,4 +23,58 @@ public class ChartsDoughnut extends AbstractChart {
         super.addDataset(label, data, bgColors, borderColors);
         return this;
     }
+
+    @Override
+    public ChartsDoughnut setId(String id) {
+        super.setId(id);
+        return this;
+    }
+
+    @Override
+    public ChartsDoughnut setProperty(String key, String value) {
+        super.setProperty(key, value);
+        return this;
+    }
+
+    @Override
+    public ChartsDoughnut setStyle(String key, String value) {
+        super.setStyle(key, value);
+        return this;
+    }
+
+    @Override
+    public ChartsDoughnut addClass(String className) {
+        super.addClass(className);
+        return this;
+    }
+
+    @Override
+    public ChartsDoughnut removeClass(String className) {
+        super.removeClass(className);
+        return this;
+    }
+
+    @Override
+    public ChartsDoughnut setContent(String content) {
+        super.setContent(content);
+        return this;
+    }
+
+    @Override
+    public ChartsDoughnut setUpdate(String ids) {
+        super.setUpdate(ids);
+        return this;
+    }
+
+    @Override
+    public ChartsDoughnut addClickListener(io.jettra.wui.events.ClickListener listener) {
+        super.addClickListener(listener);
+        return this;
+    }
+
+    @Override
+    public ChartsDoughnut add(io.jettra.wui.core.UIComponent child) {
+        super.add(child);
+        return this;
+    }
 }
