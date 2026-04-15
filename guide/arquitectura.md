@@ -12,6 +12,19 @@ The framework is based on the Abstract Syntax Tree pattern:
 - **Reusable Types**: Objects like Forms or Grids can be initialized and reused programmatically.
 - **Consistent Futuristic Concept**: `JettraTheme` enforces a strict aesthetic pattern focused on spatial depth, glass blur effects, and animations to resemble immersive environments.
 
+## Fluent API Support
+All UI components in JettraWUI support the **Fluent API** pattern. This means that methods like `setId()`, `setStyle()`, `addClass()`, and component-specific setters return the instance itself (`this`). This allows for highly concise and readable code when building complex UI trees.
+
+### Chaining Example:
+```java
+Button btn = new Button("Click Me")
+    .setId("btn1")
+    .addClass("j-btn-primary")
+    .setStyle("margin", "20px")
+    .addClickListener(() -> System.out.println("Clicked!"));
+```
+
+
 # Icon
 La clase Icon contiene iconos para ser usados con otros componentes
 

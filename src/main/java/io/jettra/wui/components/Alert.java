@@ -20,7 +20,7 @@ public class Alert extends UIComponent {
         this.setStyle("font-weight", "bold");
     }
 
-    public void setType(String type) {
+    public Alert setType(String type) {
         if ("warning".equals(type)) {
             this.setStyle("color", "#8a6d3b");
             this.setStyle("background-color", "#fcf8e3");
@@ -38,16 +38,19 @@ public class Alert extends UIComponent {
             this.setStyle("background-color", "#dff0d8");
             this.setStyle("border-color", "#d6e9c6");
         }
+        return this;
     }
 
-    public void showMessage(String message) {
+    public Alert showMessage(String message) {
         this.setContent(message);
         this.setStyle("display", "block");
+        return this;
     }
 
-    public void hide() {
+    public Alert hide() {
         this.setStyle("display", "none");
         this.setContent("");
+        return this;
     }
 
     @Override
