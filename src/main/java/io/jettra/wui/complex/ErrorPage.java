@@ -16,6 +16,7 @@ public class ErrorPage extends Page {
     private String errorTitle = "Error Petición";
     private String errorDetail = "Se ha producido un error inesperado al procesar la solicitud.";
     private String errorOrigin = "Servidor";
+    public static String path="/";
 
     public ErrorPage() {
         super("🚨 Jettra - Error");
@@ -95,7 +96,8 @@ public class ErrorPage extends Page {
                    .setStyle("transform", "translateZ(10px)");
 
         Button btnBack = new Button("Volver al Inicio");
-        btnBack.setProperty("onclick", "window.location.href='/'");
+        //btnBack.setProperty("onclick", "window.location.href='/'");
+        btnBack.setProperty("onclick", "window.location.href='"+path+"'");
         btnBack.setStyle("background", "linear-gradient(135deg, #ff4444, #cc0000)")
                .setStyle("color", "white")
                .setStyle("border", "none")
