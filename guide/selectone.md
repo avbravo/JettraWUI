@@ -40,5 +40,18 @@ SelectOne themeSelect = new SelectOne("theme")
 themeSelect.setStyle("width", "200px");
 ```
 
-## Styling
+## 4. Allowing Users to Add Items Dynamically
+
+You can allow users to insert custom values into the `SelectOne` at runtime by setting the `allowAddItem` property to `true` (it is `false` by default).
+
+```java
+SelectOne customSelect = new SelectOne("custom")
+    .addOption("1", "Option 1")
+    .addOption("2", "Option 2")
+    .setAllowAddItem(true);
+```
+
+When this property is enabled, an "Add item..." option is automatically appended to the list. If the user selects it, they will be prompted to enter a new value, which will be immediately added and selected in the drop-down.
+
+## 5. Styling
 By default, `SelectOne` applies the classes `j-select j-component` which styles the dropdown with JettraWUI's modern theme (dark backgrounds, borders, and typography). You can use `.setStyle("width", "100%")` to make it span a container.

@@ -8,6 +8,7 @@ import io.jettra.wui.core.UIComponent;
 public class SelectOne extends UIComponent {
     
     private String defaultValue;
+    private boolean allowAddItem = false;
     
     public SelectOne(String name) {
         super("select");
@@ -30,6 +31,15 @@ public class SelectOne extends UIComponent {
         return this;
     }
 
+    public SelectOne setAllowAddItem(boolean allowAddItem) {
+        this.allowAddItem = allowAddItem;
+        return this;
+    }
+
+    public boolean isAllowAddItem() {
+        return allowAddItem;
+    }
+
     /**
      * Agrega una opción al selector.
      * @param value el valor interno de la opción.
@@ -46,6 +56,27 @@ public class SelectOne extends UIComponent {
 
     @Override
     public String render() {
+        if (allowAddItem) {
+            boolean hasAddOption = false;
+            for (UIComponent child : getChildren()) {
+                if ("__add_item__".equals(child.getProperties().get("value"))) {
+                    hasAddOption = true;
+                    break;
+                }
+            }
+            if (!hasAddOption) {
+                this.addOption("__add_item__", "Add item...");
+            }
+            
+            String checkScript = "if(this.value === '__add_item__'){ let val = prompt('Insert new item:'); if(val && val.trim() !== ''){ let opt = document.createElement('option'); opt.value = val; opt.text = val; this.add(opt, this.options[this.options.length - 1]); this.value = val; } else { this.selectedIndex = 0; return false; } } ";
+            String currentOnChange = getProperties().get("onchange");
+            if (currentOnChange == null) {
+                setProperty("onchange", checkScript);
+            } else if (!currentOnChange.contains("__add_item__")) {
+                setProperty("onchange", checkScript + currentOnChange);
+            }
+        }
+
         if (!getChildren().isEmpty()) {
             boolean found = false;
             if (defaultValue != null) {
