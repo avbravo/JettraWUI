@@ -45,3 +45,14 @@ The `SelectOneIcon` handles options locally using its internal script logic (`je
 
 If you are using special names like `lang` or `theme`, the default script may execute page reloads or theme changes automatically.
 You can always manually inspect `document.getElementById('your_name_here').value` for the active field selection before submitting it via an AJAX request.
+
+## 6. Allowing Item Addition at Runtime
+You can enable the possibility for users to insert new values at runtime by setting `.setAllowAddItem(true)`. This will append an "Add item..." option at the end of the list.
+
+```java
+SelectOneIcon tagSelect = new SelectOneIcon("tags", "Select Tag")
+    .setAllowAddItem(true)
+    .addOption("java", "Java", "☕")
+    .addOption("python", "Python", "🐍");
+```
+When the user clicks "Add item...", a prompt will appear requesting the new value. The new value will be added to the dropdown and automatically selected.

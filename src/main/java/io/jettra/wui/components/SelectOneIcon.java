@@ -8,6 +8,7 @@ import io.jettra.wui.core.UIComponent;
 public class SelectOneIcon extends UIComponent {
     
     private boolean showLabelInTrigger = true;
+    private boolean allowAddItem = false;
     
     private String name;
 
@@ -60,6 +61,15 @@ public class SelectOneIcon extends UIComponent {
         this.showLabelInTrigger = show;
         return this;
     }
+
+    public SelectOneIcon setAllowAddItem(boolean allowAddItem) {
+        this.allowAddItem = allowAddItem;
+        return this;
+    }
+
+    public boolean isAllowAddItem() {
+        return allowAddItem;
+    }
     
     @Override
     public String render() {
@@ -77,6 +87,32 @@ public class SelectOneIcon extends UIComponent {
                 } else {
                     label.setStyle("display", "none");
                     setStyle("width", "50px");
+                }
+            }
+        }
+        if (allowAddItem) {
+            // Buscamos el contenedor de opciones (es el tercer hijo)
+             UIComponent options = getChildren().stream()
+                .filter(c -> c instanceof Div && (name + "_options").equals(c.getProperties().get("id")))
+                .findFirst().orElse(null);
+            
+            if (options != null) {
+                boolean hasAdd = options.getChildren().stream()
+                        .anyMatch(c -> "j-select-icon-option-add".equals(c.getProperties().get("class")));
+                
+                if (!hasAdd) {
+                    Div addOption = new Div();
+                    addOption.addClass("j-select-icon-option").addClass("j-select-icon-option-add");
+                    addOption.setProperty("onclick", "jettraSelectAddItem('" + name + "')");
+                    
+                    Div iconDiv = new Div();
+                    iconDiv.addClass("j-option-icon");
+                    iconDiv.setContent("<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><line x1='12' y1='5' x2='12' y2='19'></line><line x1='5' y1='12' x2='19' y2='12'></line></svg>");
+                    
+                    Span labelSpan = new Span("Add item...");
+                    
+                    addOption.add(iconDiv).add(labelSpan);
+                    options.add(addOption);
                 }
             }
         }
@@ -211,6 +247,11 @@ public class SelectOneIcon extends UIComponent {
                 width: 100%;
                 height: 100%;
             }
+            .j-select-icon-option-add {
+                border-top: 1px dashed var(--jettra-accent, #00e5ff);
+                color: var(--jettra-accent, #00e5ff) !important;
+                font-weight: bold;
+            }
         """);
         add(style);
     }
@@ -237,6 +278,26 @@ public class SelectOneIcon extends UIComponent {
                 
                 if (name === 'theme' && typeof changeTheme === 'function') {
                     changeTheme(value);
+                }
+            }
+            function jettraSelectAddItem(name) {
+                let val = prompt('Insert new item:');
+                if (val && val.trim() !== '') {
+                    const iconHtml = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>';
+                    
+                    // Add it to the list visually before the add button
+                    const optionsCont = document.getElementById(name + '_options');
+                    const addBtn = optionsCont.querySelector('.j-select-icon-option-add');
+                    
+                    const newOpt = document.createElement('div');
+                    newOpt.className = 'j-select-icon-option';
+                    newOpt.onclick = function() { jettraSelectOption(name, val, val, iconHtml); };
+                    newOpt.innerHTML = `<div class="j-option-icon">${iconHtml}</div><span>${val}</span>`;
+                    
+                    optionsCont.insertBefore(newOpt, addBtn);
+                    
+                    // Select it
+                    jettraSelectOption(name, val, val, iconHtml);
                 }
             }
             // Cerrar al hacer clic fuera

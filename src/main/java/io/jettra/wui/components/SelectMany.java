@@ -14,6 +14,12 @@ public class SelectMany extends SelectOne {
         this.setStyle("height", "150px");
     }
 
+    @Override
+    public SelectMany setAllowAddItem(boolean allowAddItem) {
+        super.setAllowAddItem(allowAddItem);
+        return this;
+    }
+
     /**
      * Define si el componente se muestra en bloque o en línea.
      * @param inline

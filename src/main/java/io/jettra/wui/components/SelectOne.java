@@ -68,7 +68,7 @@ public class SelectOne extends UIComponent {
                 this.addOption("__add_item__", "Add item...");
             }
             
-            String checkScript = "if(this.value === '__add_item__'){ let val = prompt('Insert new item:'); if(val && val.trim() !== ''){ let opt = document.createElement('option'); opt.value = val; opt.text = val; this.add(opt, this.options[this.options.length - 1]); this.value = val; } else { this.selectedIndex = 0; return false; } } ";
+            String checkScript = "let el = this; let isAdd = el.multiple ? Array.from(el.options).some(o => o.selected && o.value === '__add_item__') : el.value === '__add_item__'; if(isAdd){ let val = prompt('Insert new item:'); if(val && val.trim() !== ''){ let opt = document.createElement('option'); opt.value = val; opt.text = val; opt.selected = true; el.add(opt, el.options[el.options.length - 1]); if(!el.multiple) el.value = val; } if(el.multiple) Array.from(el.options).forEach(o => {if(o.value === '__add_item__') o.selected = false;}); else if(!val) el.selectedIndex = 0; } ";
             String currentOnChange = getProperties().get("onchange");
             if (currentOnChange == null) {
                 setProperty("onchange", checkScript);
