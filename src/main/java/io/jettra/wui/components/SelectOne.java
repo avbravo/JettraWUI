@@ -7,7 +7,7 @@ import io.jettra.wui.core.UIComponent;
  */
 public class SelectOne extends UIComponent {
     
-    private String defaultValue;
+    protected String defaultValue;
     private boolean allowAddItem = false;
     
     public SelectOne(String name) {
