@@ -90,6 +90,10 @@ public abstract class UIComponent {
         return this;
     }
 
+    public String getContent() {
+        return content;
+    }
+
     /**
      * Sets content and escapes it for safety (XSS protection).
      * @param content the content to escape

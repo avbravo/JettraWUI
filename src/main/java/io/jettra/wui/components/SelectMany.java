@@ -12,7 +12,7 @@ public class SelectMany extends SelectOne {
     public SelectMany(String name) {
         super(name);
         // Cambiamos el tag base a div para que deje de comportarse como un select nativo
-        this.setTag("div");
+        this.tag = "div";
         this.removeClass("j-select").addClass("j-select-many-list");
         
         // Estilos base para el contenedor de la lista
@@ -36,7 +36,6 @@ public class SelectMany extends SelectOne {
         return this;
     }
 
-    @Override
     public SelectMany setInline(boolean inline) {
         if (inline) {
             this.setStyle("display", "flex").setStyle("width", "100%");
@@ -57,7 +56,29 @@ public class SelectMany extends SelectOne {
         
         // Renderizamos el contenedor manualment para controlar las opciones
         sb.append("<").append(getTag());
-        renderAttributes(sb);
+        
+        if (!getUpdate().isEmpty()) {
+            getProperties().put("data-update", getUpdate());
+        }
+        if (!initialClasses.isEmpty() && !getProperties().containsKey("class")) {
+            getProperties().put("class", initialClasses.trim());
+        }
+        if (!getClickListeners().isEmpty() && !getProperties().containsKey("onclick")) {
+            getProperties().put("onclick", "jtFire('" + getId() + "')");
+        }
+        for (java.util.Map.Entry<String, String> entry : getProperties().entrySet()) {
+            if (!entry.getKey().equals("name")) {
+                sb.append(" ").append(entry.getKey()).append("=\"").append(entry.getValue()).append("\"");
+            }
+        }
+        if (!getStyles().isEmpty()) {
+            sb.append(" style=\"");
+            for (java.util.Map.Entry<String, String> entry : getStyles().entrySet()) {
+                sb.append(entry.getKey()).append(":").append(entry.getValue()).append("; ");
+            }
+            sb.append("\"");
+        }
+        
         sb.append(">");
         
         // Seleccionados para el input oculto inicial
