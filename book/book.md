@@ -11,136 +11,95 @@ JettraWUI is a Java-to-HTML UI framework designed for developers who want to bui
 
 ---
 
-## 2. Architecture
+## 2. Architecture & Core Concepts
 
 ### UIComponent
-The base class for everything. It manages:
-- **Properties**: HTML attributes.
-- **Styles**: Inline CSS rules.
-- **Children**: Nested `UIComponent` objects.
-- **Events**: Click and custom events.
+The base class for everything. It manages properties, styles, children, and events.
+[Read more about Architecture](../guide/arquitectura.md)
 
 ### Page
-The entry point of any JettraWUI application. It handles the `<html>`, `<head>`, and `<body>` tags, integrates the `JettraTheme`, and orchestrates the rendering of the component tree.
+The entry point of any JettraWUI application. It handles the `<html>`, `<head>`, and `<body>` tags.
 
 ### Event System
 JettraWUI uses a JSON-based event communication.
-- `@OnEvent(name="...")`: Annotation to handle client-side events in Java.
-- `jtFire`: JavaScript bridge to trigger server-side updates.
+[Read more about Events](../guide/events.md)
+
+### Theme System (New)
+Modern themes including 3D, Material, Plain, and TailwindCSS support.
+[Read more about Themes](../guide/temas.md)
 
 ---
 
-## 3. Basic Components
+## 3. Component Library Index
 
-### Button
-Standard button element with thematic support.
-```java
-Button btn = new Button("Save")
-    .primary()
-    .setId("saveBtn")
-    .addClickListener(() -> System.out.println("Saved!"));
-```
+### Form & Input Components
+- **[Button](../guide/button.md)** / **[Buttons](../guide/buttons.md)**: Standard and group buttons.
+- **[TextBox](../guide/textarea.md)**: Input field for text.
+- **[TextArea](../guide/textarea.md)**: Multi-line text input.
+- **[SelectOne](../guide/selectone.md)** / **[SelectMany](../guide/selectmany.md)**: Dropdown and multi-selection lists.
+- **[SelectOneIcon](../guide/selectoneicon.md)**: Selection with icons and "Add Item" support.
+- **[RadioButtons](../guide/radiobuttons.md)**: Group of radio selections.
+- **[CheckboxGroup](../guide/checkboxgroup.md)**: Group of checkboxes.
+- **[ToggleSwitch](../guide/toggleswitch.md)**: Modern switch toggle.
+- **[DatePicker](../guide/datepicker.md)** / **[Time](../guide/time.md)**: Date and time selection.
+- **[OtpValidator](../guide/otpvalidator.md)**: Secure OTP input.
 
-### TextBox
-Input field for text, passwords, or emails.
-```java
-TextBox input = new TextBox("text", "username")
-    .setPlaceholder("Enter username")
-    .addClass("j-input");
-```
+### Layout & Containers
+- **[Grid](../guide/grid.md)**: Flexible CSS Grid layout.
+- **[Card](../guide/card.md)**: Rich container with 3D/Glassmorphism effects.
+- **[Panel](../guide/panel.md)**: Collapsible and structured panel.
+- **[TabView](../guide/tabview.md)**: Organized tabbed content.
+- **[FormGroup](../guide/formgroup.md)**: Form element wrapper.
+- **[Board](../guide/board.md)**: Kanban-style board container.
 
-### Label
-Associates text with a form element.
-```java
-Label lbl = new Label("username", "Username");
-```
+### Complex & Advanced Components
+- **[Datatable](../guide/datatable.md)**: Powerful data grid with sorting and filtering.
+- **[Tree](../guide/tree.md)**: Hierarchical tree structure.
+- **[Kanban](../guide/kanban.md)**: Visual task management.
+- **[Schedule](../guide/schedule.md)** / **[ScheduleControl](../guide/schedulecontrol.md)**: Calendar and event scheduling.
+- **[Organigram](../guide/organigram.md)**: Organizational charts.
+- **[Timeline](../guide/timeline.md)**: Sequential event display.
 
----
+### Media & Visualization
+- **[Charts (Bar, Pie, Line, Radar, Doughnut)](../guide/charstbar.md)**: Data visualization powered by Chart.js.
+- **[Map](../guide/map.md)**: Interactive map integration.
+- **[PdfViewer](../guide/pdfviewer.md)**: Embedded PDF viewer.
+- **[ViewMedia](../guide/viewmedia.md)**: Image and video gallery.
+- **[Avatar](../guide/avatar.md)**: User profile representation.
 
-## 4. Layout Components
-
-### Grid
-Creates a CSS Grid container.
-```java
-Grid layout = new Grid(3, "20px");
-layout.add(card1).add(card2).add(card3);
-```
-
-### Card
-A visually rich container with title, subtitle, and content.
-```java
-Card card = new Card()
-    .setTitle("Profile")
-    .setImageUrl("profile.png")
-    .add(new Button("Edit"));
-```
-
-### FormGroup (New)
-A specialized `Div` that wraps form elements with the `form-group` class.
-```java
-FormGroup group = new FormGroup()
-    .add(new Label("email", "Email"))
-    .add(new TextBox("email", "email"));
-```
+### Utilities & Feedback
+- **[Alert](../guide/uso_componente_alert.md)** / **[Notification](../guide/notification.md)**: User feedback systems.
+- **[ProgressBar](../guide/progressbar.md)**: Visual progress indication.
+- **[Loading](../guide/loading.md)**: Spinner and overlay indicators.
+- **[BarCode](../guide/barcode.md)** / **[QR](../guide/qr.md)**: Dynamic code generation.
+- **[FileUpload](../guide/fileupload.md)** / **[Downloader](../guide/downloader.md)**: Asset management.
+- **[Captcha](../guide/catcha.md)**: Security verification.
+- **[CreditCard](../guide/creditcard.md)**: Specialized payment input.
 
 ---
 
-## 5. Complex & Utility Components
+## 4. Advanced Features
 
-### Datatable
-Advanced component for displaying tabular data with automatic rendering of rows.
-```java
-Datatable table = new Datatable("usersTable");
-table.addColumn("ID").addColumn("Name").addColumn("Status");
-// ... add rows
-```
+### MVC Integration
+How to use JettraWUI in a Model-View-Controller architecture.
+[Read more about MVC](../guide/mvc.md)
 
-### Alert & Notification
-Used for user feedback.
-```java
-Alert alert = new Alert().setType("error").showMessage("Access Denied");
-Notification.show("Success", "Record updated");
-```
+### Page Synchronization
+Ensuring real-time updates between client and server.
+[Read more about JettraPage Sincronized](../guide/jettrapagesincronized.md)
 
-### BarCode & QR
-Generates dynamic codes.
-```java
-QR code = new QR("https://jettra.io").setSize(200);
-BarCode bc = new BarCode("12345").setFormat("CODE128");
-```
+### Drawing & Graphics
+Canvas-based drawing capabilities.
+[Read more about Draw](../guide/draw.md)
 
 ---
 
-## 6. Dashboard Architecture
-The Dashboard is a high-level layout component that organizes the app into four main areas:
-- **Top**: Header, user info, global actions.
-- **Left**: Main navigation menu.
-- **Center**: Primary content area (forms, tables, dashboards).
-- **Footer**: Meta-info and status.
-
-### Example Dashboard Setup
-```java
-Dashboard dash = new Dashboard();
-dash.getTop().add(new Label("App Title"));
-dash.getLeft().add(new Menu().add(new MenuItem("Home")));
-dash.getCenter().add(new WelcomePage());
-```
-
----
-
-## 7. Fluent API Reference
-All JettraWUI components (extending `UIComponent`) support the following chaining methods:
-
-| Method | Description |
-| --- | --- |
-| `setId(String)` | Sets the HTML `id`. |
-| `setProperty(String, String)` | Adds an HTML attribute. |
-| `setStyle(String, String)` | Adds an inline CSS rule. |
-| `addClass(String)` | Adds a CSS class. |
-| `setContent(String)` | Sets the inner HTML of the component. |
-| `add(UIComponent)` | Adds a child component. |
-| `setUpdate(String)` | Defines which IDs to refresh on an event. |
+## 5. Development Guide
+- **[How to create a new component](../guide/howcreatenewcomponent.md)**
+- **[Validations](../guide/validations.md)**
+- **[Icons Reference](../guide/icons.md)**
 
 ---
 
 *© 2026 JettraStack - All rights reserved.*
+
