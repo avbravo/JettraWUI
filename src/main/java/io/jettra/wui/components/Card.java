@@ -1,6 +1,7 @@
 package io.jettra.wui.components;
 
 import io.jettra.wui.core.UIComponent;
+import java.util.Map;
 
 /**
  * JettraWUI Card Component
@@ -61,6 +62,30 @@ public class Card extends UIComponent {
             this.setStyle("width", width);
         }
         
+        StringBuilder builder = new StringBuilder();
+        builder.append("<").append(tag);
+        
+        if (!update.isEmpty()) {
+            properties.put("data-update", update);
+        }
+        if (!initialClasses.isEmpty() && !properties.containsKey("class")) {
+            properties.put("class", initialClasses.trim());
+        }
+        if (!clickListeners.isEmpty() && !properties.containsKey("onclick")) {
+            properties.put("onclick", "jtFire('" + getId() + "')");
+        }
+        for (Map.Entry<String, String> entry : properties.entrySet()) {
+            builder.append(" ").append(entry.getKey()).append("=\"").append(entry.getValue()).append("\"");
+        }
+        if (!styles.isEmpty()) {
+            builder.append(" style=\"");
+            for (Map.Entry<String, String> entry : styles.entrySet()) {
+                builder.append(entry.getKey()).append(":").append(entry.getValue()).append("; ");
+            }
+            builder.append("\"");
+        }
+        builder.append(">");
+
         StringBuilder innerHtml = new StringBuilder();
         
         // Image
@@ -95,9 +120,10 @@ public class Card extends UIComponent {
         }
         
         innerHtml.append("</div>");
+        builder.append(innerHtml.toString());
         
-        this.setContent(innerHtml.toString());
-        return super.render();
+        builder.append("</").append(tag).append(">\n");
+        return builder.toString();
     }
 
     @Override

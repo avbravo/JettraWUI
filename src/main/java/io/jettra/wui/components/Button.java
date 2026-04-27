@@ -10,6 +10,7 @@ public class Button extends UIComponent {
         updateContent();
         this.initialClasses = "j-btn";
     }
+     
 
     private void updateContent() {
         if (icon != null && !icon.isEmpty()) {
