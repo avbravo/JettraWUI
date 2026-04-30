@@ -101,8 +101,20 @@ public abstract class JettraDashboardPage extends Page {
         if (fullTitle == null) fullTitle = "Jettra Global Dashboard";
         if (shortTitle == null) shortTitle = fullTitle.substring(0, 1);
 
-        io.jettra.wui.components.Button menuBtn = new io.jettra.wui.components.Button("\u2630");
-        menuBtn.addClass("j-menu-toggle").addClass("show-on-mobile");
+        String hamburgerIcon = "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><line x1='3' y1='12' x2='21' y2='12'></line><line x1='3' y1='6' x2='21' y2='6'></line><line x1='3' y1='18' x2='21' y2='18'></line></svg>";
+        io.jettra.wui.components.Button menuBtn = new io.jettra.wui.components.Button("");
+        menuBtn.setContent(hamburgerIcon);
+        menuBtn.addClass("j-menu-toggle").addClass("show-on-mobile")
+               .setStyle("width", "38px")
+               .setStyle("height", "38px")
+               .setStyle("min-width", "38px")
+               .setStyle("padding", "0")
+               .setStyle("display", "flex")
+               .setStyle("align-items", "center")
+               .setStyle("justify-content", "center")
+               .setStyle("border-radius", "8px")
+               .setStyle("background", "rgba(0,255,255,0.1)")
+               .setStyle("border", "1px solid rgba(0,255,255,0.3)");
         menuBtn.setProperty("type", "button");
         menuBtn.setProperty("onclick", "toggleMobileMenu()");
         top.add(menuBtn);

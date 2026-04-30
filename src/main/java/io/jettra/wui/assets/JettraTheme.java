@@ -179,7 +179,7 @@ public class JettraTheme {
             "/* Mobile Styles */\n" +
             "  .show-on-mobile { display: none !important; }\n" +
             "  .show-on-low-res { display: none !important; }\n" +
-            "  .j-menu-toggle { cursor: pointer; display: none; align-items: center; justify-content: center; width: 40px; height: 40px; color: var(--jettra-accent); font-size: 24px; }\n" +
+            "  .j-menu-toggle { cursor: pointer; display: none; align-items: center; justify-content: center; width: 36px; height: 36px; min-width: 36px; padding: 0 !important; color: var(--jettra-accent); font-size: 20px; background: rgba(0,255,255,0.1); border: 1px solid var(--jettra-border); border-radius: 50%; transition: all 0.3s; margin-right: 10px; }\n  .j-menu-toggle:hover { background: rgba(0,255,255,0.2); border-color: var(--jettra-accent); box-shadow: 0 0 10px var(--jettra-glow); }\n  .j-menu-toggle svg { width: 18px; height: 18px; stroke: currentColor; }\n" +
             "  /* Mobile & Tablet Styles */\n" +
             "  @media (max-width: 1024px) {\n" +
             "    .j-dashboard { grid-template-columns: 1fr; grid-template-areas: 'top' 'center' 'footer'; }\n" +

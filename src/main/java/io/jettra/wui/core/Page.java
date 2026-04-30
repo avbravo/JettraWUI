@@ -18,6 +18,7 @@ import java.util.Map;
 public abstract class Page extends UIComponent implements HttpHandler {
     
     private String title;
+    protected HttpExchange currentExchange;
 
     public Page(String title) {
         super("html");
@@ -48,6 +49,7 @@ public abstract class Page extends UIComponent implements HttpHandler {
      * Entry point for JettraServer. 
      */
     public void handle(HttpExchange exchange) throws IOException {
+        this.currentExchange = exchange;
         Map<String, String> queryParams = parseQueryParams(exchange.getRequestURI().getQuery());
         Map<String, String> formParams = "POST".equalsIgnoreCase(exchange.getRequestMethod()) 
             ? parseRequestBody(exchange) 

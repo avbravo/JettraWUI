@@ -22,7 +22,7 @@ public class Login extends Form {
         password = new TextBox("password", "password");
         password.setPlaceholder("Password");
 
-        loginButton = new Button("Login");
+        loginButton = new Button("Login").setType("submit");
         forgotPasswordButton = new Button("Forgot Password?");
         // Se pueden añadir propiedades CSS predeterminadas para que parezca enlace
         forgotPasswordButton.setProperty("class", "j-forgot-btn");
