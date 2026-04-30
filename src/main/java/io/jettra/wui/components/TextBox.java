@@ -16,6 +16,20 @@ public class TextBox extends UIComponent {
         return this;
     }
 
+    public TextBox setReadonly(boolean readonly) {
+        if (readonly) {
+            setProperty("readonly", "true");
+        } else {
+            removeProperty("readonly");
+        }
+        return this;
+    }
+
+    public TextBox setDisplay(String display) {
+        setStyle("display", display);
+        return this;
+    }
+
     @Override
     public TextBox setUpdate(String ids) {
         super.setUpdate(ids);

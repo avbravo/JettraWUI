@@ -60,6 +60,9 @@ Button helpBtn = new Button("Ver Guía")
 | `.setIcon(String)` | Sets an icon text/emoji. | `Button` |
 | `.addClass(String)` | Appends a CSS class. | `Button` |
 | `.setStyle(String, String)` | Sets an inline CSS style. | `Button` |
+| `.setBackgroundColor(String)`| Sets the background color style. | `Button` |
+| `.setOnclick(String)` | Sets a client-side JavaScript action. | `Button` |
+| `.setType(String)` | Sets the button type (button, submit, reset).| `Button` |
 | `.addClickListener(ClickListener)` | Adds a server-side click event. | `Button` |
 | `.primary()` | Applies the primary style. | `Button` |
 | `.secondary()` | Applies the secondary style. | `Button` |
@@ -67,3 +70,6 @@ Button helpBtn = new Button("Ver Guía")
 | `.danger()` | Applies the danger style. | `Button` |
 | `.info()` | Applies the info style. | `Button` |
 | `.warning()` | Applies the warning style. | `Button` |
+
+> [!NOTE]
+> All `Button` components now include the `"j-btn"` class by default, so manual addition is no longer required.

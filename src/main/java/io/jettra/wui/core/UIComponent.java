@@ -48,9 +48,22 @@ public abstract class UIComponent {
         return this;
     }
 
+    public UIComponent removeProperty(String key) {
+        properties.remove(key);
+        return this;
+    }
+
     public UIComponent setStyle(String key, String value) {
         styles.put(key, value);
         return this;
+    }
+
+    public UIComponent setDisplay(String value) {
+        return setStyle("display", value);
+    }
+
+    public UIComponent setColor(String value) {
+        return setStyle("color", value);
     }
 
     public UIComponent addClass(String className) {

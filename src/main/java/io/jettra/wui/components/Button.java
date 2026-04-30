@@ -3,12 +3,30 @@ import io.jettra.wui.core.UIComponent;
 public class Button extends UIComponent {
     private String text = "";
     private String icon = "";
+    private String type = "button";
 
     public Button(String text) {
         super("button");
         this.text = text;
         updateContent();
         this.initialClasses = "j-btn";
+        setProperty("type", type);
+    }
+
+    public Button setBackgroundColor(String backgroundColor) {
+        setStyle("background-color", backgroundColor);
+        return this;
+    }
+
+    public Button setOnclick(String onclick) {
+        setProperty("onclick", onclick);
+        return this;
+    }
+
+    public Button setType(String type) {
+        this.type = type;
+        setProperty("type", type);
+        return this;
     }
      
 
