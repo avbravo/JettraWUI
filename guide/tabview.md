@@ -15,16 +15,16 @@ TabView tabView = new TabView("My TabView")
 
 You can change where the tabs are positioned relative to the content area using `setOrientation()`:
 
-- `Orientation.SUPERIOR` (Default): Tabs at the top.
-- `Orientation.INFERIOR`: Tabs at the bottom.
-- `Orientation.IZQUIERDA`: Tabs on the left (sidebar style).
-- `Orientation.DERECHA`: Tabs on the right.
+- `Orientation.TOP` (Default): Tabs at the top.
+- `Orientation.BOTTOM`: Tabs at the bottom.
+- `Orientation.LEFT`: Tabs on the left (sidebar style).
+- `Orientation.RIGHT`: Tabs on the right.
 
 ### Example with Orientation
 
 ```java
 TabView leftTabs = new TabView("Configuration")
-    .setOrientation(TabView.Orientation.IZQUIERDA)
+    .setOrientation(TabView.Orientation.LEFT)
     .addTab("General", new Div().add(new Label("Name", "App Name")))
     .addTab("Security", new Div().add(new Label("Password", "******")));
 ```
@@ -42,4 +42,4 @@ The `TabView` follows the Jettra theme automatically, using glassmorphism and ac
 | `.setOrientation(Orientation orientation)` | Sets the tab list position. | `TabView` |
 
 ### Orientations Enum
-`TabView.Orientation.SUPERIOR`, `TabView.Orientation.INFERIOR`, `TabView.Orientation.IZQUIERDA`, `TabView.Orientation.DERECHA`.
+`TabView.Orientation.TOP`, `TabView.Orientation.BOTTOM`, `TabView.Orientation.LEFT`, `TabView.Orientation.RIGHT`.

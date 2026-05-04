@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.UUID;
 
 public class TabView extends UIComponent {
-    public enum Orientation { SUPERIOR, INFERIOR, IZQUIERDA, DERECHA }
+    public enum Orientation { TOP, BOTTOM, LEFT, RIGHT }
 
     private String title;
-    private Orientation orientation = Orientation.SUPERIOR;
+    private Orientation orientation = Orientation.TOP;
     private List<Tab> tabs = new ArrayList<>();
     private String tvId;
 
@@ -77,22 +77,22 @@ public class TabView extends UIComponent {
 
         // Apply orientation logic
         switch (orientation) {
-            case SUPERIOR:
+            case TOP:
                 layout.setStyle("flex-direction", "column");
                 tabList.setStyle("flex-direction", "row").setStyle("border-bottom", "1px solid var(--jettra-border)");
                 layout.add(tabList).add(contentArea);
                 break;
-            case INFERIOR:
+            case BOTTOM:
                 layout.setStyle("flex-direction", "column-reverse");
                 tabList.setStyle("flex-direction", "row").setStyle("border-top", "1px solid var(--jettra-border)");
                 layout.add(tabList).add(contentArea);
                 break;
-            case IZQUIERDA:
+            case LEFT:
                 layout.setStyle("flex-direction", "row");
                 tabList.setStyle("flex-direction", "column").setStyle("min-width", "150px").setStyle("border-right", "1px solid var(--jettra-border)");
                 layout.add(tabList).add(contentArea);
                 break;
-            case DERECHA:
+            case RIGHT:
                 layout.setStyle("flex-direction", "row-reverse");
                 tabList.setStyle("flex-direction", "column").setStyle("min-width", "150px").setStyle("border-left", "1px solid var(--jettra-border)");
                 layout.add(tabList).add(contentArea);
