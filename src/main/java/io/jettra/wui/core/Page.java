@@ -158,18 +158,21 @@ public abstract class Page extends UIComponent implements HttpHandler {
     }
 
     private void handleSyncCheck(HttpExchange exchange, Map<String, String> params) throws IOException {
+        long startTime = io.jettra.wui.sync.JettraSyncManager.SERVER_START_TIME;
         io.jettra.wui.sync.JettraPageSincronized syncAnno = this.getClass().getAnnotation(io.jettra.wui.sync.JettraPageSincronized.class);
+        
         if (syncAnno == null) {
-            renderResponse(exchange, "{}");
+            renderResponse(exchange, String.format("{\"serverStartTime\": %d}", startTime));
             return;
         }
         String entity = syncAnno.entity().isEmpty() ? this.getClass().getSimpleName().replace("Page", "Model") : syncAnno.entity();
         io.jettra.wui.sync.JettraSyncManager.SyncInfo info = io.jettra.wui.sync.JettraSyncManager.getLastChange(entity);
         
         if (info == null) {
-            renderResponse(exchange, "{}");
+            renderResponse(exchange, String.format("{\"serverStartTime\": %d}", startTime));
         } else {
-            String json = String.format("{\"type\":\"%s\", \"user\":\"%s\", \"ts\":%d}", info.type, info.user, info.timestamp);
+            String json = String.format("{\"type\":\"%s\", \"user\":\"%s\", \"ts\":%d, \"serverStartTime\": %d}", 
+                info.type, info.user, info.timestamp, startTime);
             renderResponse(exchange, json);
         }
     }
@@ -189,6 +192,9 @@ public abstract class Page extends UIComponent implements HttpHandler {
         // Inject 3D Futuristic Theme CSS & JS
         builder.append(JettraTheme.getCSS());
         builder.append(JettraTheme.getJS());
+        
+        // Inject Heartbeat Security Logic
+        injectSecurityHeartbeat(builder);
         
         // Inject Sync Logic if needed
         injectSyncLogic(builder);
@@ -212,6 +218,39 @@ public abstract class Page extends UIComponent implements HttpHandler {
         return builder.toString();
     }
 
+    private void injectSecurityHeartbeat(StringBuilder builder) {
+        long startTime = io.jettra.wui.sync.JettraSyncManager.SERVER_START_TIME;
+        String loginPath = com.jettra.server.JettraServer.resolvePath("/login");
+        
+        builder.append("<script>\n")
+               .append("  const J_SERVER_START_TIME = ").append(startTime).append(";\n")
+               .append("  const J_LOGIN_PATH = '").append(loginPath).append("';\n")
+               .append("  \n")
+               .append("  function checkJettraHeartbeat() {\n")
+               .append("    if (window.location.pathname === J_LOGIN_PATH) return;\n")
+               .append("    \n")
+               .append("    fetch(window.location.pathname + '?_jtSyncCheck=true')\n")
+               .append("      .then(r => {\n")
+               .append("        if (!r.ok) throw new Error('Server down');\n")
+               .append("        return r.json();\n")
+               .append("      })\n")
+               .append("      .then(data => {\n")
+               .append("        if (data.serverStartTime && data.serverStartTime !== J_SERVER_START_TIME) {\n")
+               .append("           console.warn('Server restarted, redirecting to login...');\n")
+               .append("           window.location.href = J_LOGIN_PATH;\n")
+               .append("        }\n")
+               .append("      })\n")
+               .append("      .catch(err => {\n")
+               .append("        console.error('JettraHeartbeat Error:', err);\n")
+               .append("        window.location.href = J_LOGIN_PATH;\n")
+               .append("      });\n")
+               .append("  }\n")
+               .append("  \n")
+               .append("  // Heartbeat check every 10 seconds for security\n")
+               .append("  setInterval(checkJettraHeartbeat, 10000);\n")
+               .append("</script>\n");
+    }
+
     private void injectSyncLogic(StringBuilder builder) {
         io.jettra.wui.sync.JettraPageSincronized syncAnno = this.getClass().getAnnotation(io.jettra.wui.sync.JettraPageSincronized.class);
         if (syncAnno == null) return;
@@ -225,6 +264,8 @@ public abstract class Page extends UIComponent implements HttpHandler {
                .append("  const J_SYNC_TYPE = '").append(syncAnno.value()).append("';\n")
                .append("  \n")
                .append("  function checkJettraSync() {\n")
+               .append("    // Only poll if heartbeat is not already doing it? \n")
+               .append("    // Actually, checkJettraSync also checks for data changes.\n")
                .append("    fetch(window.location.pathname + '?_jtSyncCheck=true')\n")
                .append("      .then(r => r.json())\n")
                .append("      .then(data => {\n")

@@ -5,6 +5,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class JettraSyncManager {
     
+    public static final long SERVER_START_TIME = System.currentTimeMillis();
+    
     public static class SyncInfo {
         public final SyncType type;
         public final String user;
