@@ -197,8 +197,8 @@ public class JettraTheme {
             "    .j-sync-icon { font-size: 28px; animation: jPulse 2s infinite; filter: drop-shadow(0 0 10px var(--jettra-accent)); }\n" +
             "    .j-sync-text strong { display: block; color: var(--jettra-accent); margin-bottom: 5px; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; }\n" +
             "    .j-sync-text p { margin: 0; font-size: 0.85rem; opacity: 0.9; line-height: 1.4; }\n" +
-            "    .j-sync-actions { display: flex; gap: 10px; margin-top: 15px; justify-content: flex-end; }\n" +
-            "    .j-sync-actions button { background: rgba(0,255,255,0.05); border: 1px solid var(--jettra-accent); color: var(--jettra-accent); padding: 6px 14px; border-radius: 6px; cursor: pointer; transition: all 0.3s; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; }\n" +
+            "    .j-sync-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 15px; }\n" +
+            "    .j-sync-actions button { width: 100%; background: rgba(0,255,255,0.05); border: 1px solid var(--jettra-accent); color: var(--jettra-accent); padding: 8px 14px; border-radius: 6px; cursor: pointer; transition: all 0.3s; font-size: 0.85rem; font-weight: bold; text-transform: uppercase; }\n" +
             "    .j-sync-actions button:hover { background: var(--jettra-accent); color: #000; box-shadow: 0 0 15px var(--jettra-accent); }\n" +
             "    @keyframes jSlideIn { from { transform: translateX(50px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }\n" +
             "    @keyframes jPulse { 0% { opacity: 0.7; transform: scale(1); } 50% { opacity: 1; transform: scale(1.1); } 100% { opacity: 0.7; transform: scale(1); } }\n" +

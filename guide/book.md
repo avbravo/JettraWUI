@@ -86,7 +86,7 @@ How to use JettraWUI in a Model-View-Controller architecture.
 
 ### Page Synchronization
 Ensuring real-time updates between client and server.
-[Read more about JettraPage Sincronized](jettrapagesincronized.md)
+[Read more about JettraPage Sincronized](sincronized.md)
 
 ### Drawing & Graphics
 Canvas-based drawing capabilities.

@@ -261,7 +261,7 @@ public abstract class Page extends UIComponent implements HttpHandler {
                .append("        </div>\n")
                .append("        <div class='j-sync-actions'>\n")
                .append("          <button onclick='window.location.reload()'>Actualizar</button>\n")
-               .append("          <button onclick='this.closest(\".j-sync-popup-3d\").remove()'>Ignorar</button>\n")
+               .append("          <button onclick='this.closest(\".j-sync-popup-3d\").remove()'>Cerrar</button>\n")
                .append("        </div>\n")
                .append("      </div>\n")
                .append("    `;\n")
