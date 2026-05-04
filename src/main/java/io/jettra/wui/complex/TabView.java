@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class TabView extends UIComponent {
-    public enum Orientation { TOP, BOTTOM, LEFT, RIGHT }
+        public enum Orientation { TOP, BOTTOM, LEFT, RIGHT }
 
     private String title;
     private Orientation orientation = Orientation.TOP;
