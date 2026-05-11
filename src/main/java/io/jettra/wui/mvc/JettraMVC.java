@@ -196,12 +196,8 @@ public class JettraMVC {
         if (page.getClass().isAnnotationPresent(CrudView.class)) {
             try {
                 CrudView anno = page.getClass().getAnnotation(CrudView.class);
-                String modelClassName = anno.model();
-                String repoClassName = anno.repository();
-
-                // Intentar resolver las clases por nombre o convención
-                Class<?> modelClass = resolveClass(modelClassName, "com.jettra.example.model");
-                Class<?> repoClass = resolveClass(repoClassName.isEmpty() ? modelClass.getSimpleName().replace("Model", "Repository") : repoClassName, "com.jettra.example.repository");
+                Class<?> modelClass = anno.model();
+                Class<?> repoClass = anno.repository();
 
                 if (modelClass == null || repoClass == null) {
                     System.err.println("[JettraMVC] Error: Could not resolve model or repository class for @CrudView");
@@ -272,11 +268,10 @@ public class JettraMVC {
         if (page.getClass().isAnnotationPresent(CrudView.class)) {
             try {
                 CrudView anno = page.getClass().getAnnotation(CrudView.class);
+                Class<?> modelClass = anno.model();
+                Class<?> repoClass = anno.repository();
                 String action = params.get("action");
                 if (action == null || action.isEmpty()) return false;
-
-                Class<?> modelClass = resolveClass(anno.model(), "com.jettra.example.model");
-                Class<?> repoClass = resolveClass(anno.repository().isEmpty() ? modelClass.getSimpleName().replace("Model", "Repository") : anno.repository(), "com.jettra.example.repository");
 
                 if ("save".equals(action)) {
                     Object model = modelClass.getDeclaredConstructor().newInstance();

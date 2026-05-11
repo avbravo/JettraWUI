@@ -13,12 +13,12 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface CrudView {
     /**
-     * The ViewModel class name or alias.
+     * The ViewModel class.
      */
-    String model();
+    Class<?> model();
 
     /**
-     * The Repository class name or alias.
+     * The Repository class.
      */
-    String repository() default "";
+    Class<?> repository();
 }
