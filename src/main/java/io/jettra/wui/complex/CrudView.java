@@ -21,6 +21,7 @@ public class CrudView extends UIComponent {
     private String title;
     private String subtitle;
     private String modelName;
+    private boolean reportEnabled = false;
 
     private Modal crudModal;
     private Header modalHeader;
@@ -47,6 +48,15 @@ public class CrudView extends UIComponent {
         this.subtitle = getLabel("subtitle." + modelKey, "Gestión de registros");
 
         init();
+    }
+
+    public CrudView setReportEnabled(boolean enabled) {
+        this.reportEnabled = enabled;
+        // Re-init or add button if already initialized? 
+        // Better to set it before init() if called from constructor, 
+        // but init() is called in constructor. 
+        // I will change the constructor to include it or make init() callable later.
+        return this;
     }
 
     public CrudView setTitle(String title) {
@@ -94,6 +104,15 @@ public class CrudView extends UIComponent {
 
         TD actionsTdHeader = new TD();
         actionsTdHeader.add(addBtn);
+        
+        if (reportEnabled) {
+            Button reportBtn = new Button("📄 " + getLabel("btn.report", "Reporte"))
+                    .setId("reportBtn_" + uniqueId)
+                    .setBackgroundColor("#007bff")
+                    .setOnclick("location.href='?action=report'");
+            actionsTdHeader.add(reportBtn);
+        }
+
         headerRow.add(actionsTdHeader);
         table.addHeaderRow(headerRow);
 

@@ -21,4 +21,9 @@ public @interface CrudView {
      * The Repository class.
      */
     Class<?> repository();
+
+    /**
+     * Enable reporting for this view.
+     */
+    boolean report() default false;
 }

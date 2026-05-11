@@ -18,6 +18,8 @@ import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Properties;
+import java.util.List;
+import com.sun.net.httpserver.HttpExchange;
 
 /**
  * Utility class to handle MVC binding between ViewModels and UIComponents.
@@ -219,6 +221,7 @@ public class JettraMVC {
                 CrudHandler<?> handler = getCrudHandler(page.getClass());
 
                 io.jettra.wui.complex.CrudView crudComponent = new io.jettra.wui.complex.CrudView(modelClass, repoClass, msg, handler);
+                crudComponent.setReportEnabled(anno.report());
                 
                 // Buscar el Center en JettraDashboardPage si aplica
                 try {
@@ -321,10 +324,80 @@ public class JettraMVC {
                     String entityName = modelClass.getSimpleName();
                     JettraSyncManager.notifyChange(entityName, SyncType.DELETE, "System");
                     return true;
+                } else if ("report".equals(action)) {
+                    generateReport(page, modelClass, repoClass);
+                    return true;
                 }
             } catch (Exception e) {
+                System.err.println("[JettraMVC] Error in handleCrudPost: " + e.getMessage());
             }
         }
         return false;
+    }
+
+    private static void generateReport(Page page, Class<?> modelClass, Class<?> repoClass) {
+        try {
+            // 1. Obtener datos
+            Method findAll = repoClass.getMethod("findAll");
+            List<?> data = (List<?>) findAll.invoke(null);
+
+            // 2. Cargar JettraReport vía reflexión para evitar dependencia circular
+            Class<?> reportClass = Class.forName("com.jettra.report.Report");
+            Class<?> textElementClass = Class.forName("com.jettra.report.Report$TextElement");
+            Class<?> tableClass = Class.forName("com.jettra.report.Report$Table");
+            Class<?> columnClass = Class.forName("com.jettra.report.Report$Column");
+            Class<?> headerClass = Class.forName("com.jettra.report.Report$Header");
+            Class<?> footerClass = Class.forName("com.jettra.report.Report$Footer");
+            Class<?> detailClass = Class.forName("com.jettra.report.Report$Detail");
+
+            Object report = reportClass.getConstructor(String.class).newInstance("Reporte de " + modelClass.getSimpleName());
+            
+            // Set Data
+            Method setData = reportClass.getMethod("setData", List.class);
+            setData.invoke(report, data);
+
+            // Header
+            Object header = reportClass.getMethod("getHeader").invoke(report);
+            Object titleEl = textElementClass.getConstructor(String.class).newInstance("REPORTE DE " + modelClass.getSimpleName().toUpperCase());
+            headerClass.getMethod("addElement", Class.forName("com.jettra.report.Report$ReportElement")).invoke(header, titleEl);
+
+            // Table
+            Object table = tableClass.getConstructor().newInstance();
+            Method addColumn = tableClass.getMethod("addColumn", columnClass);
+            
+            Field[] fields = modelClass.getDeclaredFields();
+            for (Field field : fields) {
+                Object col = columnClass.getConstructor(String.class, String.class, int.class)
+                        .newInstance(field.getName().toUpperCase(), field.getName(), 100);
+                addColumn.invoke(table, col);
+            }
+
+            Object detail = reportClass.getMethod("getDetail").invoke(report);
+            detailClass.getMethod("addElement", Class.forName("com.jettra.report.Report$ReportElement")).invoke(detail, table);
+
+            // Footer
+            Object footer = reportClass.getMethod("getFooter").invoke(report);
+            Object footerEl = textElementClass.getConstructor(String.class).newInstance("Generado por JettraStack");
+            footerClass.getMethod("addElement", Class.forName("com.jettra.report.Report$ReportElement")).invoke(footer, footerEl);
+
+            // 3. Exportar a un archivo temporal
+            String tmpFile = "report_" + System.currentTimeMillis() + ".pdf";
+            reportClass.getMethod("exportToPdf", String.class).invoke(report, tmpFile);
+
+            // 4. Enviar al navegador
+            java.io.File file = new java.io.File(tmpFile);
+            if (file.exists()) {
+                byte[] bytes = java.nio.file.Files.readAllBytes(file.toPath());
+                page.getCurrentExchange().getResponseHeaders().set("Content-Type", "application/pdf");
+                page.getCurrentExchange().getResponseHeaders().set("Content-Disposition", "attachment; filename=" + file.getName());
+                page.getCurrentExchange().sendResponseHeaders(200, bytes.length);
+                page.getCurrentExchange().getResponseBody().write(bytes);
+                page.getCurrentExchange().getResponseBody().close();
+                file.delete();
+            }
+        } catch (Exception e) {
+            System.err.println("[JettraMVC] Error generating report: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }

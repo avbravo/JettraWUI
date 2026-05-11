@@ -20,6 +20,8 @@ public abstract class Page extends UIComponent implements HttpHandler {
     private String title;
     protected HttpExchange currentExchange;
 
+    public HttpExchange getCurrentExchange() { return currentExchange; }
+
     public Page(String title) {
         super("html");
         this.title = title;
