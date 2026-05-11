@@ -177,6 +177,62 @@ public class CrudView extends UIComponent {
     }
 
     private void setupReportModal(String uniqueId) {
+        try {
+            Class<?> reportClass = Class.forName("com.jettra.report.Report");
+            Object reportInstance = reportClass.getConstructor(String.class).newInstance("Reporte de " + modelClass.getSimpleName());
+            
+            // Set data
+            Method setData = reportClass.getMethod("setData", List.class);
+            List<?> items = null;
+            if (handler != null) {
+                items = (List<?>) handler.findAll();
+            } else {
+                Method findAll = repositoryClass.getMethod("findAll");
+                items = (List<?>) findAll.invoke(null);
+            }
+            setData.invoke(reportInstance, items);
+            
+            // Header
+            Object headerObj = reportClass.getMethod("getHeader").invoke(reportInstance);
+            Class<?> headerClass = headerObj.getClass();
+            Method addElement = headerClass.getMethod("addElement", Class.forName("com.jettra.report.Report$ReportElement"));
+            Class<?> textElementClass = Class.forName("com.jettra.report.Report$TextElement");
+            Object titleElement = textElementClass.getConstructor(String.class).newInstance("LISTADO DE " + modelName.toUpperCase());
+            addElement.invoke(headerObj, titleElement);
+
+            // Table
+            Object detailObj = reportClass.getMethod("getDetail").invoke(reportInstance);
+            Class<?> tableClass = Class.forName("com.jettra.report.Report$Table");
+            Object tableInstance = tableClass.getConstructor().newInstance();
+            Class<?> columnClass = Class.forName("com.jettra.report.Report$Column");
+            Method addColumn = tableClass.getMethod("addColumn", columnClass);
+
+            Field[] fields = modelClass.getDeclaredFields();
+            for (Field field : fields) {
+                String lbl = getFieldLabel(field);
+                Object col = columnClass.getConstructor(String.class, String.class, int.class).newInstance(lbl, field.getName(), 150);
+                addColumn.invoke(tableInstance, col);
+            }
+            addElement.invoke(detailObj, tableInstance);
+
+            // ViewerOptions
+            Object optionsObj = reportClass.getMethod("getViewerOptions").invoke(reportInstance);
+            Class<?> optionsClass = optionsObj.getClass();
+            optionsClass.getMethod("setShowViewer", boolean.class).invoke(optionsObj, reportShowViewer);
+            optionsClass.getMethod("setAllowPrint", boolean.class).invoke(optionsObj, reportAllowPrint);
+            optionsClass.getMethod("setAllowPdf", boolean.class).invoke(optionsObj, reportAllowPdf);
+            optionsClass.getMethod("setAllowExcel", boolean.class).invoke(optionsObj, reportAllowExcel);
+            optionsClass.getMethod("setAllowCsv", boolean.class).invoke(optionsObj, reportAllowCsv);
+            
+            // Create Viewer
+            Method createViewer = reportClass.getMethod("createViewer", String.class);
+            this.reportModal = (Modal) createViewer.invoke(reportInstance, uniqueId);
+            return;
+        } catch (Exception e) {
+            System.err.println("[CrudView] Error instantiating ReportViewer via reflection: " + e.getMessage());
+        }
+
+        // Fallback implementation if JettraReport is not available
         this.reportModal = new Modal("reportModal_" + uniqueId)
                 .setPadding("35px")
                 .setMaxWidth("500px")

@@ -42,6 +42,14 @@ public class PaisPage extends Page {
     - **Eliminación**: Usa `handler.delete(id)` para remover registros.
 4.  **Sincronización**: Mantiene la integración con `JettraSyncManager` para notificaciones en tiempo real.
 
+## Integración con JettraReport
+
+La interfaz generada por `@CrudView` está completamente integrada de forma nativa con **JettraReport**. Cuando la anotación incluye opciones de reporte (ej. `report = true`), JettraWUI se encarga automáticamente de:
+
+1.  **Instanciación Dinámica**: A través de Reflection, `CrudView` detecta e instancia dinámicamente el visor HTML interactivo nativo de JettraReport (`ReportViewer`). Esto evita dependencias circulares y mantiene los módulos desacoplados.
+2.  **Generación de la Interfaz del Visor**: El visor nativo muestra una vista previa del reporte en el navegador. Transforma las secciones configuradas (Header, Detail/Columnas derivadas del Modelo) en componentes HTML (Tablas, Párrafos) de JettraWUI.
+3.  **Gestión de Exportación**: Dependiendo de las variables `reportAllowPdf`, `reportAllowExcel`, `reportAllowCsv` y `reportAllowPrint`, el toolbar superior del visor habilitará los respectivos botones de exportación o impresión.
+4.  **Redimensionamiento**: El visor incrustado posee la opción de escalar su tamaño visual dinámicamente en pantalla (p. ej. a 50%, 75%, Original o Maximizar al 100%) a través de un control `<select>` integrado en la barra de herramientas del diálogo de previsualización.
 ## Configuración del Proyecto
 
 Asegúrese de tener las dependencias de Google AutoService y JavaPoet en su `pom.xml`:
