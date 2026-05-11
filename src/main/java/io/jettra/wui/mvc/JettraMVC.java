@@ -6,9 +6,14 @@ import io.jettra.wui.core.annotations.Inject;
 import io.jettra.wui.core.annotations.InjectViewModel;
 import io.jettra.wui.core.annotations.JettraViewModel;
 import io.jettra.wui.core.annotations.InjectProperties;
+import io.jettra.wui.core.annotations.CrudView;
+import io.jettra.wui.complex.Center;
+import io.jettra.wui.sync.JettraSyncManager;
+import io.jettra.wui.sync.SyncType;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Properties;
@@ -182,5 +187,120 @@ public class JettraMVC {
         for (UIComponent child : component.getChildren()) {
             syncComponentsWithModel(child, model);
         }
+    }
+
+    /**
+     * Procesa la anotación @CrudView si está presente en la página.
+     */
+    public static void processCrudView(Page page) {
+        if (page.getClass().isAnnotationPresent(CrudView.class)) {
+            try {
+                CrudView anno = page.getClass().getAnnotation(CrudView.class);
+                String modelClassName = anno.model();
+                String repoClassName = anno.repository();
+
+                // Intentar resolver las clases por nombre o convención
+                Class<?> modelClass = resolveClass(modelClassName, "com.jettra.example.model");
+                Class<?> repoClass = resolveClass(repoClassName.isEmpty() ? modelClass.getSimpleName().replace("Model", "Repository") : repoClassName, "com.jettra.example.repository");
+
+                if (modelClass == null || repoClass == null) {
+                    System.err.println("[JettraMVC] Error: Could not resolve model or repository class for @CrudView");
+                    return;
+                }
+
+                // Obtener propiedades de mensajes inyectadas
+                Properties msg = null;
+                for (Field field : page.getClass().getDeclaredFields()) {
+                    if (field.isAnnotationPresent(InjectProperties.class)) {
+                        field.setAccessible(true);
+                        msg = (Properties) field.get(page);
+                        break;
+                    }
+                }
+
+                io.jettra.wui.complex.CrudView crudComponent = new io.jettra.wui.complex.CrudView(modelClass, repoClass, msg);
+                
+                // Buscar el Center en JettraDashboardPage si aplica
+                try {
+                    Field centerField = null;
+                    Class<?> current = page.getClass();
+                    while(current != null && centerField == null) {
+                        try {
+                            centerField = current.getDeclaredField("center");
+                        } catch(Exception e) {
+                            current = current.getSuperclass();
+                        }
+                    }
+                    
+                    if (centerField != null) {
+                        centerField.setAccessible(true);
+                        Object center = centerField.get(page);
+                        if (center instanceof io.jettra.wui.complex.Center) {
+                            ((io.jettra.wui.complex.Center) center).add(crudComponent);
+                        } else {
+                            page.add(crudComponent);
+                        }
+                    } else {
+                        page.add(crudComponent);
+                    }
+                } catch (Exception e) {
+                    page.add(crudComponent);
+                }
+
+            } catch (Exception e) {
+                System.err.println("[JettraMVC] Error processing @CrudView: " + e.getMessage());
+            }
+        }
+    }
+
+    private static Class<?> resolveClass(String name, String defaultPackage) {
+        try {
+            return Class.forName(name);
+        } catch (ClassNotFoundException e) {
+            try {
+                return Class.forName(defaultPackage + "." + name);
+            } catch (ClassNotFoundException e2) {
+                return null;
+            }
+        }
+    }
+
+    /**
+     * Procesa la lógica de persistencia para @CrudView en el POST.
+     */
+    public static boolean handleCrudPost(Page page, Map<String, String> params) {
+        if (page.getClass().isAnnotationPresent(CrudView.class)) {
+            try {
+                CrudView anno = page.getClass().getAnnotation(CrudView.class);
+                String action = params.get("action");
+                if (action == null || action.isEmpty()) return false;
+
+                Class<?> modelClass = resolveClass(anno.model(), "com.jettra.example.model");
+                Class<?> repoClass = resolveClass(anno.repository().isEmpty() ? modelClass.getSimpleName().replace("Model", "Repository") : anno.repository(), "com.jettra.example.repository");
+
+                if ("save".equals(action)) {
+                    Object model = modelClass.getDeclaredConstructor().newInstance();
+                    updateModelFields(model, params);
+                    Method save = repoClass.getMethod("save", modelClass);
+                    save.invoke(null, model);
+                    
+                    String entityName = modelClass.getSimpleName();
+                    JettraSyncManager.notifyChange(entityName, SyncType.UPDATE, "System"); 
+                    return true;
+                } else if ("delete".equals(action)) {
+                    String code = params.get("code"); 
+                    if (code == null) code = params.get("id");
+                    
+                    Method delete = repoClass.getMethod("delete", String.class);
+                    delete.invoke(null, code);
+                    
+                    String entityName = modelClass.getSimpleName();
+                    JettraSyncManager.notifyChange(entityName, SyncType.DELETE, "System");
+                    return true;
+                }
+            } catch (Exception e) {
+            }
+        }
+        return false;
     }
 }

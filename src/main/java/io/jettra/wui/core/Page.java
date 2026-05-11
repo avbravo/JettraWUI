@@ -75,6 +75,9 @@ public abstract class Page extends UIComponent implements HttpHandler {
         
         System.out.println("[Page] Initializing lifecycle (onInit)...");
         onInit(allParams);
+        
+        // Process CrudView after onInit so Center is ready
+        JettraMVC.processCrudView(this);
 
         // 3. MVC Event Dispatching
         if (allParams.containsKey("_jtEvent")) {
@@ -86,6 +89,12 @@ public abstract class Page extends UIComponent implements HttpHandler {
         if ("POST".equalsIgnoreCase(exchange.getRequestMethod())) {
             if (!allParams.containsKey("_jtEvent")) {
                 System.out.println("[Page] Calling onPost...");
+                if (JettraMVC.handleCrudPost(this, allParams)) {
+                    try {
+                        redirect(exchange, exchange.getRequestURI().toString());
+                        return;
+                    } catch (Exception e) {}
+                }
                 onPost(allParams);
             } else {
                 System.out.println("[Page] Skipping onPost because _jtEvent is present (" + allParams.get("_jtEvent") + ")");
