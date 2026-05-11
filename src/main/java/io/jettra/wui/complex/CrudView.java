@@ -57,7 +57,8 @@ public class CrudView extends UIComponent {
                 .setSubtitle(subtitle)
                 .setWidth("100%");
 
-        setupModal();
+        String uniqueId = modelName + "_" + System.currentTimeMillis();
+        setupModal(uniqueId);
 
         String modelKey = modelName.toLowerCase();
         String addLabel = getLabel("btn.add." + modelKey, null);
@@ -71,9 +72,9 @@ public class CrudView extends UIComponent {
         }
 
         Button addBtn = new Button("➕ " + addLabel)
-                .setId("addBtn")
+                .setId("addBtn_" + uniqueId)
                 .setBackgroundColor("#238636")
-                .setOnclick("showCrudModal('save', false)");
+                .setOnclick("showCrudModal_" + uniqueId + "('save', false)");
 
         Datatable table = new Datatable();
         Row headerRow = new Row();
@@ -106,12 +107,12 @@ public class CrudView extends UIComponent {
                     String jsonData = getJsonData(item);
 
                     Button editBtn = new Button("✏️")
-                            .setId("editBtn_" + idValue)
-                            .setOnclick("showCrudModal('save', true, " + jsonData + ")");
+                            .setId("editBtn_" + idValue + "_" + uniqueId)
+                            .setOnclick("showCrudModal_" + uniqueId + "('save', true, " + jsonData + ")");
 
                     Button deleteBtn = new Button("🗑️")
-                            .setId("deleteBtn_" + idValue)
-                            .setOnclick("showCrudModal('delete', true, " + jsonData + ")");
+                            .setId("deleteBtn_" + idValue + "_" + uniqueId)
+                            .setOnclick("showCrudModal_" + uniqueId + "('delete', true, " + jsonData + ")");
 
                     actionsTd.add(editBtn).add(deleteBtn);
                     dataRow.add(actionsTd);
@@ -126,11 +127,11 @@ public class CrudView extends UIComponent {
         this.add(mainCard);
         this.add(crudModal);
 
-        injectScripts();
+        injectScripts(uniqueId);
     }
 
-    private void setupModal() {
-        this.crudModal = new Modal("crudModal")
+    private void setupModal(String uniqueId) {
+        this.crudModal = new Modal("crudModal_" + uniqueId)
                 .setPadding("35px")
                 .setMaxWidth("650px")
                 .setZIndex("9999");
@@ -138,15 +139,15 @@ public class CrudView extends UIComponent {
 
         this.modalHeader = new Header(3, "Operación");
 
-        Form form = new Form("crudForm", "");
-        this.modalAction = new TextBox("hidden", "action").setId("crudAction");
+        Form form = new Form("crudForm_" + uniqueId, "");
+        this.modalAction = new TextBox("hidden", "action").setId("crudAction_" + uniqueId);
 
         for (Field field : modelClass.getDeclaredFields()) {
             FormGroup group = new FormGroup();
-            group.setProperty("id", "group_" + field.getName());
+            group.setProperty("id", "group_" + field.getName() + "_" + uniqueId);
             group.add(new Label(field.getName(), getFieldLabel(field)));
             
-            TextBox input = new TextBox("text", field.getName()).setId("input_" + field.getName());
+            TextBox input = new TextBox("text", field.getName()).setId("input_" + field.getName() + "_" + uniqueId);
             JettraValidations.apply(input, modelClass, field.getName());
             
             group.add(input);
@@ -156,7 +157,7 @@ public class CrudView extends UIComponent {
         }
 
         this.deleteMsg = new Paragraph(getLabel("msg.confirm.delete", "¿Está seguro de eliminar este registro?"));
-        this.deleteMsg.setProperty("id", "deleteMsg");
+        this.deleteMsg.setProperty("id", "deleteMsg_" + uniqueId);
         this.deleteMsg.setColor("#f85149").setStyle("display", "none");
 
         Div actions = new Div().addClass("modal-actions");
@@ -165,10 +166,10 @@ public class CrudView extends UIComponent {
         Button cancelBtn = new Button(getLabel("btn.cancel", "Cancelar"))
                 .setType("button")
                 .setBackgroundColor("#30363d")
-                .setOnclick("document.getElementById('crudModal').style.display='none'; return false;");
+                .setOnclick("document.getElementById('crudModal_" + uniqueId + "').style.display='none'; return false;");
 
         this.modalSubmitBtn = new Button(getLabel("btn.save", "Guardar"))
-                .setId("modalSubmitBtn")
+                .setId("modalSubmitBtn_" + uniqueId)
                 .setType("submit")
                 .setBackgroundColor("#238636");
 
@@ -221,25 +222,24 @@ public class CrudView extends UIComponent {
         return sb.toString();
     }
 
-    private void injectScripts() {
+    private void injectScripts(String uniqueId) {
         StringBuilder script = new StringBuilder();
-        script.append("<script>\n")
-              .append("function showCrudModal(action, isEdit, data) {\n")
-              .append("  console.log('showCrudModal', action, isEdit, data);\n")
-              .append("  const modal = document.getElementById('crudModal');\n")
-              .append("  const actionInput = document.getElementById('crudAction');\n")
-              .append("  const submitBtn = document.getElementById('modalSubmitBtn');\n")
-              .append("  const deleteMsg = document.getElementById('deleteMsg');\n")
+        script.append("function showCrudModal_").append(uniqueId).append("(action, isEdit, data) {\n")
+              .append("  console.log('showCrudModal_").append(uniqueId).append("', action, isEdit, data);\n")
+              .append("  const modal = document.getElementById('crudModal_").append(uniqueId).append("');\n")
+              .append("  const actionInput = document.getElementById('crudAction_").append(uniqueId).append("');\n")
+              .append("  const submitBtn = document.getElementById('modalSubmitBtn_").append(uniqueId).append("');\n")
+              .append("  const deleteMsg = document.getElementById('deleteMsg_").append(uniqueId).append("');\n")
               .append("  \n")
-              .append("  if(!modal) { console.error('Modal not found'); return; }\n")
+              .append("  if(!modal) { console.error('Modal not found: crudModal_").append(uniqueId).append("'); return; }\n")
               .append("  \n")
               .append("  modal.style.display = 'flex';\n")
               .append("  if(actionInput) actionInput.value = action;\n")
               .append("  \n");
 
         for (Field field : modelClass.getDeclaredFields()) {
-            script.append("  const input_").append(field.getName()).append(" = document.getElementById('input_").append(field.getName()).append("');\n")
-                  .append("  const group_").append(field.getName()).append(" = document.getElementById('group_").append(field.getName()).append("');\n")
+            script.append("  const input_").append(field.getName()).append(" = document.getElementById('input_").append(field.getName()).append("_").append(uniqueId).append("');\n")
+                  .append("  const group_").append(field.getName()).append(" = document.getElementById('group_").append(field.getName()).append("_").append(uniqueId).append("');\n")
                   .append("  if(input_").append(field.getName()).append(") {\n")
                   .append("    if(data) {\n")
                   .append("      input_").append(field.getName()).append(".value = data['").append(field.getName()).append("'] || '';\n")
@@ -269,8 +269,7 @@ public class CrudView extends UIComponent {
             script.append("    if(group_").append(field.getName()).append(") group_").append(field.getName()).append(".style.display = 'block';\n");
         }
         script.append("  }\n")
-              .append("}\n")
-              .append("</script>");
+              .append("}\n");
 
         this.add(new Script(script.toString()));
     }

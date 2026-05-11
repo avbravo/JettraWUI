@@ -120,6 +120,14 @@ public class JettraTheme {
             "  --jettra-text: #fff;\n" +
             "  --jettra-accent: rgba(255, 255, 255, 0.8);\n" +
             "}\n" +
+            "body.theme-nx {\n" +
+            "  --jettra-bg: #141414;\n" +
+            "  --jettra-glow: rgba(229, 9, 20, 0.4);\n" +
+            "  --jettra-glass: rgba(20, 20, 20, 0.98);\n" +
+            "  --jettra-border: #333;\n" +
+            "  --jettra-text: #fff;\n" +
+            "  --jettra-accent: #e50914;\n" +
+            "}\n" +
             "@keyframes jtGlowPulse { 0% { box-shadow: 0 0 5px var(--jettra-glow); } 50% { box-shadow: 0 0 20px var(--jettra-glow); } 100% { box-shadow: 0 0 5px var(--jettra-glow); } }\n" +
             "body {\n" +
             "  background-color: var(--jettra-bg);\n" +
@@ -138,6 +146,14 @@ public class JettraTheme {
             "body.theme-plain { background: #fff; }\n" +
             "body.theme-tailwindcss { background: #f3f4f6; }\n" +
             "body.theme-tailwindcss-3d { background-image: linear-gradient(to bottom right, #1e293b, #0f172a); }\n" +
+            "body.theme-nx { background: #141414; }\n" +
+            "body.theme-nx .j-btn { border-radius: 4px; font-weight: 700; text-transform: none; }\n" +
+            "body.theme-nx .j-btn-primary { background: #e50914; color: #fff; box-shadow: none; }\n" +
+            "body.theme-nx .j-btn-primary:hover { background: #b20710; }\n" +
+            "body.theme-nx .j-top { background: #000; border: none; border-radius: 0; }\n" +
+            "body.theme-nx .j-left { background: #000; border: none; border-radius: 0; }\n" +
+            "body.theme-nx .j-center { background: #141414; border: none; border-radius: 0; }\n" +
+            "body.theme-nx .j-card { background: #181818; border-radius: 8px; border: 1px solid #333; }\n" +
             "/* Tailwind helpers embedded */\n" +
             "body.theme-tailwindcss .j-center, body.theme-tailwindcss .j-left, body.theme-tailwindcss .j-top, body.theme-tailwindcss .j-footer { box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1),0 1px 2px 0 rgba(0,0,0,0.06); border-radius: 0.5rem; border: none; }\n" +
             "body.theme-material-plain .j-3d-effect, body.theme-plain .j-3d-effect, body.theme-tailwindcss .j-3d-effect, body.theme-white .j-3d-effect { box-shadow: none !important; transform: none !important; }\n" +
