@@ -26,4 +26,29 @@ public @interface CrudView {
      * Enable reporting for this view.
      */
     boolean report() default false;
+
+    /**
+     * Show report viewer UI before exporting/printing.
+     */
+    boolean reportShowViewer() default true;
+
+    /**
+     * Enable Print option in report viewer.
+     */
+    boolean reportAllowPrint() default true;
+
+    /**
+     * Enable PDF option in report viewer.
+     */
+    boolean reportAllowPdf() default true;
+
+    /**
+     * Enable Excel option in report viewer.
+     */
+    boolean reportAllowExcel() default true;
+
+    /**
+     * Enable CSV option in report viewer.
+     */
+    boolean reportAllowCsv() default true;
 }

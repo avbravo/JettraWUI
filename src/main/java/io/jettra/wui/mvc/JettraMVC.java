@@ -222,7 +222,11 @@ public class JettraMVC {
 
                 io.jettra.wui.complex.CrudView crudComponent = new io.jettra.wui.complex.CrudView(modelClass, repoClass, msg, handler);
                 crudComponent.setReportEnabled(anno.report());
-                
+                crudComponent.setReportShowViewer(anno.reportShowViewer());
+                crudComponent.setReportAllowPrint(anno.reportAllowPrint());
+                crudComponent.setReportAllowPdf(anno.reportAllowPdf());
+                crudComponent.setReportAllowExcel(anno.reportAllowExcel());
+                crudComponent.setReportAllowCsv(anno.reportAllowCsv());
                 // Buscar el Center en JettraDashboardPage si aplica
                 try {
                     Field centerField = null;
@@ -325,7 +329,9 @@ public class JettraMVC {
                     JettraSyncManager.notifyChange(entityName, SyncType.DELETE, "System");
                     return true;
                 } else if ("report".equals(action)) {
-                    generateReport(page, modelClass, repoClass);
+                    String format = params.get("format");
+                    if (format == null) format = "pdf";
+                    generateReport(page, modelClass, repoClass, format);
                     return true;
                 }
             } catch (Exception e) {
@@ -335,7 +341,7 @@ public class JettraMVC {
         return false;
     }
 
-    private static void generateReport(Page page, Class<?> modelClass, Class<?> repoClass) {
+    private static void generateReport(Page page, Class<?> modelClass, Class<?> repoClass, String format) {
         try {
             // 1. Obtener datos
             Method findAll = repoClass.getMethod("findAll");
@@ -381,14 +387,20 @@ public class JettraMVC {
             footerClass.getMethod("addElement", Class.forName("com.jettra.report.Report$ReportElement")).invoke(footer, footerEl);
 
             // 3. Exportar a un archivo temporal
-            String tmpFile = "report_" + System.currentTimeMillis() + ".pdf";
-            reportClass.getMethod("exportToPdf", String.class).invoke(report, tmpFile);
+            String tmpFile = "report_" + System.currentTimeMillis() + "." + format;
+            String exportMethod = "exportTo" + format.substring(0, 1).toUpperCase() + format.substring(1).toLowerCase();
+            reportClass.getMethod(exportMethod, String.class).invoke(report, tmpFile);
 
             // 4. Enviar al navegador
             java.io.File file = new java.io.File(tmpFile);
             if (file.exists()) {
                 byte[] bytes = java.nio.file.Files.readAllBytes(file.toPath());
-                page.getCurrentExchange().getResponseHeaders().set("Content-Type", "application/pdf");
+                String contentType = "application/octet-stream";
+                if ("pdf".equals(format)) contentType = "application/pdf";
+                else if ("excel".equals(format) || "xlsx".equals(format)) contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                else if ("csv".equals(format)) contentType = "text/csv";
+                
+                page.getCurrentExchange().getResponseHeaders().set("Content-Type", contentType);
                 page.getCurrentExchange().getResponseHeaders().set("Content-Disposition", "attachment; filename=" + file.getName());
                 page.getCurrentExchange().sendResponseHeaders(200, bytes.length);
                 page.getCurrentExchange().getResponseBody().write(bytes);

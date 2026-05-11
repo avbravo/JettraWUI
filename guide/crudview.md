@@ -25,6 +25,12 @@ public class PaisPage extends Page {
 
 - **model**: La clase del modelo (ej. `Pais.class`).
 - **repository**: La clase del repositorio (ej. `PaisRepository.class`). El repositorio debe contar con métodos estáticos `findAll()`, `save(model)` y `delete(id)`.
+- **report**: Activa el botón de reportes en la vista. Por defecto es `false`.
+- **reportShowViewer**: Muestra un visor de reporte antes de generar el archivo. Por defecto es `true`.
+- **reportAllowPrint**: Habilita el botón imprimir en el visor. Por defecto es `true`.
+- **reportAllowPdf**: Habilita el botón de exportación PDF en el visor. Por defecto es `true`.
+- **reportAllowExcel**: Habilita el botón de exportación Excel en el visor. Por defecto es `true`.
+- **reportAllowCsv**: Habilita el botón de exportación CSV en el visor. Por defecto es `true`.
 
 ## Funcionamiento Interno
 

@@ -22,8 +22,14 @@ public class CrudView extends UIComponent {
     private String subtitle;
     private String modelName;
     private boolean reportEnabled = false;
+    private boolean reportShowViewer = true;
+    private boolean reportAllowPrint = true;
+    private boolean reportAllowPdf = true;
+    private boolean reportAllowExcel = true;
+    private boolean reportAllowCsv = true;
 
     private Modal crudModal;
+    private Modal reportModal;
     private Header modalHeader;
     private TextBox modalAction;
     private List<TextBox> inputFields = new ArrayList<>();
@@ -50,14 +56,12 @@ public class CrudView extends UIComponent {
         init();
     }
 
-    public CrudView setReportEnabled(boolean enabled) {
-        this.reportEnabled = enabled;
-        // Re-init or add button if already initialized? 
-        // Better to set it before init() if called from constructor, 
-        // but init() is called in constructor. 
-        // I will change the constructor to include it or make init() callable later.
-        return this;
-    }
+    public CrudView setReportEnabled(boolean enabled) { this.reportEnabled = enabled; return this; }
+    public CrudView setReportShowViewer(boolean show) { this.reportShowViewer = show; return this; }
+    public CrudView setReportAllowPrint(boolean allow) { this.reportAllowPrint = allow; return this; }
+    public CrudView setReportAllowPdf(boolean allow) { this.reportAllowPdf = allow; return this; }
+    public CrudView setReportAllowExcel(boolean allow) { this.reportAllowExcel = allow; return this; }
+    public CrudView setReportAllowCsv(boolean allow) { this.reportAllowCsv = allow; return this; }
 
     public CrudView setTitle(String title) {
         this.title = title;
@@ -108,8 +112,13 @@ public class CrudView extends UIComponent {
         if (reportEnabled) {
             Button reportBtn = new Button("📄 " + getLabel("btn.report", "Reporte"))
                     .setId("reportBtn_" + uniqueId)
-                    .setBackgroundColor("#007bff")
-                    .setOnclick("location.href='?action=report'");
+                    .setBackgroundColor("#007bff");
+
+            if (reportShowViewer) {
+                reportBtn.setOnclick("document.getElementById('reportModal_" + uniqueId + "').style.display='flex'");
+            } else {
+                reportBtn.setOnclick("location.href='?action=report&format=pdf'");
+            }
             actionsTdHeader.add(reportBtn);
         }
 
@@ -158,8 +167,54 @@ public class CrudView extends UIComponent {
         mainCard.add(table);
         this.add(mainCard);
         this.add(crudModal);
+        
+        if (reportEnabled && reportShowViewer) {
+            setupReportModal(uniqueId);
+            this.add(reportModal);
+        }
 
         injectScripts(uniqueId);
+    }
+
+    private void setupReportModal(String uniqueId) {
+        this.reportModal = new Modal("reportModal_" + uniqueId)
+                .setPadding("35px")
+                .setMaxWidth("500px")
+                .setZIndex("9999");
+        this.reportModal.setStyle("display", "none");
+
+        Header header = new Header(3, getLabel("lbl.report_viewer", "Visor de Reporte"));
+        Paragraph desc = new Paragraph(getLabel("lbl.report_desc", "Seleccione el formato de exportación o acción deseada."));
+
+        Div actions = new Div().setStyle("display", "flex").setStyle("flex-wrap", "wrap").setStyle("gap", "10px").setStyle("margin-top", "20px");
+
+        if (reportAllowPdf) {
+            actions.add(new Button("📄 PDF")
+                .setBackgroundColor("#da3633")
+                .setOnclick("location.href='?action=report&format=pdf'; document.getElementById('reportModal_" + uniqueId + "').style.display='none';"));
+        }
+        if (reportAllowExcel) {
+            actions.add(new Button("📊 Excel")
+                .setBackgroundColor("#238636")
+                .setOnclick("location.href='?action=report&format=excel'; document.getElementById('reportModal_" + uniqueId + "').style.display='none';"));
+        }
+        if (reportAllowCsv) {
+            actions.add(new Button("📝 CSV")
+                .setBackgroundColor("#8957e5")
+                .setOnclick("location.href='?action=report&format=csv'; document.getElementById('reportModal_" + uniqueId + "').style.display='none';"));
+        }
+        if (reportAllowPrint) {
+            actions.add(new Button("🖨️ Imprimir")
+                .setBackgroundColor("#007bff")
+                .setOnclick("location.href='?action=report&format=pdf&print=true'; document.getElementById('reportModal_" + uniqueId + "').style.display='none';"));
+        }
+
+        Button cancelBtn = new Button(getLabel("btn.close", "Cerrar"))
+                .setBackgroundColor("#30363d")
+                .setOnclick("document.getElementById('reportModal_" + uniqueId + "').style.display='none';");
+        actions.add(cancelBtn);
+
+        this.reportModal.add(header).add(desc).add(actions);
     }
 
     private void setupModal(String uniqueId) {
