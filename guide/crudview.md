@@ -1,30 +1,56 @@
 # @CrudView
 
-La anotación `@CrudView` simplifica drásticamente la creación de interfaces CRUD. En lugar de definir manualmente el Datatable, los modales para mostrar los elementos y controlar todos los eventos, solo es necesario definir la clase de la página con esta anotación.
+La anotación `@CrudView` simplifica drásticamente la creación de interfaces CRUD. A partir de la versión actual, el framework utiliza **Java Annotation Processing (JAP)** para generar código en tiempo de compilación, eliminando la necesidad de usar Java Reflection API en las operaciones críticas de persistencia y visualización.
 
 ## Uso
 
-Aplica la anotación a tu clase de página (que debe extender de `DashboardBasePage` o `JettraDashboardPage`):
+Aplica la anotación a tu clase de página:
 
 ```java
-@JettraPageSincronized(SyncType.ALL)
-@CrudView(model = "PlanetaModel")
-public class PlanetaPage extends DashboardBasePage {
-    public PlanetaPage() {
-        super("Mantenimiento de Planetas");
+@CrudView(model = Pais.class, repository = PaisRepository.class)
+public class PaisPage extends Page {
+    public PaisPage() {
+        super("Gestión de Países");
     }
 }
 ```
 
+## Beneficios del Procesamiento de Anotaciones
+
+1.  **Rendimiento**: Se genera una clase `{PageName}CrudHandler` que implementa la interfaz `CrudHandler`. Las llamadas a los métodos del repositorio y el acceso a los campos del modelo se realizan de forma directa o altamente optimizada.
+2.  **Validación en Compilación**: Los errores en la configuración de `@CrudView` pueden detectarse durante la compilación en lugar de en tiempo de ejecución.
+3.  **Código Limpio**: `JettraMVC` utiliza el handler generado automáticamente si existe, delegando en él la lógica de negocio.
+
 ## Atributos
 
-- **model**: El nombre de la clase ViewModel (ej. `PlanetaModel`). El framework intentará resolverla en el paquete por defecto `com.jettra.example.model` o por nombre completo.
-- **repository**: (Opcional) El nombre de la clase Repository. Si se omite, se asume que se llama igual que el modelo pero terminado en `Repository` (ej. `PlanetaRepository`).
+- **model**: La clase del modelo (ej. `Pais.class`).
+- **repository**: La clase del repositorio (ej. `PaisRepository.class`). El repositorio debe contar con métodos estáticos `findAll()`, `save(model)` y `delete(id)`.
 
-## Funcionamiento
+## Funcionamiento Interno
 
-1.  **UI Automática**: El framework escanea el modelo y genera un `Datatable` con columnas para cada campo.
-2.  **Etiquetas**: Utiliza `@PropertiesLabel` de cada atributo para asignar las etiquetas de las columnas y los campos del formulario.
-3.  **Validaciones**: Aplica automáticamente las validaciones definidas en el modelo (ej. `@NotNull`, `@Size`).
-4.  **Persistencia**: Delega las operaciones de guardado y eliminación al Repository especificado, asumiendo que tiene métodos estáticos `findAll()`, `save(Model)` y `delete(String id)`.
-5.  **Sincronización**: Notifica automáticamente a `JettraSyncManager` después de cada operación.
+1.  **Generación de Handler**: El `CrudViewProcessor` escanea las clases anotadas y genera un archivo fuente Java que implementa `CrudHandler<M>`.
+2.  **Inyección**: Al procesar la página, `JettraMVC` busca la clase generada por nombre (`PageClassName + "CrudHandler"`).
+3.  **Operaciones**:
+    - **Listado**: Usa `handler.findAll()` para obtener los datos.
+    - **Guardado**: Usa `handler.save(model)` para persistir cambios.
+    - **Eliminación**: Usa `handler.delete(id)` para remover registros.
+4.  **Sincronización**: Mantiene la integración con `JettraSyncManager` para notificaciones en tiempo real.
+
+## Configuración del Proyecto
+
+Asegúrese de tener las dependencias de Google AutoService y JavaPoet en su `pom.xml`:
+
+```xml
+<dependency>
+    <groupId>com.google.auto.service</groupId>
+    <artifactId>auto-service</artifactId>
+    <version>1.1.1</version>
+    <optional>true</optional>
+</dependency>
+<dependency>
+    <groupId>com.squareup</groupId>
+    <artifactId>javapoet</artifactId>
+    <version>1.13.0</version>
+</dependency>
+```
+

@@ -2,18 +2,21 @@ package io.jettra.wui.complex;
 
 import io.jettra.wui.components.*;
 import io.jettra.wui.core.UIComponent;
+import io.jettra.wui.core.annotations.CrudHandler;
 import io.jettra.wui.core.annotations.PropertiesLabel;
 import io.jettra.wui.validations.JettraValidations;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 public class CrudView extends UIComponent {
 
     private Class<?> modelClass;
     private Class<?> repositoryClass;
+    private CrudHandler<?> handler;
     private Properties messages;
     private String title;
     private String subtitle;
@@ -28,10 +31,15 @@ public class CrudView extends UIComponent {
     private Button modalSubmitBtn;
 
     public CrudView(Class<?> modelClass, Class<?> repositoryClass, Properties messages) {
+        this(modelClass, repositoryClass, messages, null);
+    }
+
+    public CrudView(Class<?> modelClass, Class<?> repositoryClass, Properties messages, CrudHandler<?> handler) {
         super("div");
         this.modelClass = modelClass;
         this.repositoryClass = repositoryClass;
         this.messages = messages;
+        this.handler = handler;
         this.modelName = modelClass.getSimpleName().replace("Model", "");
         
         String modelKey = modelName.toLowerCase();
@@ -90,8 +98,13 @@ public class CrudView extends UIComponent {
         table.addHeaderRow(headerRow);
 
         try {
-            Method findAll = repositoryClass.getMethod("findAll");
-            List<?> items = (List<?>) findAll.invoke(null);
+            List<?> items;
+            if (handler != null) {
+                items = (List<?>) handler.findAll();
+            } else {
+                Method findAll = repositoryClass.getMethod("findAll");
+                items = (List<?>) findAll.invoke(null);
+            }
 
             if (items != null) {
                 for (Object item : items) {
@@ -103,8 +116,8 @@ public class CrudView extends UIComponent {
                     }
 
                     TD actionsTd = new TD();
-                    String idValue = getIdValue(item);
-                    String jsonData = getJsonData(item);
+                    String idValue = (handler != null) ? ((CrudHandler<Object>)handler).getIdValue(item) : getIdValue(item);
+                    String jsonData = (handler != null) ? getJsonDataFromMap(((CrudHandler<Object>)handler).getJsonMap(item)) : getJsonData(item);
 
                     Button editBtn = new Button("✏️")
                             .setId("editBtn_" + idValue + "_" + uniqueId)
@@ -206,6 +219,18 @@ public class CrudView extends UIComponent {
         idField.setAccessible(true);
         Object val = idField.get(item);
         return val != null ? val.toString() : "0";
+    }
+
+    private String getJsonDataFromMap(Map<String, String> data) {
+        StringBuilder sb = new StringBuilder("{");
+        int count = 0;
+        for (Map.Entry<String, String> entry : data.entrySet()) {
+            String valStr = entry.getValue().replace("'", "\\'").replace("\"", "\\\"");
+            sb.append("'").append(entry.getKey()).append("': '").append(valStr).append("'");
+            if (++count < data.size()) sb.append(", ");
+        }
+        sb.append("}");
+        return sb.toString();
     }
 
     private String getJsonData(Object item) throws Exception {

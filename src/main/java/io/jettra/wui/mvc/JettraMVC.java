@@ -7,6 +7,7 @@ import io.jettra.wui.core.annotations.InjectViewModel;
 import io.jettra.wui.core.annotations.JettraViewModel;
 import io.jettra.wui.core.annotations.InjectProperties;
 import io.jettra.wui.core.annotations.CrudView;
+import io.jettra.wui.core.annotations.CrudHandler;
 import io.jettra.wui.complex.Center;
 import io.jettra.wui.sync.JettraSyncManager;
 import io.jettra.wui.sync.SyncType;
@@ -214,7 +215,10 @@ public class JettraMVC {
                     }
                 }
 
-                io.jettra.wui.complex.CrudView crudComponent = new io.jettra.wui.complex.CrudView(modelClass, repoClass, msg);
+                // Intentar obtener el handler generado por Annotation Processing
+                CrudHandler<?> handler = getCrudHandler(page.getClass());
+
+                io.jettra.wui.complex.CrudView crudComponent = new io.jettra.wui.complex.CrudView(modelClass, repoClass, msg, handler);
                 
                 // Buscar el Center en JettraDashboardPage si aplica
                 try {
@@ -262,11 +266,25 @@ public class JettraMVC {
     }
 
     /**
+     * Obtiene el handler generado para una página.
+     */
+    public static CrudHandler<?> getCrudHandler(Class<?> pageClass) {
+        try {
+            String handlerClassName = pageClass.getName() + "CrudHandler";
+            Class<?> handlerClass = Class.forName(handlerClassName);
+            return (CrudHandler<?>) handlerClass.getDeclaredConstructor().newInstance();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
      * Procesa la lógica de persistencia para @CrudView en el POST.
      */
     public static boolean handleCrudPost(Page page, Map<String, String> params) {
         if (page.getClass().isAnnotationPresent(CrudView.class)) {
             try {
+                CrudHandler<Object> handler = (CrudHandler<Object>) getCrudHandler(page.getClass());
                 CrudView anno = page.getClass().getAnnotation(CrudView.class);
                 Class<?> modelClass = anno.model();
                 Class<?> repoClass = anno.repository();
@@ -274,10 +292,17 @@ public class JettraMVC {
                 if (action == null || action.isEmpty()) return false;
 
                 if ("save".equals(action)) {
-                    Object model = modelClass.getDeclaredConstructor().newInstance();
-                    updateModelFields(model, params);
-                    Method save = repoClass.getMethod("save", modelClass);
-                    save.invoke(null, model);
+                    Object model;
+                    if (handler != null) {
+                        model = handler.createInstance();
+                        handler.updateFields(model, params);
+                        handler.save(model);
+                    } else {
+                        model = modelClass.getDeclaredConstructor().newInstance();
+                        updateModelFields(model, params);
+                        Method save = repoClass.getMethod("save", modelClass);
+                        save.invoke(null, model);
+                    }
                     
                     String entityName = modelClass.getSimpleName();
                     JettraSyncManager.notifyChange(entityName, SyncType.UPDATE, "System"); 
@@ -286,8 +311,12 @@ public class JettraMVC {
                     String code = params.get("code"); 
                     if (code == null) code = params.get("id");
                     
-                    Method delete = repoClass.getMethod("delete", String.class);
-                    delete.invoke(null, code);
+                    if (handler != null) {
+                        handler.delete(code);
+                    } else {
+                        Method delete = repoClass.getMethod("delete", String.class);
+                        delete.invoke(null, code);
+                    }
                     
                     String entityName = modelClass.getSimpleName();
                     JettraSyncManager.notifyChange(entityName, SyncType.DELETE, "System");
