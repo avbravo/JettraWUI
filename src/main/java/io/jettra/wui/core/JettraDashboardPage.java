@@ -132,7 +132,10 @@ public abstract class JettraDashboardPage extends Page {
         if (defaultConfigLang == null) defaultConfigLang = "en";
         defaultConfigLang = defaultConfigLang.trim();
         
-        String defaultConfigTheme = com.jettra.server.config.JettraConfig.getProperty("app.theme");
+        String defaultConfigTheme = params.get("theme");
+        if (defaultConfigTheme == null) {
+            defaultConfigTheme = com.jettra.server.config.JettraConfig.getProperty("app.theme");
+        }
         if (defaultConfigTheme == null) defaultConfigTheme = "3d";
         defaultConfigTheme = defaultConfigTheme.trim();
 
@@ -152,20 +155,20 @@ public abstract class JettraDashboardPage extends Page {
         // Theme Selector
         SelectOneIcon themeSelect = new SelectOneIcon("theme","");
         themeSelect.setShowLabelInTrigger(false);
-        themeSelect.addOption("3d", "", "\uD83D\uDE80");
-        themeSelect.addOption("cyberpunk", "", "\uD83E\uDDEC");
-        themeSelect.addOption("neon", "", "\uD83E\uDDEA");
-        themeSelect.addOption("glass", "", "\uD83E\uDDC3");
-        themeSelect.addOption("dark", "", "\uD83C\uDF19");
-        themeSelect.addOption("white", "", "\u2600\uFE0F");
-        themeSelect.addOption("material", "", "\uD83C\uDFA8");
-        themeSelect.addOption("futuristic", "", "\u2728");
-        themeSelect.addOption("modern", "", "\uD83D\uDD33");
-        themeSelect.addOption("material-plain", "", "\uD83D\uDCCB");
-        themeSelect.addOption("plain", "", "\uD83D\uDCCB");
-        themeSelect.addOption("tailwindcss", "", "\uD83C\uDF00");
-        themeSelect.addOption("tailwindcss-3d", "", "\uD83C\uDF2A\uFE0F");
-        themeSelect.addOption("nx", "", "\uD83C\uDFA6");
+        themeSelect.addOption("3d", "3D Rocket", "\uD83D\uDE80");
+        themeSelect.addOption("cyberpunk", "Cyberpunk", "\uD83E\uDDEC");
+        themeSelect.addOption("neon", "Neon", "\uD83E\uDDEA");
+        themeSelect.addOption("glass", "Glassmorphism", "\uD83E\uDDC3");
+        themeSelect.addOption("dark", "Dark Mode", "\uD83C\uDF19");
+        themeSelect.addOption("white", "Light Mode", "\u2600\uFE0F");
+        themeSelect.addOption("material", "Material Design", "\uD83C\uDFA8");
+        themeSelect.addOption("futuristic", "Futuristic", "\u2728");
+        themeSelect.addOption("modern", "Modern Green", "\uD83D\uDD33");
+        themeSelect.addOption("material-plain", "Material Plain", "\uD83D\uDCCB");
+        themeSelect.addOption("plain", "Plain Style", "\uD83D\uDCCB");
+        themeSelect.addOption("tailwindcss", "Tailwind CSS", "\uD83C\uDF00");
+        themeSelect.addOption("tailwindcss-3d", "Tailwind 3D", "\uD83C\uDF2A\uFE0F");
+        themeSelect.addOption("nx", "Nx", "\uD83C\uDFA6");
         
         String themeVal = defaultConfigTheme.toLowerCase();
         String themeIcon = "\uD83D\uDE80";

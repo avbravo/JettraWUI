@@ -122,6 +122,9 @@ public class SelectOneIcon extends UIComponent {
     public SelectOneIcon addOption(String value, String label, String iconHtml) {
         Div option = new Div();
         option.addClass("j-select-icon-option");
+        if (label != null && !label.isEmpty()) {
+            option.setProperty("title", label);
+        }
         // Escapamos comillas simples para el JS
         String safeIcon = iconHtml.replace("'", "\\'");
         option.setProperty("onclick", "jettraSelectOption('" + name + "', '" + value + "', '" + label + "', '" + safeIcon + "')");
@@ -211,17 +214,24 @@ public class SelectOneIcon extends UIComponent {
                 position: absolute;
                 top: 100%;
                 left: 0;
-                right: 0;
-                background: rgba(10, 15, 30, 0.95);
+                min-width: 160px;
+                background: rgba(10, 15, 30, 0.98);
                 border: 1px solid var(--jettra-accent, #00e5ff);
-                border-top: none;
                 border-radius: 0 0 8px 8px;
                 display: none;
                 flex-direction: column;
-                overflow: hidden;
-                box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-                backdrop-filter: blur(10px);
+                max-height: 350px;
+                overflow-y: auto;
+                box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+                backdrop-filter: blur(15px);
                 z-index: 9999;
+            }
+            .j-select-icon-options::-webkit-scrollbar {
+                width: 6px;
+            }
+            .j-select-icon-options::-webkit-scrollbar-thumb {
+                background: var(--jettra-accent, #00e5ff);
+                border-radius: 3px;
             }
             .j-select-icon-option {
                 display: flex;

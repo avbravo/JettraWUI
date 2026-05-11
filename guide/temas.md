@@ -9,7 +9,7 @@ JettraWUI soporta un sistema de temas dinámico basado en variables CSS y clases
 - **White**: Tema claro y minimalista.
 - **Cyberpunk**: Estilo retro-futurista con colores vibrantes.
 - **Modern**: Estilo limpio con acentos verdes.
-- **Nx (Netflix)**: Inspirado en la interfaz de Netflix. Fondo negro profundo, acentos rojos y tipografía negrita.
+- **Nx (: Inspirado en la interfaz de Netflix. Fondo negro profundo, acentos rojos y tipografía negrita.
 
 ## Tema Nx (Netflix)
 

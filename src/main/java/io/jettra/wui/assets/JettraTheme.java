@@ -247,9 +247,10 @@ public class JettraTheme {
             "  }\n" +
             "}\n" +
             "function changeTheme(theme) {\n" +
-            "  document.body.className = 'theme-' + theme;\n" +
             "  localStorage.setItem('jettra-theme', theme);\n" +
-            "  window.location.reload();\n" +
+            "  const url = new URL(window.location.href);\n" +
+            "  url.searchParams.set('theme', theme);\n" +
+            "  window.location.href = url.toString();\n" +
             "}\n" +
             "function toggleMobileMenu() {\n" +
             "  const menu = document.querySelector('.j-left');\n" +
@@ -264,7 +265,10 @@ public class JettraTheme {
             "  if(d) d.style.display = d.style.display === 'block' ? 'none' : 'block';\n" +
             "}\n" +
             "document.addEventListener('DOMContentLoaded', () => {\n" +
-            "  const savedTheme = localStorage.getItem('jettra-theme') || '3d';\n" +
+            "  const urlParams = new URLSearchParams(window.location.search);\n" +
+            "  const themeParam = urlParams.get('theme');\n" +
+            "  if (themeParam) localStorage.setItem('jettra-theme', themeParam);\n" +
+            "  const savedTheme = themeParam || localStorage.getItem('jettra-theme') || '3d';\n" +
             "  document.body.className = 'theme-' + savedTheme;\n" +
             "  document.addEventListener('click', (e) => {\n" +
             "    if(!e.target.closest('.j-avatar-wrapper')) {\n" +
