@@ -274,6 +274,30 @@ public class JettraMVC {
     }
 
     /**
+     * Procesa la lógica de persistencia para @CrudView en el POST.
+     */
+    public static boolean handleCrudGet(Page page, Map<String, String> params) {
+        if (page.getClass().isAnnotationPresent(CrudView.class)) {
+            try {
+                String action = params.get("action");
+                if ("report".equals(action)) {
+                    CrudView anno = page.getClass().getAnnotation(CrudView.class);
+                    Class<?> modelClass = anno.model();
+                    Class<?> repoClass = anno.repository();
+                    String format = params.get("format");
+                    if (format == null) format = "pdf";
+                    boolean print = "true".equals(params.get("print"));
+                    generateReport(page, modelClass, repoClass, format, print);
+                    return true;
+                }
+            } catch (Exception e) {
+                System.err.println("[JettraMVC] Error in handleCrudGet: " + e.getMessage());
+            }
+        }
+        return false;
+    }
+
+    /**
      * Obtiene el handler generado para una página.
      */
     public static CrudHandler<?> getCrudHandler(Class<?> pageClass) {
@@ -332,7 +356,8 @@ public class JettraMVC {
                 } else if ("report".equals(action)) {
                     String format = params.get("format");
                     if (format == null) format = "pdf";
-                    generateReport(page, modelClass, repoClass, format);
+                    boolean print = "true".equals(params.get("print"));
+                    generateReport(page, modelClass, repoClass, format, print);
                     return true;
                 }
             } catch (Exception e) {
@@ -342,7 +367,7 @@ public class JettraMVC {
         return false;
     }
 
-    private static void generateReport(Page page, Class<?> modelClass, Class<?> repoClass, String format) {
+    private static void generateReport(Page page, Class<?> modelClass, Class<?> repoClass, String format, boolean print) {
         try {
             // 1. Obtener datos
             Method findAll = repoClass.getMethod("findAll");
@@ -402,7 +427,11 @@ public class JettraMVC {
                 else if ("csv".equals(format)) contentType = "text/csv";
                 
                 page.getCurrentExchange().getResponseHeaders().set("Content-Type", contentType);
-                page.getCurrentExchange().getResponseHeaders().set("Content-Disposition", "attachment; filename=" + file.getName());
+                if (print && "pdf".equals(format)) {
+                    page.getCurrentExchange().getResponseHeaders().set("Content-Disposition", "inline; filename=" + file.getName());
+                } else {
+                    page.getCurrentExchange().getResponseHeaders().set("Content-Disposition", "attachment; filename=" + file.getName());
+                }
                 page.getCurrentExchange().sendResponseHeaders(200, bytes.length);
                 page.getCurrentExchange().getResponseBody().write(bytes);
                 page.getCurrentExchange().getResponseBody().close();

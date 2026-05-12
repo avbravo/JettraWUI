@@ -103,6 +103,9 @@ public abstract class Page extends UIComponent implements HttpHandler {
             }
         } else {
             System.out.println("[Page] Calling onGet...");
+            if (JettraMVC.handleCrudGet(this, allParams)) {
+                return;
+            }
             onGet(allParams);
         }
 
