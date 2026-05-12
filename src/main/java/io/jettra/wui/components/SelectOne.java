@@ -50,6 +50,9 @@ public class SelectOne extends UIComponent {
         UIComponent option = new UIComponent("option") {};
         option.setProperty("value", value);
         option.setContent(label);
+        // Asegurar que las opciones tengan colores legibles
+        option.setStyle("background-color", "#ffffff")
+              .setStyle("color", "#000000");
         add(option);
         return this;
     }

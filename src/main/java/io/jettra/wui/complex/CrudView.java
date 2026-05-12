@@ -52,8 +52,11 @@ public class CrudView extends UIComponent {
         String modelKey = modelName.toLowerCase();
         this.title = getLabel("title." + modelKey, "Mantenimiento de " + modelName);
         this.subtitle = getLabel("subtitle." + modelKey, "Gestión de registros");
+    }
 
+    public CrudView build() {
         init();
+        return this;
     }
 
     public CrudView setReportEnabled(boolean enabled) { this.reportEnabled = enabled; return this; }
@@ -110,7 +113,7 @@ public class CrudView extends UIComponent {
         actionsTdHeader.add(addBtn);
         
         if (reportEnabled) {
-            Button reportBtn = new Button("📄 " + getLabel("btn.report", "Reporte"))
+            Button reportBtn = new Button("🖨️ " + getLabel("btn.report", "Reporte"))
                     .setId("reportBtn_" + uniqueId)
                     .setBackgroundColor("#007bff");
 
@@ -239,8 +242,8 @@ public class CrudView extends UIComponent {
                 .setZIndex("9999");
         this.reportModal.setStyle("display", "none");
 
-        Header header = new Header(3, getLabel("lbl.report_viewer", "Visor de Reporte"));
-        Paragraph desc = new Paragraph(getLabel("lbl.report_desc", "Seleccione el formato de exportación o acción deseada."));
+        Header header = new Header(3, getLabel("lbl.report_viewer", "Visor de Impresión"));
+        Paragraph desc = new Paragraph(getLabel("lbl.report_desc", "Seleccione el formato de exportación o acción de impresión."));
 
         Div actions = new Div().setStyle("display", "flex").setStyle("flex-wrap", "wrap").setStyle("gap", "10px").setStyle("margin-top", "20px");
 

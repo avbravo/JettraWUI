@@ -227,6 +227,7 @@ public class JettraMVC {
                 crudComponent.setReportAllowPdf(anno.reportAllowPdf());
                 crudComponent.setReportAllowExcel(anno.reportAllowExcel());
                 crudComponent.setReportAllowCsv(anno.reportAllowCsv());
+                crudComponent.build();
                 // Buscar el Center en JettraDashboardPage si aplica
                 try {
                     Field centerField = null;

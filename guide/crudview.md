@@ -25,7 +25,7 @@ public class PaisPage extends Page {
 
 - **model**: La clase del modelo (ej. `Pais.class`).
 - **repository**: La clase del repositorio (ej. `PaisRepository.class`). El repositorio debe contar con métodos estáticos `findAll()`, `save(model)` y `delete(id)`.
-- **report**: Activa el botón de reportes en la vista. Por defecto es `false`.
+- **report**: Activa el botón de impresión en la vista. Por defecto es `false`.
 - **reportShowViewer**: Muestra un visor de reporte antes de generar el archivo. Por defecto es `true`.
 - **reportAllowPrint**: Habilita el botón imprimir en el visor. Por defecto es `true`.
 - **reportAllowPdf**: Habilita el botón de exportación PDF en el visor. Por defecto es `true`.
@@ -44,7 +44,7 @@ public class PaisPage extends Page {
 
 ## Integración con JettraReport
 
-La interfaz generada por `@CrudView` está completamente integrada de forma nativa con **JettraReport**. Cuando la anotación incluye opciones de reporte (ej. `report = true`), JettraWUI se encarga automáticamente de:
+La interfaz generada por `@CrudView` está completamente integrada de forma nativa con **JettraReport**. Cuando la anotación incluye opciones de reporte (ej. `report = true`), JettraWUI se encarga automáticamente de generar un botón **🖨️ Imprimir** que gestiona:
 
 1.  **Instanciación Dinámica**: A través de Reflection, `CrudView` detecta e instancia dinámicamente el visor HTML interactivo nativo de JettraReport (`ReportViewer`). Esto evita dependencias circulares y mantiene los módulos desacoplados.
 2.  **Generación de la Interfaz del Visor**: El visor nativo muestra una vista previa del reporte en el navegador. Transforma las secciones configuradas (Header, Detail/Columnas derivadas del Modelo) en componentes HTML (Tablas, Párrafos) de JettraWUI.
