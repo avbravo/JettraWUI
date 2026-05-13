@@ -166,8 +166,7 @@ public abstract class JettraDashboardPage extends Page {
         themeSelect.addOption("modern", "Modern Green", "\uD83D\uDD33");
         themeSelect.addOption("material-plain", "Material Plain", "\uD83D\uDCCB");
         themeSelect.addOption("plain", "Plain Style", "\uD83D\uDCCB");
-        themeSelect.addOption("tailwindcss", "Tailwind CSS", "\uD83C\uDF00");
-        themeSelect.addOption("tailwindcss-3d", "Tailwind 3D", "\uD83C\uDF2A\uFE0F");
+        themeSelect.addOption("astro", "Astro Theme", "\uD83D\uDE80");
         themeSelect.addOption("nx", "Nx", "\uD83C\uDFA6");
         
         String themeVal = defaultConfigTheme.toLowerCase();
@@ -182,8 +181,7 @@ public abstract class JettraDashboardPage extends Page {
         else if (themeVal.equals("modern")) themeIcon = "\uD83D\uDD33";
         else if (themeVal.equals("material-plain")) themeIcon = "\uD83D\uDCCB";
         else if (themeVal.equals("plain")) themeIcon = "\uD83D\uDCCB";
-        else if (themeVal.equals("tailwindcss")) themeIcon = "\uD83C\uDF00";
-        else if (themeVal.equals("tailwindcss-3d")) themeIcon = "\uD83C\uDF2A\uFE0F";
+        else if (themeVal.equals("astro")) themeIcon = "\uD83D\uDE80";
         else if (themeVal.equals("nx")) themeIcon = "\uD83C\uDFA6";
         
         themeSelect.setSelectedValue(themeVal, "", themeIcon);

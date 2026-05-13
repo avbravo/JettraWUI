@@ -17,12 +17,12 @@ public class JettraTheme {
             "  --jt-anim-duration: 0.3s;\n" +
             "}\n" +
             "body.theme-material {\n" +
-            "  --jettra-bg: #f5f5f7;\n" +
-            "  --jettra-glow: rgba(0, 0, 0, 0.1);\n" +
-            "  --jettra-glass: rgba(255, 255, 255, 0.9);\n" +
-            "  --jettra-border: rgba(0, 0, 0, 0.08);\n" +
-            "  --jettra-text: #1d1d1f;\n" +
-            "  --jettra-accent: #0071e3;\n" +
+            "  --jettra-bg: #121212;\n" +
+            "  --jettra-glow: rgba(187, 134, 252, 0.2);\n" +
+            "  --jettra-glass: #1e1e1e;\n" +
+            "  --jettra-border: #333333;\n" +
+            "  --jettra-text: #ffffff;\n" +
+            "  --jettra-accent: #bb86fc;\n" +
             "}\n" +
             "body.theme-futuristic {\n" +
             "  --jettra-bg: #050510;\n" +
@@ -49,12 +49,12 @@ public class JettraTheme {
             "  --jettra-accent: #0284c7;\n" +
             "}\n" +
             "body.theme-material-plain {\n" +
-            "  --jettra-bg: #fdfdfd;\n" +
-            "  --jettra-glow: rgba(0, 0, 0, 0);\n" +
-            "  --jettra-glass: #ffffff;\n" +
-            "  --jettra-border: #e0e0e0;\n" +
-            "  --jettra-text: #202124;\n" +
-            "  --jettra-accent: #1a73e8;\n" +
+            "  --jettra-bg: #000000;\n" +
+            "  --jettra-glow: transparent;\n" +
+            "  --jettra-glass: #000000;\n" +
+            "  --jettra-border: #333333;\n" +
+            "  --jettra-text: #e8eaed;\n" +
+            "  --jettra-accent: #8ab4f8;\n" +
             "}\n" +
             "body.theme-plain {\n" +
             "  --jettra-bg: #fff;\n" +
@@ -64,21 +64,13 @@ public class JettraTheme {
             "  --jettra-text: #333;\n" +
             "  --jettra-accent: #000;\n" +
             "}\n" +
-            "body.theme-tailwindcss {\n" +
-            "  --jettra-bg: #f3f4f6;\n" +
-            "  --jettra-glow: transparent;\n" +
-            "  --jettra-glass: #ffffff;\n" +
-            "  --jettra-border: #e5e7eb;\n" +
-            "  --jettra-text: #1f2937;\n" +
-            "  --jettra-accent: #3b82f6;\n" +
-            "}\n" +
-            "body.theme-tailwindcss-3d {\n" +
-            "  --jettra-bg: #1e293b;\n" +
-            "  --jettra-glow: rgba(56, 189, 248, 0.4);\n" +
+            "body.theme-astro {\n" +
+            "  --jettra-bg: #0f172a;\n" +
+            "  --jettra-glow: rgba(139, 92, 246, 0.4);\n" +
             "  --jettra-glass: rgba(15, 23, 42, 0.8);\n" +
-            "  --jettra-border: #334155;\n" +
+            "  --jettra-border: rgba(139, 92, 246, 0.3);\n" +
             "  --jettra-text: #f8fafc;\n" +
-            "  --jettra-accent: #38bdf8;\n" +
+            "  --jettra-accent: #ff5d01;\n" +
             "}\n" +
             "body.theme-dark {\n" +
             "  --jettra-bg: #020617;\n" +
@@ -113,12 +105,12 @@ public class JettraTheme {
             "  --jettra-accent: #39ff14;\n" +
             "}\n" +
             "body.theme-glass {\n" +
-            "  --jettra-bg: q-gradient(linear, left top, left bottom, from(#1e293b), to(#0f172a));\n" +
-            "  --jettra-glow: rgba(255, 255, 255, 0.1);\n" +
-            "  --jettra-glass: rgba(255, 255, 255, 0.05);\n" +
-            "  --jettra-border: rgba(255, 255, 255, 0.1);\n" +
-            "  --jettra-text: #fff;\n" +
-            "  --jettra-accent: rgba(255, 255, 255, 0.8);\n" +
+            "  --jettra-bg: #1e293b;\n" +
+            "  --jettra-glow: rgba(0, 255, 255, 0.3);\n" +
+            "  --jettra-glass: rgba(15, 23, 42, 0.45);\n" +
+            "  --jettra-border: rgba(255, 255, 255, 0.15);\n" +
+            "  --jettra-text: #ffffff;\n" +
+            "  --jettra-accent: #00e5ff;\n" +
             "}\n" +
             "body.theme-nx {\n" +
             "  --jettra-bg: #141414;\n" +
@@ -142,10 +134,11 @@ public class JettraTheme {
             "body.theme-cyberpunk { background-image: radial-gradient(circle, #2a0134 0%, #0b0114 100%); }\n" +
             "body.theme-neon { background-image: linear-gradient(135deg, #000 0%, #051a05 100%); }\n" +
             "body.theme-dark { background-image: linear-gradient(to bottom, #0f172a, #020617); }\n" +
-            "body.theme-material-plain { background: #fdfdfd; }\n" +
+            "body.theme-glass { background-image: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); }\n" +
+            "body.theme-material { background: #121212; }\n" +
+            "body.theme-material-plain { background: #000000; }\n" +
             "body.theme-plain { background: #fff; }\n" +
-            "body.theme-tailwindcss { background: #f3f4f6; }\n" +
-            "body.theme-tailwindcss-3d { background-image: linear-gradient(to bottom right, #1e293b, #0f172a); }\n" +
+            "body.theme-astro { background-image: radial-gradient(at top right, #312e81 0%, #0f172a 50%, #020617 100%); }\n" +
             "body.theme-nx { background: #141414; }\n" +
             "body.theme-nx .j-btn { border-radius: 4px; font-weight: 700; text-transform: none; }\n" +
             "body.theme-nx .j-btn-primary { background: #e50914; color: #fff; box-shadow: none; }\n" +
@@ -154,9 +147,7 @@ public class JettraTheme {
             "body.theme-nx .j-left { background: #000; border: none; border-radius: 0; }\n" +
             "body.theme-nx .j-center { background: #141414; border: none; border-radius: 0; }\n" +
             "body.theme-nx .j-card { background: #181818; border-radius: 8px; border: 1px solid #333; }\n" +
-            "/* Tailwind helpers embedded */\n" +
-            "body.theme-tailwindcss .j-center, body.theme-tailwindcss .j-left, body.theme-tailwindcss .j-top, body.theme-tailwindcss .j-footer { box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1),0 1px 2px 0 rgba(0,0,0,0.06); border-radius: 0.5rem; border: none; }\n" +
-            "body.theme-material-plain .j-3d-effect, body.theme-plain .j-3d-effect, body.theme-tailwindcss .j-3d-effect, body.theme-white .j-3d-effect { box-shadow: none !important; transform: none !important; }\n" +
+            "body.theme-material-plain .j-3d-effect, body.theme-plain .j-3d-effect, body.theme-white .j-3d-effect { box-shadow: none !important; transform: none !important; }\n" +
             ".j-dashboard {\n" +
             "  display: grid; grid-template-columns: 260px 1fr; grid-template-rows: 64px 1fr auto;\n" +
             "  grid-template-areas: 'top top' 'left center' 'footer footer';\n" +
