@@ -187,51 +187,75 @@ public class CrudView extends UIComponent {
 
     private void setupReportModal(String uniqueId) {
         try {
-            Class<?> reportClass = Class.forName("com.jettra.report.Report", true, modelClass.getClassLoader());
+            ClassLoader loader = Thread.currentThread().getContextClassLoader();
+            Class<?> reportClass = null;
+            try {
+                reportClass = Class.forName("com.jettra.report.Report", true, loader);
+            } catch (Exception e) {
+                try {
+                    loader = modelClass.getClassLoader();
+                    reportClass = Class.forName("com.jettra.report.Report", true, loader);
+                } catch (Exception e2) {
+                    reportClass = Class.forName("com.jettra.report.Report");
+                    loader = reportClass.getClassLoader();
+                }
+            }
+
+            if (reportClass == null) {
+                setupFallbackModal(uniqueId, "No se pudo cargar la clase com.jettra.report.Report");
+                return;
+            }
+
             Object reportInstance = reportClass.getConstructor(String.class).newInstance("Reporte de " + modelClass.getSimpleName());
             
             // Set data
             Method setData = reportClass.getMethod("setData", List.class);
             List<?> items = null;
-            if (handler != null) {
-                items = (List<?>) handler.findAll();
-            } else {
-                Method findAll = repositoryClass.getMethod("findAll");
-                items = (List<?>) findAll.invoke(null);
+            try {
+                if (handler != null) {
+                    items = (List<?>) handler.findAll();
+                } else {
+                    Method findAll = repositoryClass.getMethod("findAll");
+                    items = (List<?>) findAll.invoke(null);
+                }
+            } catch (Exception e) {
+                System.err.println("[CrudView] Error fetching data for report: " + e.getMessage());
+                items = new ArrayList<>();
             }
             setData.invoke(reportInstance, items);
             
             // Page Orientation
-            Object pageSettings = reportClass.getMethod("getPageSettings").invoke(reportInstance);
-            Class<?> orientationEnum = Class.forName("com.jettra.report.Report$PageSettings$Orientation");
-            Object orientationVal = Enum.valueOf((Class<Enum>)orientationEnum, reportOrientation.toUpperCase());
-            pageSettings.getClass().getMethod("setOrientation", orientationEnum).invoke(pageSettings, orientationVal);
+            try {
+                Object pageSettings = reportClass.getMethod("getPageSettings").invoke(reportInstance);
+                Class<?> orientationEnum = Class.forName("com.jettra.report.Report$PageSettings$Orientation", true, loader);
+                Object orientationVal = Enum.valueOf((Class<Enum>)orientationEnum, reportOrientation.toUpperCase());
+                pageSettings.getClass().getMethod("setOrientation", orientationEnum).invoke(pageSettings, orientationVal);
+            } catch (Exception e) {
+                System.err.println("[CrudView] Error setting orientation: " + e.getMessage());
+            }
 
             // Header
             Object headerObj = reportClass.getMethod("getHeader").invoke(reportInstance);
             Class<?> headerClass = headerObj.getClass();
-            Method addElement = headerClass.getMethod("addElement", Class.forName("com.jettra.report.Report$ReportElement"));
-            Class<?> textElementClass = Class.forName("com.jettra.report.Report$TextElement");
+            Class<?> reportElementClass = Class.forName("com.jettra.report.Report$ReportElement", true, loader);
+            Method addElement = headerClass.getMethod("addElement", reportElementClass);
+            Class<?> textElementClass = Class.forName("com.jettra.report.Report$TextElement", true, loader);
             
             String finalTitle = (reportCustomTitle != null && !reportCustomTitle.isEmpty()) ? reportCustomTitle : "LISTADO DE " + modelName.toUpperCase();
             Object titleElement = textElementClass.getConstructor(String.class).newInstance(finalTitle);
             
             // Apply header color and bold
-            Method setFontColor = textElementClass.getMethod("setFontColor", String.class);
-            Method setBold = textElementClass.getMethod("setBold", boolean.class);
-            Method setFontSize = textElementClass.getMethod("setFontSize", int.class);
-            
-            setFontColor.invoke(titleElement, reportHeaderColor);
-            setBold.invoke(titleElement, true);
-            setFontSize.invoke(titleElement, 14);
+            textElementClass.getMethod("setFontColor", String.class).invoke(titleElement, reportHeaderColor);
+            textElementClass.getMethod("setBold", boolean.class).invoke(titleElement, true);
+            textElementClass.getMethod("setFontSize", int.class).invoke(titleElement, 14);
             
             addElement.invoke(headerObj, titleElement);
 
             // Table
             Object detailObj = reportClass.getMethod("getDetail").invoke(reportInstance);
-            Class<?> tableClass = Class.forName("com.jettra.report.Report$Table");
+            Class<?> tableClass = Class.forName("com.jettra.report.Report$Table", true, loader);
             Object tableInstance = tableClass.getConstructor().newInstance();
-            Class<?> columnClass = Class.forName("com.jettra.report.Report$Column");
+            Class<?> columnClass = Class.forName("com.jettra.report.Report$Column", true, loader);
             Method addColumn = tableClass.getMethod("addColumn", columnClass);
 
             Field[] fields = modelClass.getDeclaredFields();
@@ -239,7 +263,6 @@ public class CrudView extends UIComponent {
                 String lbl = getFieldLabel(field);
                 Object col = columnClass.getConstructor(String.class, String.class, int.class).newInstance(lbl, field.getName(), 150);
                 
-                // Style columns - use red/bold for 'id' if requested by convention or just keep it clean
                 if (field.getName().equalsIgnoreCase("id") || field.getName().equalsIgnoreCase("code")) {
                     columnClass.getMethod("setFontColor", String.class).invoke(col, reportHeaderColor);
                     columnClass.getMethod("setBold", boolean.class).invoke(col, true);
@@ -263,10 +286,14 @@ public class CrudView extends UIComponent {
             this.reportModal = (Modal) createViewer.invoke(reportInstance, uniqueId);
             return;
         } catch (Exception e) {
-            System.err.println("[CrudView] Error instantiating ReportViewer via reflection: " + e.getMessage());
+            System.err.println("[CrudView] CRITICAL: Reflection error in setupReportModal: " + e.getMessage());
+            e.printStackTrace();
+            setupFallbackModal(uniqueId, e.toString() + " - " + e.getMessage());
+            return;
         }
+    }
 
-        // Fallback implementation if JettraReport is not available
+    private void setupFallbackModal(String uniqueId, String errorMsg) {
         this.reportModal = new Modal("reportModal_" + uniqueId)
                 .setPadding("0")
                 .setMaxWidth("900px")
@@ -321,7 +348,8 @@ public class CrudView extends UIComponent {
             .setStyle("background-color", "white").setStyle("color", "#333").setStyle("padding", "40px").setStyle("margin", "20px").setStyle("border-radius", "4px").setStyle("text-align", "center");
         
         previewArea.add(new Header(3, getLabel("lbl.report_preview", "Vista Previa no disponible")))
-                  .add(new Paragraph(getLabel("msg.report_engine_missing", "El motor JettraReport no está detectado. Use los botones superiores para exportar directamente.")));
+                  .add(new Paragraph(getLabel("msg.report_engine_missing", "El motor JettraReport no está detectado. Use los botones superiores para exportar directamente.")))
+                  .add(new Paragraph("Error: " + (errorMsg != null ? errorMsg : "Desconocido")).setStyle("color", "red").setStyle("font-size", "12px").setStyle("margin-top", "20px"));
         
         this.reportModal.add(previewArea);
     }
