@@ -97,6 +97,8 @@ Canvas-based drawing capabilities.
 ## 5. Development Guide
 - **[How to create a new component](howcreatenewcomponent.md)**
 - **[Validations](validations.md)**
+- **[ViewSelectOne (@ViewSelectOne)](viewselectone.md)**
+- **[ViewSelectMany (@ViewSelectMany)](viewselectmany.md)**
 - **[Icons Reference](icons.md)**
 
 ---

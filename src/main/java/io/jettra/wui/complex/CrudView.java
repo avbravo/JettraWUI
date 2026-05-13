@@ -2,15 +2,16 @@ package io.jettra.wui.complex;
 
 import io.jettra.wui.components.*;
 import io.jettra.wui.core.UIComponent;
-import io.jettra.wui.core.annotations.CrudHandler;
-import io.jettra.wui.core.annotations.PropertiesLabel;
+import io.jettra.wui.core.annotations.*;
 import io.jettra.wui.validations.JettraValidations;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 public class CrudView extends UIComponent {
 
@@ -35,7 +36,7 @@ public class CrudView extends UIComponent {
     private Modal reportModal;
     private Header modalHeader;
     private TextBox modalAction;
-    private List<TextBox> inputFields = new ArrayList<>();
+    private List<UIComponent> inputFields = new ArrayList<>();
     private List<FormGroup> groupFields = new ArrayList<>();
     private Paragraph deleteMsg;
     private Button modalSubmitBtn;
@@ -372,8 +373,22 @@ public class CrudView extends UIComponent {
             group.setProperty("id", "group_" + field.getName() + "_" + uniqueId);
             group.add(new Label(field.getName(), getFieldLabel(field)));
             
-            TextBox input = new TextBox("text", field.getName()).setId("input_" + field.getName() + "_" + uniqueId);
-            JettraValidations.apply(input, modelClass, field.getName());
+            UIComponent input;
+            if (field.isAnnotationPresent(ViewSelectOne.class)) {
+                ViewSelectOne anno = field.getAnnotation(ViewSelectOne.class);
+                SelectOne select = new SelectOne(field.getName()).setId("input_" + field.getName() + "_" + uniqueId);
+                populateSelectOptions(select, anno.source(), anno.method(), anno.label(), anno.filter());
+                input = select;
+            } else if (field.isAnnotationPresent(ViewSelectMany.class)) {
+                ViewSelectMany anno = field.getAnnotation(ViewSelectMany.class);
+                SelectMany select = new SelectMany(field.getName()).setId("input_" + field.getName() + "_" + uniqueId);
+                populateSelectOptions(select, anno.source(), anno.method(), anno.label(), anno.filter());
+                input = select;
+            } else {
+                TextBox text = new TextBox("text", field.getName()).setId("input_" + field.getName() + "_" + uniqueId);
+                JettraValidations.apply(text, modelClass, field.getName());
+                input = text;
+            }
             
             group.add(input);
             inputFields.add(input);
@@ -478,10 +493,19 @@ public class CrudView extends UIComponent {
             script.append("  const input_").append(field.getName()).append(" = document.getElementById('input_").append(field.getName()).append("_").append(uniqueId).append("');\n")
                   .append("  const group_").append(field.getName()).append(" = document.getElementById('group_").append(field.getName()).append("_").append(uniqueId).append("');\n")
                   .append("  if(input_").append(field.getName()).append(") {\n")
-                  .append("    if(data) {\n")
-                  .append("      input_").append(field.getName()).append(".value = data['").append(field.getName()).append("'] || '';\n")
+                  .append("    let val = data ? (data['").append(field.getName()).append("'] || '') : '';\n")
+                  .append("    if(input_").append(field.getName()).append(".classList.contains('j-select-many-list')) {\n")
+                  .append("       const hidden = document.getElementById('input_").append(field.getName()).append("_").append(uniqueId).append("_value');\n")
+                  .append("       if(hidden) hidden.value = val;\n")
+                  .append("       const vals = val.split(',');\n")
+                  .append("       input_").append(field.getName()).append(".querySelectorAll('.j-select-many-item').forEach(item => {\n")
+                  .append("          const isSel = vals.includes(item.getAttribute('data-value'));\n")
+                  .append("          item.classList.toggle('selected', isSel);\n")
+                  .append("          const inner = item.querySelector('.j-checkbox-inner');\n")
+                  .append("          if(inner) inner.innerText = isSel ? '✓' : '';\n")
+                  .append("       });\n")
                   .append("    } else {\n")
-                  .append("      input_").append(field.getName()).append(".value = '';\n")
+                  .append("       input_").append(field.getName()).append(".value = val;\n")
                   .append("    }\n")
                   .append("    input_").append(field.getName()).append(".readOnly = (action === 'save' && isEdit && '").append(field.getName()).append("' === 'code');\n")
                   .append("  }\n");
@@ -509,5 +533,103 @@ public class CrudView extends UIComponent {
               .append("}\n");
 
         this.add(new Script(script.toString()));
+    }
+
+    private void populateSelectOptions(SelectOne select, String source, String method, String labelFields, String filter) {
+        try {
+            Class<?> sourceClass = null;
+            String pkg = modelClass.getPackageName();
+            
+            // Intentar cargar la clase fuente por nombre completo o relativo a paquetes comunes
+            List<String> attempts = Arrays.asList(
+                source,
+                pkg + "." + source,
+                pkg.replace(".model", ".repository") + "." + source,
+                pkg.replace(".model", ".services") + "." + source,
+                pkg.replace(".model", ".controller") + "." + source
+            );
+
+            for (String attempt : attempts) {
+                try {
+                    sourceClass = Class.forName(attempt, true, modelClass.getClassLoader());
+                    break;
+                } catch (Exception e) {}
+            }
+
+            if (sourceClass != null) {
+                Method m;
+                Object result;
+                if (filter != null && !filter.isEmpty()) {
+                    m = sourceClass.getMethod(method, String.class);
+                    result = m.invoke(null, filter);
+                } else {
+                    m = sourceClass.getMethod(method);
+                    result = m.invoke(null);
+                }
+
+                if (result instanceof List) {
+                    List<?> list = (List<?>) result;
+                    for (Object obj : list) {
+                        String val = getIdValueForSource(obj);
+                        String lbl = resolveLabel(obj, labelFields);
+                        select.addOption(val, lbl);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("[CrudView] Error populating select options for source " + source + ": " + e.getMessage());
+        }
+    }
+
+    private String getIdValueForSource(Object item) {
+        if (item instanceof String) return (String) item;
+        if (item instanceof Number) return item.toString();
+        
+        try {
+            for (String idName : Arrays.asList("code", "id", "id" + item.getClass().getSimpleName())) {
+                try {
+                    Field f = item.getClass().getDeclaredField(idName);
+                    f.setAccessible(true);
+                    Object val = f.get(item);
+                    if (val != null) return val.toString();
+                } catch (Exception e) {}
+            }
+            
+            // Try getters
+            for (String idName : Arrays.asList("getCode", "getId")) {
+                try {
+                    Method m = item.getClass().getMethod(idName);
+                    Object val = m.invoke(item);
+                    if (val != null) return val.toString();
+                } catch (Exception e) {}
+            }
+        } catch (Exception e) {}
+        return "0";
+    }
+
+    private String resolveLabel(Object obj, String labelFields) {
+        if (obj instanceof String) return (String) obj;
+        String[] fields = labelFields.split(",");
+        List<String> values = new ArrayList<>();
+        
+        for (String fieldName : fields) {
+            try {
+                String name = fieldName.trim();
+                Field f = obj.getClass().getDeclaredField(name);
+                f.setAccessible(true);
+                Object val = f.get(obj);
+                if (val != null) values.add(val.toString());
+            } catch (Exception e) {
+                // Try getter
+                try {
+                    String name = fieldName.trim();
+                    String getterName = "get" + name.substring(0, 1).toUpperCase() + name.substring(1);
+                    Method m = obj.getClass().getMethod(getterName);
+                    Object val = m.invoke(obj);
+                    if (val != null) values.add(val.toString());
+                } catch (Exception e2) {}
+            }
+        }
+        return values.isEmpty() ? obj.toString() : values.stream().collect(Collectors.joining(" - "));
     }
 }
