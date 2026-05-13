@@ -88,7 +88,7 @@ public class CrudView extends UIComponent {
                 .setSubtitle(subtitle)
                 .setWidth("100%");
 
-        String uniqueId = modelName + "_" + System.currentTimeMillis();
+        String uniqueId = modelName.toLowerCase();
         setupModal(uniqueId);
 
         String modelKey = modelName.toLowerCase();
@@ -187,7 +187,7 @@ public class CrudView extends UIComponent {
 
     private void setupReportModal(String uniqueId) {
         try {
-            Class<?> reportClass = Class.forName("com.jettra.report.Report");
+            Class<?> reportClass = Class.forName("com.jettra.report.Report", true, modelClass.getClassLoader());
             Object reportInstance = reportClass.getConstructor(String.class).newInstance("Reporte de " + modelClass.getSimpleName());
             
             // Set data
@@ -268,43 +268,62 @@ public class CrudView extends UIComponent {
 
         // Fallback implementation if JettraReport is not available
         this.reportModal = new Modal("reportModal_" + uniqueId)
-                .setPadding("35px")
-                .setMaxWidth("500px")
+                .setPadding("0")
+                .setMaxWidth("900px")
+                .setBackgroundColor("#161b22")
                 .setZIndex("9999");
         this.reportModal.setStyle("display", "none");
+        this.reportModal.setStyle("border", "1px solid #30363d");
 
-        Header header = new Header(3, getLabel("lbl.report_viewer", "Visor de Impresión"));
-        Paragraph desc = new Paragraph(getLabel("lbl.report_desc", "Seleccione el formato de exportación o acción de impresión."));
-
-        Div actions = new Div().setStyle("display", "flex").setStyle("flex-wrap", "wrap").setStyle("gap", "10px").setStyle("margin-top", "20px");
+        Div toolbar = new Div()
+            .setStyle("display", "flex").setStyle("flex-wrap", "wrap").setStyle("gap", "8px").setStyle("padding", "15px")
+            .setStyle("background-color", "#0d1117").setStyle("border-bottom", "1px solid #30363d").setStyle("border-radius", "8px 8px 0 0");
 
         if (reportAllowPdf) {
-            actions.add(new Button("📄 PDF")
-                .setBackgroundColor("#da3633")
-                .setOnclick("location.href='?action=report&format=pdf'; document.getElementById('reportModal_" + uniqueId + "').style.display='none';"));
+            toolbar.add(new Button("📄\nPDF").setBackgroundColor("#da3633")
+                .setStyle("height", "60px").setStyle("width", "70px").setStyle("display", "flex").setStyle("flex-direction", "column").setStyle("align-items", "center").setStyle("justify-content", "center")
+                .setOnclick("location.href='?action=report&format=pdf';"));
         }
         if (reportAllowExcel) {
-            actions.add(new Button("📊 Excel")
-                .setBackgroundColor("#238636")
-                .setOnclick("location.href='?action=report&format=excel'; document.getElementById('reportModal_" + uniqueId + "').style.display='none';"));
+            toolbar.add(new Button("📊\nExcel").setBackgroundColor("#238636")
+                .setStyle("height", "60px").setStyle("width", "70px").setStyle("display", "flex").setStyle("flex-direction", "column").setStyle("align-items", "center").setStyle("justify-content", "center")
+                .setOnclick("location.href='?action=report&format=excel';"));
         }
         if (reportAllowCsv) {
-            actions.add(new Button("📝 CSV")
-                .setBackgroundColor("#8957e5")
-                .setOnclick("location.href='?action=report&format=csv'; document.getElementById('reportModal_" + uniqueId + "').style.display='none';"));
+            toolbar.add(new Button("📝\nCSV").setBackgroundColor("#8957e5")
+                .setStyle("height", "60px").setStyle("width", "70px").setStyle("display", "flex").setStyle("flex-direction", "column").setStyle("align-items", "center").setStyle("justify-content", "center")
+                .setOnclick("location.href='?action=report&format=csv';"));
         }
+        toolbar.add(new Button("📘\nWord").setBackgroundColor("#0969da")
+                .setStyle("height", "60px").setStyle("width", "70px").setStyle("display", "flex").setStyle("flex-direction", "column").setStyle("align-items", "center").setStyle("justify-content", "center")
+                .setOnclick("location.href='?action=report&format=word';"));
+        
         if (reportAllowPrint) {
-            actions.add(new Button("🖨️ Imprimir")
-                .setBackgroundColor("#007bff")
-                .setOnclick("location.href='?action=report&format=pdf&print=true'; document.getElementById('reportModal_" + uniqueId + "').style.display='none';"));
+            toolbar.add(new Button("🖨️\nImprimir").setBackgroundColor("#007bff")
+                .setStyle("height", "60px").setStyle("width", "100px").setStyle("display", "flex").setStyle("flex-direction", "column").setStyle("align-items", "center").setStyle("justify-content", "center")
+                .setOnclick("location.href='?action=report&format=pdf&print=true';"));
         }
 
-        Button cancelBtn = new Button(getLabel("btn.close", "Cerrar"))
-                .setBackgroundColor("#30363d")
-                .setOnclick("document.getElementById('reportModal_" + uniqueId + "').style.display='none';");
-        actions.add(cancelBtn);
+        SelectOne sizeSelect = new SelectOne("sizeSelect")
+            .setStyle("height", "60px").setStyle("padding", "0 15px").setStyle("background-color", "#21262d").setStyle("color", "white").setStyle("border", "1px solid #30363d").setStyle("border-radius", "6px")
+            .addOption("100%", "Maximizar (100%)")
+            .addOption("900px", "Original (900px)")
+            .setProperty("onchange", "var size = this.value; var modal = document.getElementById('reportModal_" + uniqueId + "'); if(modal) modal.style.width = size;");
+        toolbar.add(sizeSelect);
 
-        this.reportModal.add(header).add(desc).add(actions);
+        toolbar.add(new Button("Cerrar").setBackgroundColor("#30363d")
+                .setStyle("height", "60px").setStyle("padding", "0 20px")
+                .setOnclick("document.getElementById('reportModal_" + uniqueId + "').style.display='none';"));
+
+        this.reportModal.add(toolbar);
+
+        Div previewArea = new Div()
+            .setStyle("background-color", "white").setStyle("color", "#333").setStyle("padding", "40px").setStyle("margin", "20px").setStyle("border-radius", "4px").setStyle("text-align", "center");
+        
+        previewArea.add(new Header(3, getLabel("lbl.report_preview", "Vista Previa no disponible")))
+                  .add(new Paragraph(getLabel("msg.report_engine_missing", "El motor JettraReport no está detectado. Use los botones superiores para exportar directamente.")));
+        
+        this.reportModal.add(previewArea);
     }
 
     private void setupModal(String uniqueId) {
