@@ -51,4 +51,19 @@ public @interface CrudView {
      * Enable CSV option in report viewer.
      */
     boolean reportAllowCsv() default true;
+
+    /**
+     * Report orientation (PORTRAIT or LANDSCAPE).
+     */
+    String reportOrientation() default "PORTRAIT";
+
+    /**
+     * Custom title for the report.
+     */
+    String reportTitle() default "";
+
+    /**
+     * Header text color in hex format.
+     */
+    String reportHeaderColor() default "#000000";
 }

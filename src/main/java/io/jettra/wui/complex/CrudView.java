@@ -27,6 +27,9 @@ public class CrudView extends UIComponent {
     private boolean reportAllowPdf = true;
     private boolean reportAllowExcel = true;
     private boolean reportAllowCsv = true;
+    private String reportOrientation = "PORTRAIT";
+    private String reportHeaderColor = "#000000";
+    private String reportCustomTitle = "";
 
     private Modal crudModal;
     private Modal reportModal;
@@ -65,6 +68,9 @@ public class CrudView extends UIComponent {
     public CrudView setReportAllowPdf(boolean allow) { this.reportAllowPdf = allow; return this; }
     public CrudView setReportAllowExcel(boolean allow) { this.reportAllowExcel = allow; return this; }
     public CrudView setReportAllowCsv(boolean allow) { this.reportAllowCsv = allow; return this; }
+    public CrudView setReportOrientation(String orientation) { this.reportOrientation = orientation; return this; }
+    public CrudView setReportHeaderColor(String color) { this.reportHeaderColor = color; return this; }
+    public CrudView setReportCustomTitle(String title) { this.reportCustomTitle = title; return this; }
 
     public CrudView setTitle(String title) {
         this.title = title;
@@ -195,12 +201,30 @@ public class CrudView extends UIComponent {
             }
             setData.invoke(reportInstance, items);
             
+            // Page Orientation
+            Object pageSettings = reportClass.getMethod("getPageSettings").invoke(reportInstance);
+            Class<?> orientationEnum = Class.forName("com.jettra.report.Report$PageSettings$Orientation");
+            Object orientationVal = Enum.valueOf((Class<Enum>)orientationEnum, reportOrientation.toUpperCase());
+            pageSettings.getClass().getMethod("setOrientation", orientationEnum).invoke(pageSettings, orientationVal);
+
             // Header
             Object headerObj = reportClass.getMethod("getHeader").invoke(reportInstance);
             Class<?> headerClass = headerObj.getClass();
             Method addElement = headerClass.getMethod("addElement", Class.forName("com.jettra.report.Report$ReportElement"));
             Class<?> textElementClass = Class.forName("com.jettra.report.Report$TextElement");
-            Object titleElement = textElementClass.getConstructor(String.class).newInstance("LISTADO DE " + modelName.toUpperCase());
+            
+            String finalTitle = (reportCustomTitle != null && !reportCustomTitle.isEmpty()) ? reportCustomTitle : "LISTADO DE " + modelName.toUpperCase();
+            Object titleElement = textElementClass.getConstructor(String.class).newInstance(finalTitle);
+            
+            // Apply header color and bold
+            Method setFontColor = textElementClass.getMethod("setFontColor", String.class);
+            Method setBold = textElementClass.getMethod("setBold", boolean.class);
+            Method setFontSize = textElementClass.getMethod("setFontSize", int.class);
+            
+            setFontColor.invoke(titleElement, reportHeaderColor);
+            setBold.invoke(titleElement, true);
+            setFontSize.invoke(titleElement, 14);
+            
             addElement.invoke(headerObj, titleElement);
 
             // Table
@@ -214,6 +238,13 @@ public class CrudView extends UIComponent {
             for (Field field : fields) {
                 String lbl = getFieldLabel(field);
                 Object col = columnClass.getConstructor(String.class, String.class, int.class).newInstance(lbl, field.getName(), 150);
+                
+                // Style columns - use red/bold for 'id' if requested by convention or just keep it clean
+                if (field.getName().equalsIgnoreCase("id") || field.getName().equalsIgnoreCase("code")) {
+                    columnClass.getMethod("setFontColor", String.class).invoke(col, reportHeaderColor);
+                    columnClass.getMethod("setBold", boolean.class).invoke(col, true);
+                }
+                
                 addColumn.invoke(tableInstance, col);
             }
             addElement.invoke(detailObj, tableInstance);

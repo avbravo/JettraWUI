@@ -227,6 +227,9 @@ public class JettraMVC {
                 crudComponent.setReportAllowPdf(anno.reportAllowPdf());
                 crudComponent.setReportAllowExcel(anno.reportAllowExcel());
                 crudComponent.setReportAllowCsv(anno.reportAllowCsv());
+                crudComponent.setReportOrientation(anno.reportOrientation());
+                crudComponent.setReportCustomTitle(anno.reportTitle());
+                crudComponent.setReportHeaderColor(anno.reportHeaderColor());
                 crudComponent.build();
                 // Buscar el Center en JettraDashboardPage si aplica
                 try {
@@ -388,9 +391,24 @@ public class JettraMVC {
             Method setData = reportClass.getMethod("setData", List.class);
             setData.invoke(report, data);
 
+            // Orientation
+            Object pageSettings = reportClass.getMethod("getPageSettings").invoke(report);
+            Class<?> orientationEnum = Class.forName("com.jettra.report.Report$PageSettings$Orientation");
+            String orientationStr = page.getClass().getAnnotation(CrudView.class).reportOrientation();
+            Object orientationVal = Enum.valueOf((Class<Enum>)orientationEnum, orientationStr.toUpperCase());
+            pageSettings.getClass().getMethod("setOrientation", orientationEnum).invoke(pageSettings, orientationVal);
+
             // Header
             Object header = reportClass.getMethod("getHeader").invoke(report);
-            Object titleEl = textElementClass.getConstructor(String.class).newInstance("REPORTE DE " + modelClass.getSimpleName().toUpperCase());
+            String customTitle = page.getClass().getAnnotation(CrudView.class).reportTitle();
+            String finalTitle = (customTitle != null && !customTitle.isEmpty()) ? customTitle : "REPORTE DE " + modelClass.getSimpleName().toUpperCase();
+            Object titleEl = textElementClass.getConstructor(String.class).newInstance(finalTitle);
+            
+            String headerColor = page.getClass().getAnnotation(CrudView.class).reportHeaderColor();
+            textElementClass.getMethod("setFontColor", String.class).invoke(titleEl, headerColor);
+            textElementClass.getMethod("setBold", boolean.class).invoke(titleEl, true);
+            textElementClass.getMethod("setFontSize", int.class).invoke(titleEl, 14);
+
             headerClass.getMethod("addElement", Class.forName("com.jettra.report.Report$ReportElement")).invoke(header, titleEl);
 
             // Table
@@ -401,6 +419,12 @@ public class JettraMVC {
             for (Field field : fields) {
                 Object col = columnClass.getConstructor(String.class, String.class, int.class)
                         .newInstance(field.getName().toUpperCase(), field.getName(), 100);
+                
+                if (field.getName().equalsIgnoreCase("id") || field.getName().equalsIgnoreCase("code")) {
+                    columnClass.getMethod("setFontColor", String.class).invoke(col, headerColor);
+                    columnClass.getMethod("setBold", boolean.class).invoke(col, true);
+                }
+                
                 addColumn.invoke(table, col);
             }
 
