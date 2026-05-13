@@ -270,7 +270,8 @@ public class CrudView extends UIComponent {
                 
                 addColumn.invoke(tableInstance, col);
             }
-            addElement.invoke(detailObj, tableInstance);
+            Method addDetailElement = detailObj.getClass().getMethod("addElement", reportElementClass);
+            addDetailElement.invoke(detailObj, tableInstance);
 
             // ViewerOptions
             Object optionsObj = reportClass.getMethod("getViewerOptions").invoke(reportInstance);
