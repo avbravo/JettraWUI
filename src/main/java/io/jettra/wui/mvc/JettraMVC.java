@@ -370,20 +370,28 @@ public class JettraMVC {
         return false;
     }
 
-    private static void generateReport(Page page, Class<?> modelClass, Class<?> repoClass, String format, boolean print) {
+    public static void generateReport(Page page, Class<?> modelClass, Class<?> repoClass, String format, boolean print) {
         try {
             // 1. Obtener datos
             Method findAll = repoClass.getMethod("findAll");
             List<?> data = (List<?>) findAll.invoke(null);
 
             // 2. Cargar JettraReport vía reflexión para evitar dependencia circular
-            Class<?> reportClass = Class.forName("com.jettra.report.Report");
-            Class<?> textElementClass = Class.forName("com.jettra.report.Report$TextElement");
-            Class<?> tableClass = Class.forName("com.jettra.report.Report$Table");
-            Class<?> columnClass = Class.forName("com.jettra.report.Report$Column");
-            Class<?> headerClass = Class.forName("com.jettra.report.Report$Header");
-            Class<?> footerClass = Class.forName("com.jettra.report.Report$Footer");
-            Class<?> detailClass = Class.forName("com.jettra.report.Report$Detail");
+            ClassLoader loader = Thread.currentThread().getContextClassLoader();
+            Class<?> reportClass = null;
+            try {
+                reportClass = Class.forName("com.jettra.report.Report", true, loader);
+            } catch (Exception e) {
+                loader = page.getClass().getClassLoader();
+                reportClass = Class.forName("com.jettra.report.Report", true, loader);
+            }
+            
+            Class<?> textElementClass = Class.forName("com.jettra.report.Report$TextElement", true, loader);
+            Class<?> tableClass = Class.forName("com.jettra.report.Report$Table", true, loader);
+            Class<?> columnClass = Class.forName("com.jettra.report.Report$Column", true, loader);
+            Class<?> headerClass = Class.forName("com.jettra.report.Report$Header", true, loader);
+            Class<?> footerClass = Class.forName("com.jettra.report.Report$Footer", true, loader);
+            Class<?> detailClass = Class.forName("com.jettra.report.Report$Detail", true, loader);
 
             Object report = reportClass.getConstructor(String.class).newInstance("Reporte de " + modelClass.getSimpleName());
             
@@ -417,8 +425,19 @@ public class JettraMVC {
             
             Field[] fields = modelClass.getDeclaredFields();
             for (Field field : fields) {
+                String detailExpression = field.getName();
+                if (field.isAnnotationPresent(io.jettra.wui.core.annotations.TableColumnField.class)) {
+                    io.jettra.wui.core.annotations.TableColumnField tcf = field.getAnnotation(io.jettra.wui.core.annotations.TableColumnField.class);
+                    if (!tcf.field().isEmpty()) {
+                        // JettraReport doesn't support nested expressions like field.subfield directly yet
+                        // but we can pass the field name and handle it in the viewer/exporter if needed.
+                        // For now, we use the field name.
+                        detailExpression = field.getName(); 
+                    }
+                }
+                
                 Object col = columnClass.getConstructor(String.class, String.class, int.class)
-                        .newInstance(field.getName().toUpperCase(), field.getName(), 100);
+                        .newInstance(field.getName().toUpperCase(), detailExpression, 100);
                 
                 if (field.getName().equalsIgnoreCase("id") || field.getName().equalsIgnoreCase("code")) {
                     columnClass.getMethod("setFontColor", String.class).invoke(col, headerColor);
@@ -429,7 +448,7 @@ public class JettraMVC {
             }
 
             Object detail = reportClass.getMethod("getDetail").invoke(report);
-            detailClass.getMethod("addElement", Class.forName("com.jettra.report.Report$ReportElement")).invoke(detail, table);
+            detailClass.getMethod("addElement", Class.forName("com.jettra.report.Report$ReportElement", true, loader)).invoke(detail, table);
 
             // Footer
             Object footer = reportClass.getMethod("getFooter").invoke(report);

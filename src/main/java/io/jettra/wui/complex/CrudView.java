@@ -3,6 +3,7 @@ package io.jettra.wui.complex;
 import io.jettra.wui.components.*;
 import io.jettra.wui.core.UIComponent;
 import io.jettra.wui.core.annotations.*;
+import io.jettra.wui.core.annotations.TableColumnField;
 import io.jettra.wui.validations.JettraValidations;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -150,7 +151,29 @@ public class CrudView extends UIComponent {
                     for (Field field : fields) {
                         field.setAccessible(true);
                         Object val = field.get(item);
-                        dataRow.add(new TD(val != null ? val.toString() : ""));
+                        
+                        String displayValue = "";
+                        if (val != null) {
+                            if (field.isAnnotationPresent(TableColumnField.class)) {
+                                TableColumnField tcf = field.getAnnotation(TableColumnField.class);
+                                String targetField = tcf.field();
+                                if (!targetField.isEmpty()) {
+                                    if (val instanceof List) {
+                                        List<?> list = (List<?>) val;
+                                        displayValue = list.stream()
+                                            .map(obj -> resolveObjectField(obj, targetField))
+                                            .collect(Collectors.joining(", "));
+                                    } else {
+                                        displayValue = resolveObjectField(val, targetField);
+                                    }
+                                } else {
+                                    displayValue = val.toString();
+                                }
+                            } else {
+                                displayValue = val.toString();
+                            }
+                        }
+                        dataRow.add(new TD(displayValue));
                     }
 
                     TD actionsTd = new TD();
@@ -605,6 +628,25 @@ public class CrudView extends UIComponent {
             }
         } catch (Exception e) {}
         return "0";
+    }
+
+    private String resolveObjectField(Object obj, String fieldName) {
+        if (obj == null) return "";
+        try {
+            Field f = obj.getClass().getDeclaredField(fieldName);
+            f.setAccessible(true);
+            Object val = f.get(obj);
+            return val != null ? val.toString() : "";
+        } catch (Exception e) {
+            try {
+                String getterName = "get" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
+                Method m = obj.getClass().getMethod(getterName);
+                Object val = m.invoke(obj);
+                return val != null ? val.toString() : "";
+            } catch (Exception e2) {
+                return obj.toString();
+            }
+        }
     }
 
     private String resolveLabel(Object obj, String labelFields) {
