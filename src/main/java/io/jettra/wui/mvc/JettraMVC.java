@@ -401,18 +401,21 @@ public class JettraMVC {
 
             // Orientation
             Object pageSettings = reportClass.getMethod("getPageSettings").invoke(report);
-            Class<?> orientationEnum = Class.forName("com.jettra.report.Report$PageSettings$Orientation");
-            String orientationStr = page.getClass().getAnnotation(CrudView.class).reportOrientation();
+            Class<?> orientationEnum = Class.forName("com.jettra.report.Report$PageSettings$Orientation", true, loader);
+            
+            CrudView anno = page.getClass().getAnnotation(CrudView.class);
+            String orientationStr = (anno != null) ? anno.reportOrientation() : "PORTRAIT";
+            String customTitle = (anno != null) ? anno.reportTitle() : "";
+            String headerColor = (anno != null) ? anno.reportHeaderColor() : "#000000";
+
             Object orientationVal = Enum.valueOf((Class<Enum>)orientationEnum, orientationStr.toUpperCase());
             pageSettings.getClass().getMethod("setOrientation", orientationEnum).invoke(pageSettings, orientationVal);
 
             // Header
             Object header = reportClass.getMethod("getHeader").invoke(report);
-            String customTitle = page.getClass().getAnnotation(CrudView.class).reportTitle();
             String finalTitle = (customTitle != null && !customTitle.isEmpty()) ? customTitle : "REPORTE DE " + modelClass.getSimpleName().toUpperCase();
             Object titleEl = textElementClass.getConstructor(String.class).newInstance(finalTitle);
             
-            String headerColor = page.getClass().getAnnotation(CrudView.class).reportHeaderColor();
             textElementClass.getMethod("setFontColor", String.class).invoke(titleEl, headerColor);
             textElementClass.getMethod("setBold", boolean.class).invoke(titleEl, true);
             textElementClass.getMethod("setFontSize", int.class).invoke(titleEl, 14);

@@ -487,10 +487,30 @@ public class CrudView extends UIComponent {
         StringBuilder sb = new StringBuilder("{");
         Field[] fields = modelClass.getDeclaredFields();
         for (int i = 0; i < fields.length; i++) {
-            fields[i].setAccessible(true);
-            Object val = fields[i].get(item);
-            String valStr = val != null ? val.toString().replace("'", "\\'").replace("\"", "\\\"") : "";
-            sb.append("'").append(fields[i].getName()).append("': '").append(valStr).append("'");
+            Field field = fields[i];
+            field.setAccessible(true);
+            Object val = field.get(item);
+            
+            String valStr = "";
+            if (val != null) {
+                if (field.isAnnotationPresent(ViewSelectOne.class)) {
+                    valStr = getIdValueForSource(val);
+                } else if (field.isAnnotationPresent(ViewSelectMany.class)) {
+                    if (val instanceof List) {
+                        List<?> list = (List<?>) val;
+                        valStr = list.stream()
+                                .map(this::getIdValueForSource)
+                                .collect(Collectors.joining(","));
+                    } else {
+                        valStr = val.toString();
+                    }
+                } else {
+                    valStr = val.toString();
+                }
+            }
+            
+            valStr = valStr.replace("'", "\\'").replace("\"", "\\\"");
+            sb.append("'").append(field.getName()).append("': '").append(valStr).append("'");
             if (i < fields.length - 1) sb.append(", ");
         }
         sb.append("}");
@@ -605,29 +625,44 @@ public class CrudView extends UIComponent {
     }
 
     private String getIdValueForSource(Object item) {
+        if (item == null) return "";
         if (item instanceof String) return (String) item;
         if (item instanceof Number) return item.toString();
         
+        Class<?> clazz = item.getClass();
         try {
-            for (String idName : Arrays.asList("code", "id", "id" + item.getClass().getSimpleName())) {
-                try {
-                    Field f = item.getClass().getDeclaredField(idName);
+            // Priority 1: Common names
+            List<String> commonNames = Arrays.asList("code", "id", "id" + clazz.getSimpleName());
+            for (Field f : clazz.getDeclaredFields()) {
+                if (commonNames.stream().anyMatch(name -> name.equalsIgnoreCase(f.getName()))) {
                     f.setAccessible(true);
                     Object val = f.get(item);
                     if (val != null) return val.toString();
-                } catch (Exception e) {}
+                }
             }
             
-            // Try getters
-            for (String idName : Arrays.asList("getCode", "getId")) {
-                try {
-                    Method m = item.getClass().getMethod(idName);
-                    Object val = m.invoke(item);
-                    if (val != null) return val.toString();
-                } catch (Exception e) {}
+            // Priority 2: Getters
+            for (Method m : clazz.getMethods()) {
+                if (m.getName().equalsIgnoreCase("getCode") || m.getName().equalsIgnoreCase("getId") || m.getName().equalsIgnoreCase("getid" + clazz.getSimpleName())) {
+                    if (m.getParameterCount() == 0) {
+                        Object val = m.invoke(item);
+                        if (val != null) return val.toString();
+                    }
+                }
             }
-        } catch (Exception e) {}
-        return "0";
+
+            // Priority 3: Any field containing 'id' or 'code'
+            for (Field f : clazz.getDeclaredFields()) {
+                if (f.getName().toLowerCase().contains("id") || f.getName().toLowerCase().contains("code")) {
+                    f.setAccessible(true);
+                    Object val = f.get(item);
+                    if (val != null) return val.toString();
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("[CrudView] Error resolving ID for " + clazz.getSimpleName() + ": " + e.getMessage());
+        }
+        return item.toString(); // Fallback to toString if nothing else found
     }
 
     private String resolveObjectField(Object obj, String fieldName) {
