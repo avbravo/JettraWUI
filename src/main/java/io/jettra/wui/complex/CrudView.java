@@ -396,7 +396,13 @@ public class CrudView extends UIComponent {
         for (Field field : modelClass.getDeclaredFields()) {
             FormGroup group = new FormGroup();
             group.setProperty("id", "group_" + field.getName() + "_" + uniqueId);
-            group.add(new Label(field.getName(), getFieldLabel(field)));
+            
+            boolean isHidden = field.isAnnotationPresent(Hidden.class);
+            if (!isHidden) {
+                group.add(new Label(field.getName(), getFieldLabel(field)));
+            } else {
+                group.setStyle("display", "none");
+            }
             
             UIComponent input;
             if (field.isAnnotationPresent(ViewSelectOne.class)) {
@@ -410,16 +416,27 @@ public class CrudView extends UIComponent {
                 populateSelectOptions(select, anno.source(), anno.method(), anno.label(), anno.filter());
                 input = select;
             } else {
-                TextBox text = new TextBox("text", field.getName()).setId("input_" + field.getName() + "_" + uniqueId);
-                JettraValidations.apply(text, modelClass, field.getName());
+                TextBox text = new TextBox(isHidden ? "hidden" : "text", field.getName()).setId("input_" + field.getName() + "_" + uniqueId);
+                if (!isHidden) {
+                    JettraValidations.apply(text, modelClass, field.getName());
+                }
                 
-                if (field.isAnnotationPresent(Compute.class)) {
+                boolean isReadonly = false;
+                
+                if (field.isAnnotationPresent(NoEditable.class)) {
+                    isReadonly = true;
+                } else if (field.isAnnotationPresent(Compute.class)) {
                     Compute computeAnno = field.getAnnotation(Compute.class);
                     if (!computeAnno.editable()) {
-                        text.setReadonly(true);
-                        text.setStyle("background-color", "#f0f0f0");
-                        text.setStyle("cursor", "not-allowed");
+                        isReadonly = true;
                     }
+                }
+                
+                if (isReadonly) {
+                    text.setReadonly(true);
+                    text.setStyle("background-color", "#f0f0f0");
+                    text.setStyle("color", "#333333"); // Fix for text color visibility on gray background
+                    text.setStyle("cursor", "not-allowed");
                 }
                 
                 input = text;
