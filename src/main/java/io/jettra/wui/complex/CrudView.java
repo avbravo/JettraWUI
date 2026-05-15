@@ -4,6 +4,8 @@ import io.jettra.wui.components.*;
 import io.jettra.wui.core.UIComponent;
 import io.jettra.wui.core.annotations.*;
 import io.jettra.wui.core.annotations.TableColumnField;
+import io.jettra.rules.annotations.Compute;
+import io.jettra.rules.enums.OperationType;
 import io.jettra.wui.validations.JettraValidations;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -410,6 +412,16 @@ public class CrudView extends UIComponent {
             } else {
                 TextBox text = new TextBox("text", field.getName()).setId("input_" + field.getName() + "_" + uniqueId);
                 JettraValidations.apply(text, modelClass, field.getName());
+                
+                if (field.isAnnotationPresent(Compute.class)) {
+                    Compute computeAnno = field.getAnnotation(Compute.class);
+                    if (!computeAnno.editable()) {
+                        text.setReadonly(true);
+                        text.setStyle("background-color", "#f0f0f0");
+                        text.setStyle("cursor", "not-allowed");
+                    }
+                }
+                
                 input = text;
             }
             
@@ -574,6 +586,50 @@ public class CrudView extends UIComponent {
         }
         script.append("  }\n")
               .append("}\n");
+
+        // Add Compute logic
+        for (Field field : modelClass.getDeclaredFields()) {
+            if (field.isAnnotationPresent(Compute.class)) {
+                Compute computeAnno = field.getAnnotation(Compute.class);
+                String targetId = "input_" + field.getName() + "_" + uniqueId;
+                String[] sourceFields = computeAnno.fields();
+                
+                if (sourceFields != null && sourceFields.length > 0) {
+                    script.append("function compute_").append(field.getName()).append("_").append(uniqueId).append("() {\n")
+                          .append("  const target = document.getElementById('").append(targetId).append("');\n");
+                    
+                    for (String source : sourceFields) {
+                        script.append("  const el_").append(source).append(" = document.getElementById('input_").append(source).append("_").append(uniqueId).append("');\n")
+                              .append("  const val_").append(source).append(" = el_").append(source).append(" ? (parseFloat(el_").append(source).append(".value) || 0) : 0;\n");
+                    }
+                    
+                    script.append("  let result = 0;\n");
+                    
+                    OperationType op = computeAnno.operation();
+                    if (op == OperationType.SUM) {
+                        for (String source : sourceFields) script.append("  result += val_").append(source).append(";\n");
+                    } else if (op == OperationType.SUBTRACTION) {
+                        script.append("  result = val_").append(sourceFields[0]).append(";\n");
+                        for (int i = 1; i < sourceFields.length; i++) script.append("  result -= val_").append(sourceFields[i]).append(";\n");
+                    } else if (op == OperationType.MULT) {
+                        script.append("  result = 1;\n");
+                        for (String source : sourceFields) script.append("  result *= val_").append(source).append(";\n");
+                    } else if (op == OperationType.DIV) {
+                        script.append("  result = val_").append(sourceFields[0]).append(";\n");
+                        for (int i = 1; i < sourceFields.length; i++) script.append("  if(val_").append(sourceFields[i]).append(" !== 0) result /= val_").append(sourceFields[i]).append(";\n");
+                    } else if (op == OperationType.PERCENTAGE) {
+                        if (sourceFields.length >= 2) script.append("  result = (val_").append(sourceFields[0]).append(" * val_").append(sourceFields[1]).append(") / 100;\n");
+                    }
+                    
+                    script.append("  if(target) target.value = result.toFixed(2);\n")
+                          .append("}\n");
+                    
+                    for (String source : sourceFields) {
+                        script.append("document.getElementById('input_").append(source).append("_").append(uniqueId).append("').addEventListener('input', compute_").append(field.getName()).append("_").append(uniqueId).append(");\n");
+                    }
+                }
+            }
+        }
 
         this.add(new Script(script.toString()));
     }
