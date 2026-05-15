@@ -34,6 +34,7 @@ public class CrudView extends UIComponent {
     private String reportOrientation = "PORTRAIT";
     private String reportHeaderColor = "#000000";
     private String reportCustomTitle = "";
+    private boolean editable = false;
 
     private Modal crudModal;
     private Modal reportModal;
@@ -75,6 +76,7 @@ public class CrudView extends UIComponent {
     public CrudView setReportOrientation(String orientation) { this.reportOrientation = orientation; return this; }
     public CrudView setReportHeaderColor(String color) { this.reportHeaderColor = color; return this; }
     public CrudView setReportCustomTitle(String title) { this.reportCustomTitle = title; return this; }
+    public CrudView setEditable(boolean editable) { this.editable = editable; return this; }
 
     public CrudView setTitle(String title) {
         this.title = title;
@@ -116,7 +118,9 @@ public class CrudView extends UIComponent {
 
         Field[] fields = modelClass.getDeclaredFields();
         for (Field field : fields) {
-            headerRow.add(new TD(getFieldLabel(field)));
+            if (!field.isAnnotationPresent(io.jettra.wui.core.annotations.Hidden.class)) {
+                headerRow.add(new TD(getFieldLabel(field)));
+            }
         }
 
         TD actionsTdHeader = new TD();
@@ -175,7 +179,39 @@ public class CrudView extends UIComponent {
                                 displayValue = val.toString();
                             }
                         }
-                        dataRow.add(new TD(displayValue));
+                        
+                        TD td = new TD();
+                        if (this.editable && !field.isAnnotationPresent(Hidden.class)) {
+                            boolean isReadonly = field.isAnnotationPresent(NoEditable.class);
+                            if (field.isAnnotationPresent(Compute.class) && !field.getAnnotation(Compute.class).editable()) {
+                                isReadonly = true;
+                            }
+                            if (field.isAnnotationPresent(ViewSelectOne.class)) {
+                                ViewSelectOne anno = field.getAnnotation(ViewSelectOne.class);
+                                SelectOne select = new SelectOne("table_" + field.getName() + "_" + item.hashCode());
+                                populateSelectOptions(select, anno.source(), anno.method(), anno.label(), anno.filter());
+                                if (val != null) select.setProperty("value", getIdValueForSource(val));
+                                if (isReadonly) select.setStyle("pointer-events", "none").setStyle("background-color", "var(--jettra-bg-muted, #f0f0f0)");
+                                else select.setStyle("background-color", "var(--jettra-bg, #fff)").setStyle("color", "var(--jettra-text, #000)");
+                                td.add(select);
+                            } else {
+                                TextBox textBox = new TextBox("text", "table_" + field.getName() + "_" + item.hashCode());
+                                textBox.setProperty("value", displayValue);
+                                textBox.setStyle("width", "100%").setStyle("box-sizing", "border-box").setStyle("padding", "4px").setStyle("border", "1px solid var(--jettra-border, #ccc)");
+                                if (isReadonly) {
+                                    textBox.setReadonly(true);
+                                    textBox.setStyle("background-color", "var(--jettra-bg-muted, #f0f0f0)");
+                                    textBox.setStyle("color", "var(--jettra-text-muted, #555)");
+                                    textBox.setStyle("cursor", "not-allowed");
+                                } else {
+                                    textBox.setStyle("background-color", "var(--jettra-bg, #fff)").setStyle("color", "var(--jettra-text, #000)");
+                                }
+                                td.add(textBox);
+                            }
+                        } else {
+                            td.setContent(displayValue);
+                        }
+                        dataRow.add(td);
                     }
 
                     TD actionsTd = new TD();
@@ -434,8 +470,8 @@ public class CrudView extends UIComponent {
                 
                 if (isReadonly) {
                     text.setReadonly(true);
-                    text.setStyle("background-color", "#f0f0f0");
-                    text.setStyle("color", "#333333"); // Fix for text color visibility on gray background
+                    text.setStyle("background-color", "var(--jettra-bg-muted, #f0f0f0)");
+                    text.setStyle("color", "var(--jettra-text-muted, #555555)"); // Fix for text color visibility on gray background
                     text.setStyle("cursor", "not-allowed");
                 }
                 

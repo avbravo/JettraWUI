@@ -66,4 +66,9 @@ public @interface CrudView {
      * Header text color in hex format.
      */
     String reportHeaderColor() default "#000000";
+
+    /**
+     * Enable inline editable datatable.
+     */
+    boolean editable() default false;
 }

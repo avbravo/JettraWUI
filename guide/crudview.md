@@ -25,6 +25,7 @@ public class PaisPage extends Page {
 
 - **model**: La clase del modelo (ej. `Pais.class`).
 - **repository**: La clase del repositorio (ej. `PaisRepository.class`). El repositorio debe contar con métodos estáticos `findAll()`, `save(model)` y `delete(id)`.
+- **editable**: Convierte el listado de datos en una tabla (datatable) con campos editables en línea para el modelo proporcionado. Por defecto es `false`.
 - **report**: Activa el botón de impresión en la vista. Por defecto es `false`.
 - **reportShowViewer**: Muestra un visor de reporte antes de generar el archivo. Por defecto es `true`.
 - **reportAllowPrint**: Habilita el botón imprimir en el visor. Por defecto es `true`.
@@ -50,6 +51,14 @@ La interfaz generada por `@CrudView` está completamente integrada de forma nati
 2.  **Generación de la Interfaz del Visor**: El visor nativo muestra una vista previa del reporte en el navegador. Transforma las secciones configuradas (Header, Detail/Columnas derivadas del Modelo) en componentes HTML (Tablas, Párrafos) de JettraWUI.
 3.  **Gestión de Exportación**: Dependiendo de las variables `reportAllowPdf`, `reportAllowExcel`, `reportAllowCsv` y `reportAllowPrint`, el toolbar superior del visor habilitará los respectivos botones de exportación o impresión.
 4.  **Redimensionamiento**: El visor incrustado posee la opción de escalar su tamaño visual dinámicamente en pantalla (p. ej. a 50%, 75%, Original o Maximizar al 100%) a través de un control `<select>` integrado en la barra de herramientas del diálogo de previsualización.
+
+## DataTables Editables
+
+Puedes activar la edición en línea de los registros usando el atributo `editable = true`. Cuando este atributo está activo, las celdas del datatable no renderizarán simple texto estático, sino controles interactivos (`TextBox`, `SelectOne`, etc.) de JettraWUI, que permiten manipular los datos directamente desde la vista del listado. 
+
+- El framework detecta las anotaciones `@NoEditable`, `@Compute` y cambia el estilo del elemento para indicar que es de sólo lectura.
+- Con el uso de CSS variables (ej. `var(--jettra-bg-muted)`) se asegura la correcta visibilidad del texto sobre fondos desactivados tanto en modos claros como oscuros.
+
 ## Configuración del Proyecto
 
 Asegúrese de tener las dependencias de Google AutoService y JavaPoet en su `pom.xml`:

@@ -221,6 +221,7 @@ public class JettraMVC {
                 CrudHandler<?> handler = getCrudHandler(page.getClass());
 
                 io.jettra.wui.complex.CrudView crudComponent = new io.jettra.wui.complex.CrudView(modelClass, repoClass, msg, handler);
+                crudComponent.setEditable(anno.editable());
                 crudComponent.setReportEnabled(anno.report());
                 crudComponent.setReportShowViewer(anno.reportShowViewer());
                 crudComponent.setReportAllowPrint(anno.reportAllowPrint());
