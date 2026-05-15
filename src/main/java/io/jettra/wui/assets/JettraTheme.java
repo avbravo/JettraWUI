@@ -164,6 +164,7 @@ public class JettraTheme {
             ".j-btn-primary { background: linear-gradient(135deg, var(--jettra-accent), #0891b2); color: #000; border: none; box-shadow: 0 4px 15px rgba(0,255,255,0.3); }\n" +
             ".j-input { background: rgba(0,0,0,0.3); border: 1px solid var(--jettra-border); color: var(--jettra-text); padding: 12px 16px; border-radius: 8px; width: 100%; transition: all 0.3s; }\n" +
             ".j-input:focus { border-color: var(--jettra-accent); box-shadow: 0 0 10px var(--jettra-glow); outline: none; }\n" +
+            ".j-input[readonly], .j-input:disabled { background: var(--jettra-glass); color: var(--jettra-text) !important; opacity: 0.7; cursor: not-allowed; border-style: dashed; }\n" +
             ".j-table { width: 100%; border-collapse: separate; border-spacing: 0; }\n" +
             ".j-table th { background: rgba(0,255,255,0.05); color: var(--jettra-accent); text-align: left; padding: 15px; font-weight: 700; border-bottom: 2px solid var(--jettra-border); }\n" +
             ".j-table td { padding: 15px; border-bottom: 1px solid var(--jettra-border); transition: background 0.2s; }\n" +
