@@ -56,8 +56,28 @@ La interfaz generada por `@CrudView` está completamente integrada de forma nati
 
 Puedes activar la edición en línea de los registros usando el atributo `editable = true`. Cuando este atributo está activo, las celdas del datatable no renderizarán simple texto estático, sino controles interactivos (`TextBox`, `SelectOne`, etc.) de JettraWUI, que permiten manipular los datos directamente desde la vista del listado. 
 
-- El framework detecta las anotaciones `@NoEditable`, `@Compute` y cambia el estilo del elemento para indicar que es de sólo lectura.
-- Con el uso de CSS variables (ej. `var(--jettra-bg-muted)`) se asegura la correcta visibilidad del texto sobre fondos desactivados tanto en modos claros como oscuros.
+- El framework detecta las anotaciones `@NoEditable`, `@Hidden` y `@Compute`, ajustando la visibilidad y editabilidad de los campos automáticamente.
+- El color del texto en campos de solo lectura se ajusta automáticamente para garantizar contraste y legibilidad (usando `var(--jettra-text)`).
+
+## Soporte para Reglas de Negocio (@Rules)
+
+`CrudView` integra el motor de **JettraRules** para proporcionar validaciones en tiempo real tanto en los formularios modales como en los DataTables editables.
+
+- Las anotaciones `@Rules` definidas en el modelo se traducen automáticamente a lógica JavaScript inyectada en la vista.
+- Soporta operadores como `greater`, `lessorequals`, `less`, `greaterorequals` y `equals`.
+- Proporciona retroalimentación visual inmediata (bordes rojos) y bloquea el envío de formularios si hay violaciones de reglas.
+- Se integra con `@Compute` para revalidar reglas automáticamente cuando un campo calculado cambia.
+
+### Ejemplo de Reglas en Modelo
+```java
+public class ReglasModel {
+    @Rules(apply="greater", than="0", message="Saldo debe ser positivo")
+    private Double saldo;
+
+    @Rules(apply="lessorequals", than="saldo", message="Descuento excedido")
+    private Double descuento;
+}
+```
 
 ## Configuración del Proyecto
 

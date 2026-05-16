@@ -155,6 +155,9 @@ public class CrudView extends UIComponent {
                 for (Object item : items) {
                     Row dataRow = new Row();
                     for (Field field : fields) {
+                        if (field.isAnnotationPresent(io.jettra.wui.core.annotations.Hidden.class)) {
+                            continue;
+                        }
                         field.setAccessible(true);
                         Object val = field.get(item);
                         
@@ -470,9 +473,11 @@ public class CrudView extends UIComponent {
                 
                 if (isReadonly) {
                     text.setReadonly(true);
-                    text.setStyle("background-color", "var(--jettra-bg-muted, #f0f0f0)");
-                    text.setStyle("color", "var(--jettra-text-muted, #555555)"); // Fix for text color visibility on gray background
+                    text.setStyle("background-color", "rgba(48, 54, 61, 0.5)"); // Subtle dark contrast
+                    text.setStyle("color", "var(--jettra-text, #ffffff)"); // Clear text
                     text.setStyle("cursor", "not-allowed");
+                    text.setStyle("opacity", "0.9");
+                    text.setStyle("border", "1px solid rgba(255,255,255,0.1)");
                 }
                 
                 input = text;
@@ -640,6 +645,91 @@ public class CrudView extends UIComponent {
         script.append("  }\n")
               .append("}\n");
 
+        // Helper for toast notifications
+        script.append("function showToast_").append(uniqueId).append("(msg, type) {\n")
+              .append("  let toast = document.getElementById('j-toast-").append(uniqueId).append("');\n")
+              .append("  if(!toast) {\n")
+              .append("    toast = document.createElement('div');\n")
+              .append("    toast.id = 'j-toast-").append(uniqueId).append("';\n")
+              .append("    toast.style = 'position:fixed;top:20px;right:20px;z-index:99999;padding:12px 20px;border-radius:8px;color:white;font-weight:bold;transition:all 0.3s;display:none;';\n")
+              .append("    document.body.appendChild(toast);\n")
+              .append("  }\n")
+              .append("  toast.innerText = msg;\n")
+              .append("  toast.style.backgroundColor = type === 'error' ? 'rgba(239, 68, 68, 0.9)' : 'rgba(16, 185, 129, 0.9)';\n")
+              .append("  toast.style.display = 'block';\n")
+              .append("  toast.style.opacity = '1';\n")
+              .append("  setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.style.display='none', 300); }, 3000);\n")
+              .append("}\n");
+
+        // Add Rules validation logic
+        script.append("function validateRules_").append(uniqueId).append("(data) {\n")
+              .append("  let errors = [];\n");
+
+        for (Field field : modelClass.getDeclaredFields()) {
+            if (field.isAnnotationPresent(io.jettra.rules.annotations.Rules.class)) {
+                io.jettra.rules.annotations.Rules rule = field.getAnnotation(io.jettra.rules.annotations.Rules.class);
+                String fieldName = field.getName();
+                String apply = rule.apply();
+                String than = rule.than();
+                String message = rule.message();
+
+                script.append("  {\n")
+                      .append("    const val = parseFloat(document.getElementById('input_").append(fieldName).append("_").append(uniqueId).append("').value) || 0;\n");
+                
+                if (than.matches("-?\\d+(\\.\\d+)?")) {
+                    script.append("    const thanVal = ").append(than).append(";\n");
+                } else {
+                    script.append("    const thanVal = parseFloat(document.getElementById('input_").append(than).append("_").append(uniqueId).append("').value) || 0;\n");
+                }
+
+                if ("greater".equals(apply)) {
+                    script.append("    if (!(val > thanVal)) errors.push('").append(message).append("');\n");
+                } else if ("lessorequals".equals(apply)) {
+                    script.append("    if (!(val <= thanVal)) errors.push('").append(message).append("');\n");
+                } else if ("less".equals(apply)) {
+                    script.append("    if (!(val < thanVal)) errors.push('").append(message).append("');\n");
+                } else if ("greaterorequals".equals(apply)) {
+                    script.append("    if (!(val >= thanVal)) errors.push('").append(message).append("');\n");
+                } else if ("equals".equals(apply)) {
+                    script.append("    if (val !== thanVal) errors.push('").append(message).append("');\n");
+                }
+                
+                script.append("  }\n");
+            }
+        }
+        script.append("  return errors;\n")
+              .append("}\n");
+
+        script.append("document.getElementById('crudForm_").append(uniqueId).append("').onsubmit = function(e) {\n")
+              .append("  if(document.getElementById('crudAction_").append(uniqueId).append("').value === 'delete') return true;\n")
+              .append("  const errs = validateRules_").append(uniqueId).append("();\n")
+              .append("  if(errs.length > 0) {\n")
+              .append("    showToast_").append(uniqueId).append("('Error: ' + errs[0], 'error');\n")
+              .append("    e.preventDefault();\n")
+              .append("    return false;\n")
+              .append("  }\n")
+              .append("  return true;\n")
+              .append("};\n");
+
+        // Real-time notification support
+        for (Field field : modelClass.getDeclaredFields()) {
+            if (field.isAnnotationPresent(io.jettra.rules.annotations.Rules.class)) {
+                script.append("document.getElementById('input_").append(field.getName()).append("_").append(uniqueId).append("').addEventListener('input', () => {\n")
+                      .append("  const errs = validateRules_").append(uniqueId).append("();\n")
+                      .append("  const input = document.getElementById('input_").append(field.getName()).append("_").append(uniqueId).append("');\n")
+                      .append("  const myErrs = errs.filter(e => e.includes('").append(field.getName()).append("') || e.includes('").append(field.getAnnotation(io.jettra.rules.annotations.Rules.class).message()).append("'));\n")
+                      .append("  if(myErrs.length > 0) {\n")
+                      .append("    input.style.borderColor = '#ef4444';\n")
+                      .append("    input.style.boxShadow = '0 0 8px rgba(239, 68, 68, 0.4)';\n")
+                      .append("    showToast_").append(uniqueId).append("(myErrs[0], 'error');\n")
+                      .append("  } else {\n")
+                      .append("    input.style.borderColor = '';\n")
+                      .append("    input.style.boxShadow = '';\n")
+                      .append("  }\n")
+                      .append("});\n");
+            }
+        }
+
         // Add Compute logic
         for (Field field : modelClass.getDeclaredFields()) {
             if (field.isAnnotationPresent(Compute.class)) {
@@ -675,6 +765,9 @@ public class CrudView extends UIComponent {
                     }
                     
                     script.append("  if(target) target.value = result.toFixed(2);\n")
+                          .append("  // Trigger rules validation after compute\n")
+                          .append("  const inputEvent = new Event('input', { bubbles: true });\n")
+                          .append("  if(target) target.dispatchEvent(inputEvent);\n")
                           .append("}\n");
                     
                     for (String source : sourceFields) {
