@@ -154,6 +154,8 @@ public class CrudView extends UIComponent {
             if (items != null) {
                 for (Object item : items) {
                     Row dataRow = new Row();
+                    String idValue = (handler != null) ? ((CrudHandler<Object>)handler).getIdValue(item) : getIdValue(item);
+                    
                     for (Field field : fields) {
                         if (field.isAnnotationPresent(io.jettra.wui.core.annotations.Hidden.class)) {
                             continue;
@@ -191,14 +193,20 @@ public class CrudView extends UIComponent {
                             }
                             if (field.isAnnotationPresent(ViewSelectOne.class)) {
                                 ViewSelectOne anno = field.getAnnotation(ViewSelectOne.class);
-                                SelectOne select = new SelectOne("table_" + field.getName() + "_" + item.hashCode());
+                                SelectOne select = new SelectOne("table_" + field.getName() + "_" + idValue);
+                                select.setId("table_" + field.getName() + "_" + idValue);
                                 populateSelectOptions(select, anno.source(), anno.method(), anno.label(), anno.filter());
                                 if (val != null) select.setProperty("value", getIdValueForSource(val));
-                                if (isReadonly) select.setStyle("pointer-events", "none").setStyle("background-color", "var(--jettra-bg-muted, #f0f0f0)");
-                                else select.setStyle("background-color", "var(--jettra-bg, #fff)").setStyle("color", "var(--jettra-text, #000)");
+                                if (isReadonly) {
+                                    select.setStyle("pointer-events", "none").setStyle("background-color", "var(--jettra-bg-muted, #f0f0f0)");
+                                } else {
+                                    select.setStyle("background-color", "var(--jettra-bg, #fff)").setStyle("color", "var(--jettra-text, #000)");
+                                    select.setProperty("onchange", "saveInlineEdit_" + uniqueId + "('" + idValue + "', '" + field.getName() + "', this.value)");
+                                }
                                 td.add(select);
                             } else {
-                                TextBox textBox = new TextBox("text", "table_" + field.getName() + "_" + item.hashCode());
+                                TextBox textBox = new TextBox("text", "table_" + field.getName() + "_" + idValue);
+                                textBox.setId("table_" + field.getName() + "_" + idValue);
                                 textBox.setProperty("value", displayValue);
                                 textBox.setStyle("width", "100%").setStyle("box-sizing", "border-box").setStyle("padding", "4px").setStyle("border", "1px solid var(--jettra-border, #ccc)");
                                 if (isReadonly) {
@@ -208,6 +216,7 @@ public class CrudView extends UIComponent {
                                     textBox.setStyle("cursor", "not-allowed");
                                 } else {
                                     textBox.setStyle("background-color", "var(--jettra-bg, #fff)").setStyle("color", "var(--jettra-text, #000)");
+                                    textBox.setProperty("onchange", "saveInlineEdit_" + uniqueId + "('" + idValue + "', '" + field.getName() + "', this.value)");
                                 }
                                 td.add(textBox);
                             }
@@ -218,7 +227,6 @@ public class CrudView extends UIComponent {
                     }
 
                     TD actionsTd = new TD();
-                    String idValue = (handler != null) ? ((CrudHandler<Object>)handler).getIdValue(item) : getIdValue(item);
                     String jsonData = (handler != null) ? getJsonDataFromMap(((CrudHandler<Object>)handler).getJsonMap(item)) : getJsonData(item);
 
                     Button editBtn = new Button("✏️")
@@ -448,11 +456,27 @@ public class CrudView extends UIComponent {
                 ViewSelectOne anno = field.getAnnotation(ViewSelectOne.class);
                 SelectOne select = new SelectOne(field.getName()).setId("input_" + field.getName() + "_" + uniqueId);
                 populateSelectOptions(select, anno.source(), anno.method(), anno.label(), anno.filter());
+                if (field.isAnnotationPresent(NoEditable.class)) {
+                    select.setStyle("pointer-events", "none")
+                          .setStyle("background-color", "rgba(48, 54, 61, 0.5)")
+                          .setStyle("color", "var(--jettra-text, #ffffff)")
+                          .setStyle("cursor", "not-allowed")
+                          .setStyle("opacity", "0.9")
+                          .setStyle("border", "1px solid rgba(255,255,255,0.1)");
+                }
                 input = select;
             } else if (field.isAnnotationPresent(ViewSelectMany.class)) {
                 ViewSelectMany anno = field.getAnnotation(ViewSelectMany.class);
                 SelectMany select = new SelectMany(field.getName()).setId("input_" + field.getName() + "_" + uniqueId);
                 populateSelectOptions(select, anno.source(), anno.method(), anno.label(), anno.filter());
+                if (field.isAnnotationPresent(NoEditable.class)) {
+                    select.setStyle("pointer-events", "none")
+                          .setStyle("background-color", "rgba(48, 54, 61, 0.5)")
+                          .setStyle("color", "var(--jettra-text, #ffffff)")
+                          .setStyle("cursor", "not-allowed")
+                          .setStyle("opacity", "0.9")
+                          .setStyle("border", "1px solid rgba(255,255,255,0.1)");
+                }
                 input = select;
             } else {
                 TextBox text = new TextBox(isHidden ? "hidden" : "text", field.getName()).setId("input_" + field.getName() + "_" + uniqueId);
@@ -527,6 +551,19 @@ public class CrudView extends UIComponent {
         return defaultValue;
     }
 
+    private String getIdFieldName() {
+        try {
+            modelClass.getDeclaredField("code");
+            return "code";
+        } catch (Exception e) {
+            try {
+                modelClass.getDeclaredField("id");
+                return "id";
+            } catch (Exception e2) {}
+        }
+        return modelClass.getDeclaredFields()[0].getName();
+    }
+
     private String getIdValue(Object item) throws Exception {
         Field idField = modelClass.getDeclaredFields()[0];
         try {
@@ -589,6 +626,38 @@ public class CrudView extends UIComponent {
 
     private void injectScripts(String uniqueId) {
         StringBuilder script = new StringBuilder();
+        
+        script.append("function saveInlineEdit_").append(uniqueId).append("(id, fieldName, value) {\n")
+              .append("  console.log('saveInlineEdit_', id, fieldName, value);\n")
+              .append("  const params = new URLSearchParams();\n")
+              .append("  params.append('action', 'save');\n")
+              .append("  params.append('").append(getIdFieldName()).append("', id);\n");
+
+        for (Field field : modelClass.getDeclaredFields()) {
+            if (field.isAnnotationPresent(Hidden.class)) {
+                continue;
+            }
+            script.append("  const el_").append(field.getName()).append(" = document.getElementById('table_").append(field.getName()).append("_' + id);\n")
+                  .append("  if (el_").append(field.getName()).append(") {\n")
+                  .append("    params.append('").append(field.getName()).append("', el_").append(field.getName()).append(".value);\n")
+                  .append("  }\n");
+        }
+
+        script.append("  fetch(window.location.pathname + window.location.search, {\n")
+              .append("    method: 'POST',\n")
+              .append("    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },\n")
+              .append("    body: params.toString()\n")
+              .append("  }).then(r => {\n")
+              .append("    if(r.ok) {\n")
+              .append("      window.location.reload();\n")
+              .append("    } else {\n")
+              .append("      showToast_").append(uniqueId).append("('Error saving change', 'error');\n")
+              .append("    }\n")
+              .append("  }).catch(err => {\n")
+              .append("    showToast_").append(uniqueId).append("('Network error saving change', 'error');\n")
+              .append("  });\n")
+              .append("}\n\n");
+
         script.append("function showCrudModal_").append(uniqueId).append("(action, isEdit, data) {\n")
               .append("  console.log('showCrudModal_").append(uniqueId).append("', action, isEdit, data);\n")
               .append("  const modal = document.getElementById('crudModal_").append(uniqueId).append("');\n")

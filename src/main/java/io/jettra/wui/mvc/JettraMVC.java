@@ -139,8 +139,15 @@ public class JettraMVC {
                         field.set(model, value);
                     } else if (field.getType().equals(int.class) || field.getType().equals(Integer.class)) {
                         field.set(model, Integer.parseInt(value));
+                    } else if (field.getType().equals(double.class) || field.getType().equals(Double.class)) {
+                        field.set(model, Double.parseDouble(value));
+                    } else if (field.getType().equals(float.class) || field.getType().equals(Float.class)) {
+                        field.set(model, Float.parseFloat(value));
+                    } else if (field.getType().equals(long.class) || field.getType().equals(Long.class)) {
+                        field.set(model, Long.parseLong(value));
+                    } else if (field.getType().equals(boolean.class) || field.getType().equals(Boolean.class)) {
+                        field.set(model, Boolean.parseBoolean(value));
                     }
-                    // Add more types as needed
                 } catch (Exception e) {
                     System.err.println("Error setting field " + field.getName() + ": " + e.getMessage());
                 }
