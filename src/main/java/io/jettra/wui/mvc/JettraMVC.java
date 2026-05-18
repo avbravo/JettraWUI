@@ -242,6 +242,7 @@ public class JettraMVC {
                 crudComponent.setReportOrientation(anno.reportOrientation());
                 crudComponent.setReportCustomTitle(anno.reportTitle());
                 crudComponent.setReportHeaderColor(anno.reportHeaderColor());
+                crudComponent.setParentPage(page);
                 crudComponent.build();
                 // Buscar el Center en JettraDashboardPage si aplica
                 try {

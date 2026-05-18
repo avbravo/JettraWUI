@@ -35,6 +35,7 @@ public class CrudView extends UIComponent {
     private String reportHeaderColor = "#000000";
     private String reportCustomTitle = "";
     private boolean editable = false;
+    private io.jettra.wui.core.Page parentPage;
 
     private Modal crudModal;
     private Modal reportModal;
@@ -77,6 +78,7 @@ public class CrudView extends UIComponent {
     public CrudView setReportHeaderColor(String color) { this.reportHeaderColor = color; return this; }
     public CrudView setReportCustomTitle(String title) { this.reportCustomTitle = title; return this; }
     public CrudView setEditable(boolean editable) { this.editable = editable; return this; }
+    public CrudView setParentPage(io.jettra.wui.core.Page parentPage) { this.parentPage = parentPage; return this; }
 
     public CrudView setTitle(String title) {
         this.title = title;
@@ -198,9 +200,12 @@ public class CrudView extends UIComponent {
                                 populateSelectOptions(select, anno.source(), anno.method(), anno.label(), anno.filter());
                                 if (val != null) select.setProperty("value", getIdValueForSource(val));
                                 if (isReadonly) {
-                                    select.setStyle("pointer-events", "none").setStyle("background-color", "var(--jettra-bg-muted, #f0f0f0)");
+                                    select.setStyle("pointer-events", "none")
+                                          .setStyle("background", "transparent")
+                                          .setStyle("color", "var(--jettra-text, #ffffff)")
+                                          .setStyle("border", "none");
                                 } else {
-                                    select.setStyle("background-color", "var(--jettra-bg, #fff)").setStyle("color", "var(--jettra-text, #000)");
+                                    select.setStyle("background", "var(--jettra-glass, rgba(0,0,0,0.3))").setStyle("color", "var(--jettra-text, #ffffff)");
                                     select.setProperty("onchange", "saveInlineEdit_" + uniqueId + "('" + idValue + "', '" + field.getName() + "', this.value)");
                                 }
                                 td.add(select);
@@ -221,11 +226,12 @@ public class CrudView extends UIComponent {
                                 textBox.setStyle("width", "100%").setStyle("box-sizing", "border-box").setStyle("padding", "4px").setStyle("border", "1px solid var(--jettra-border, #ccc)");
                                 if (isReadonly) {
                                     textBox.setReadonly(true);
-                                    textBox.setStyle("background-color", "var(--jettra-bg-muted, #f0f0f0)");
-                                    textBox.setStyle("color", "var(--jettra-text-muted, #555)");
+                                    textBox.setStyle("background", "transparent");
+                                    textBox.setStyle("color", "var(--jettra-text, #ffffff)");
                                     textBox.setStyle("cursor", "not-allowed");
+                                    textBox.setStyle("border", "none");
                                 } else {
-                                    textBox.setStyle("background-color", "var(--jettra-bg, #fff)").setStyle("color", "var(--jettra-text, #000)");
+                                    textBox.setStyle("background", "var(--jettra-glass, rgba(0,0,0,0.3))").setStyle("color", "var(--jettra-text, #ffffff)");
                                     textBox.setProperty("onchange", "saveInlineEdit_" + uniqueId + "('" + idValue + "', '" + field.getName() + "', this.value)");
                                 }
                                 td.add(textBox);
@@ -256,7 +262,8 @@ public class CrudView extends UIComponent {
             System.err.println("[CrudView] Error loading items: " + e.getMessage());
         }
 
-        mainCard.add(table);
+        Div tableWrapper = new Div().setStyle("display", "flex").setStyle("flex-direction", "column").setStyle("width", "100%").setStyle("gap", "20px");
+        tableWrapper.add(table);
 
         if (this.editable) {
             Field computeField = null;
@@ -275,9 +282,11 @@ public class CrudView extends UIComponent {
                 Header sumHeader = new Header(3, "Gran Total " + labelStr + ": $<span id='gran_total_" + uniqueId + "'>0.00</span>");
                 sumHeader.setStyle("color", "#238636");
                 sumContainer.add(sumHeader);
-                mainCard.add(sumContainer);
+                tableWrapper.add(sumContainer);
             }
         }
+
+        mainCard.add(tableWrapper);
 
         this.add(mainCard);
         this.add(crudModal);
@@ -311,7 +320,24 @@ public class CrudView extends UIComponent {
                 return;
             }
 
-            Object reportInstance = reportClass.getConstructor(String.class).newInstance("Reporte de " + modelClass.getSimpleName());
+            Object reportInstance = null;
+            boolean isCustomReport = false;
+            if (parentPage != null) {
+                try {
+                    Method getCustomReport = parentPage.getClass().getMethod("getCustomReport");
+                    reportInstance = getCustomReport.invoke(parentPage);
+                    isCustomReport = true;
+                    System.out.println("[CrudView] Loaded custom report from page class: " + parentPage.getClass().getName());
+                } catch (NoSuchMethodException e) {
+                    // No custom report method
+                } catch (Exception e) {
+                    System.err.println("[CrudView] Error loading custom report: " + e.getMessage());
+                }
+            }
+
+            if (reportInstance == null) {
+                reportInstance = reportClass.getConstructor(String.class).newInstance("Reporte de " + modelClass.getSimpleName());
+            }
             
             // Set data
             Method setData = reportClass.getMethod("setData", List.class);
@@ -329,54 +355,56 @@ public class CrudView extends UIComponent {
             }
             setData.invoke(reportInstance, items);
             
-            // Page Orientation
-            try {
-                Object pageSettings = reportClass.getMethod("getPageSettings").invoke(reportInstance);
-                Class<?> orientationEnum = Class.forName("com.jettra.report.Report$PageSettings$Orientation", true, loader);
-                Object orientationVal = Enum.valueOf((Class<Enum>)orientationEnum, reportOrientation.toUpperCase());
-                pageSettings.getClass().getMethod("setOrientation", orientationEnum).invoke(pageSettings, orientationVal);
-            } catch (Exception e) {
-                System.err.println("[CrudView] Error setting orientation: " + e.getMessage());
-            }
-
-            // Header
-            Object headerObj = reportClass.getMethod("getHeader").invoke(reportInstance);
-            Class<?> headerClass = headerObj.getClass();
-            Class<?> reportElementClass = Class.forName("com.jettra.report.Report$ReportElement", true, loader);
-            Method addElement = headerClass.getMethod("addElement", reportElementClass);
-            Class<?> textElementClass = Class.forName("com.jettra.report.Report$TextElement", true, loader);
-            
-            String finalTitle = (reportCustomTitle != null && !reportCustomTitle.isEmpty()) ? reportCustomTitle : "LISTADO DE " + modelName.toUpperCase();
-            Object titleElement = textElementClass.getConstructor(String.class).newInstance(finalTitle);
-            
-            // Apply header color and bold
-            textElementClass.getMethod("setFontColor", String.class).invoke(titleElement, reportHeaderColor);
-            textElementClass.getMethod("setBold", boolean.class).invoke(titleElement, true);
-            textElementClass.getMethod("setFontSize", int.class).invoke(titleElement, 14);
-            
-            addElement.invoke(headerObj, titleElement);
-
-            // Table
-            Object detailObj = reportClass.getMethod("getDetail").invoke(reportInstance);
-            Class<?> tableClass = Class.forName("com.jettra.report.Report$Table", true, loader);
-            Object tableInstance = tableClass.getConstructor().newInstance();
-            Class<?> columnClass = Class.forName("com.jettra.report.Report$Column", true, loader);
-            Method addColumn = tableClass.getMethod("addColumn", columnClass);
-
-            Field[] fields = modelClass.getDeclaredFields();
-            for (Field field : fields) {
-                String lbl = getFieldLabel(field);
-                Object col = columnClass.getConstructor(String.class, String.class, int.class).newInstance(lbl, field.getName(), 150);
-                
-                if (field.getName().equalsIgnoreCase("id") || field.getName().equalsIgnoreCase("code")) {
-                    columnClass.getMethod("setFontColor", String.class).invoke(col, reportHeaderColor);
-                    columnClass.getMethod("setBold", boolean.class).invoke(col, true);
+            if (!isCustomReport) {
+                // Page Orientation
+                try {
+                    Object pageSettings = reportClass.getMethod("getPageSettings").invoke(reportInstance);
+                    Class<?> orientationEnum = Class.forName("com.jettra.report.Report$PageSettings$Orientation", true, loader);
+                    Object orientationVal = Enum.valueOf((Class<Enum>)orientationEnum, reportOrientation.toUpperCase());
+                    pageSettings.getClass().getMethod("setOrientation", orientationEnum).invoke(pageSettings, orientationVal);
+                } catch (Exception e) {
+                    System.err.println("[CrudView] Error setting orientation: " + e.getMessage());
                 }
+
+                // Header
+                Object headerObj = reportClass.getMethod("getHeader").invoke(reportInstance);
+                Class<?> headerClass = headerObj.getClass();
+                Class<?> reportElementClass = Class.forName("com.jettra.report.Report$ReportElement", true, loader);
+                Method addElement = headerClass.getMethod("addElement", reportElementClass);
+                Class<?> textElementClass = Class.forName("com.jettra.report.Report$TextElement", true, loader);
                 
-                addColumn.invoke(tableInstance, col);
+                String finalTitle = (reportCustomTitle != null && !reportCustomTitle.isEmpty()) ? reportCustomTitle : "LISTADO DE " + modelName.toUpperCase();
+                Object titleElement = textElementClass.getConstructor(String.class).newInstance(finalTitle);
+                
+                // Apply header color and bold
+                textElementClass.getMethod("setFontColor", String.class).invoke(titleElement, reportHeaderColor);
+                textElementClass.getMethod("setBold", boolean.class).invoke(titleElement, true);
+                textElementClass.getMethod("setFontSize", int.class).invoke(titleElement, 14);
+                
+                addElement.invoke(headerObj, titleElement);
+
+                // Table
+                Object detailObj = reportClass.getMethod("getDetail").invoke(reportInstance);
+                Class<?> tableClass = Class.forName("com.jettra.report.Report$Table", true, loader);
+                Object tableInstance = tableClass.getConstructor().newInstance();
+                Class<?> columnClass = Class.forName("com.jettra.report.Report$Column", true, loader);
+                Method addColumn = tableClass.getMethod("addColumn", columnClass);
+
+                Field[] fields = modelClass.getDeclaredFields();
+                for (Field field : fields) {
+                    String lbl = getFieldLabel(field);
+                    Object col = columnClass.getConstructor(String.class, String.class, int.class).newInstance(lbl, field.getName(), 150);
+                    
+                    if (field.getName().equalsIgnoreCase("id") || field.getName().equalsIgnoreCase("code")) {
+                        columnClass.getMethod("setFontColor", String.class).invoke(col, reportHeaderColor);
+                        columnClass.getMethod("setBold", boolean.class).invoke(col, true);
+                    }
+                    
+                    addColumn.invoke(tableInstance, col);
+                }
+                Method addDetailElement = detailObj.getClass().getMethod("addElement", reportElementClass);
+                addDetailElement.invoke(detailObj, tableInstance);
             }
-            Method addDetailElement = detailObj.getClass().getMethod("addElement", reportElementClass);
-            addDetailElement.invoke(detailObj, tableInstance);
 
             // ViewerOptions
             Object optionsObj = reportClass.getMethod("getViewerOptions").invoke(reportInstance);
