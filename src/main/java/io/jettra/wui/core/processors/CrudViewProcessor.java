@@ -130,6 +130,8 @@ public class CrudViewProcessor extends AbstractProcessor {
                 .addStatement("    else if (field.getType().equals(float.class) || field.getType().equals(Float.class)) field.set(model, Float.parseFloat(entry.getValue()))")
                 .addStatement("    else if (field.getType().equals(long.class) || field.getType().equals(Long.class)) field.set(model, Long.parseLong(entry.getValue()))")
                 .addStatement("    else if (field.getType().equals(boolean.class) || field.getType().equals(Boolean.class)) field.set(model, Boolean.parseBoolean(entry.getValue()))")
+                .addStatement("    else if (field.getType().equals(java.time.LocalDate.class)) field.set(model, java.time.LocalDate.parse(entry.getValue()))")
+                .addStatement("    else if (field.getType().equals(java.util.Date.class)) field.set(model, new java.text.SimpleDateFormat(\"yyyy-MM-dd\").parse(entry.getValue()))")
                 .addStatement("  } catch (Exception e) {}")
                 .addStatement("}");
         

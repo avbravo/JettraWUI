@@ -147,6 +147,10 @@ public class JettraMVC {
                         field.set(model, Long.parseLong(value));
                     } else if (field.getType().equals(boolean.class) || field.getType().equals(Boolean.class)) {
                         field.set(model, Boolean.parseBoolean(value));
+                    } else if (field.getType().equals(java.time.LocalDate.class)) {
+                        field.set(model, java.time.LocalDate.parse(value));
+                    } else if (field.getType().equals(java.util.Date.class)) {
+                        field.set(model, new java.text.SimpleDateFormat("yyyy-MM-dd").parse(value));
                     }
                 } catch (Exception e) {
                     System.err.println("Error setting field " + field.getName() + ": " + e.getMessage());

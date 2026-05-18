@@ -204,6 +204,16 @@ public class CrudView extends UIComponent {
                                     select.setProperty("onchange", "saveInlineEdit_" + uniqueId + "('" + idValue + "', '" + field.getName() + "', this.value)");
                                 }
                                 td.add(select);
+                            } else if (field.getType() == java.time.LocalDate.class || field.getType() == java.util.Date.class) {
+                                DatePicker datePicker = new DatePicker("table_" + field.getName() + "_" + idValue, "");
+                                if (val != null) datePicker.setValue(val.toString());
+                                datePicker.setStyle("width", "100%").setStyle("box-sizing", "border-box");
+                                if (isReadonly) {
+                                    datePicker.setEditable(false);
+                                } else {
+                                    datePicker.setOnChange("saveInlineEdit_" + uniqueId + "('" + idValue + "', '" + field.getName() + "', this.value)");
+                                }
+                                td.add(datePicker);
                             } else {
                                 TextBox textBox = new TextBox("text", "table_" + field.getName() + "_" + idValue);
                                 textBox.setId("table_" + field.getName() + "_" + idValue);
@@ -247,6 +257,28 @@ public class CrudView extends UIComponent {
         }
 
         mainCard.add(table);
+
+        if (this.editable) {
+            Field computeField = null;
+            for (Field field : fields) {
+                if (field.isAnnotationPresent(Compute.class)) {
+                    computeField = field;
+                    break;
+                }
+            }
+            if (computeField != null) {
+                String labelStr = getFieldLabel(computeField);
+                Div sumContainer = new Div().setStyle("margin-top", "20px")
+                        .setStyle("display", "flex")
+                        .setStyle("justify-content", "flex-end")
+                        .setStyle("padding-right", "20px");
+                Header sumHeader = new Header(3, "Gran Total " + labelStr + ": $<span id='gran_total_" + uniqueId + "'>0.00</span>");
+                sumHeader.setStyle("color", "#238636");
+                sumContainer.add(sumHeader);
+                mainCard.add(sumContainer);
+            }
+        }
+
         this.add(mainCard);
         this.add(crudModal);
         
@@ -478,6 +510,12 @@ public class CrudView extends UIComponent {
                           .setStyle("border", "1px solid rgba(255,255,255,0.1)");
                 }
                 input = select;
+            } else if (field.getType() == java.time.LocalDate.class || field.getType() == java.util.Date.class) {
+                DatePicker datePicker = new DatePicker("input_" + field.getName() + "_" + uniqueId, isHidden ? "" : getFieldLabel(field));
+                if (field.isAnnotationPresent(NoEditable.class)) {
+                    datePicker.setEditable(false);
+                }
+                input = datePicker;
             } else {
                 TextBox text = new TextBox(isHidden ? "hidden" : "text", field.getName()).setId("input_" + field.getName() + "_" + uniqueId);
                 if (!isHidden) {
@@ -643,6 +681,13 @@ public class CrudView extends UIComponent {
                   .append("  }\n");
         }
 
+        // Highlight Row
+        script.append("  const rowEl = document.getElementById('row_' + id + '_").append(uniqueId).append("');\n")
+              .append("  if (rowEl) {\n")
+              .append("    rowEl.style.transition = 'background-color 0.3s';\n")
+              .append("    rowEl.style.backgroundColor = 'rgba(0, 255, 255, 0.1)';\n")
+              .append("  }\n");
+
         script.append("  fetch(window.location.pathname + window.location.search, {\n")
               .append("    method: 'POST',\n")
               .append("    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },\n")
@@ -651,9 +696,11 @@ public class CrudView extends UIComponent {
               .append("    if(r.ok) {\n")
               .append("      window.location.reload();\n")
               .append("    } else {\n")
+              .append("      if (rowEl) rowEl.style.backgroundColor = '';\n")
               .append("      showToast_").append(uniqueId).append("('Error saving change', 'error');\n")
               .append("    }\n")
               .append("  }).catch(err => {\n")
+              .append("    if (rowEl) rowEl.style.backgroundColor = '';\n")
               .append("    showToast_").append(uniqueId).append("('Network error saving change', 'error');\n")
               .append("  });\n")
               .append("}\n\n");
@@ -843,6 +890,152 @@ public class CrudView extends UIComponent {
                         script.append("document.getElementById('input_").append(source).append("_").append(uniqueId).append("').addEventListener('input', compute_").append(field.getName()).append("_").append(uniqueId).append(");\n");
                     }
                 }
+            }
+        }
+
+        List<?> items = null;
+        try {
+            if (handler != null) {
+                items = (List<?>) handler.findAll();
+            } else {
+                Method findAll = repositoryClass.getMethod("findAll");
+                items = (List<?>) findAll.invoke(null);
+            }
+        } catch (Exception e) {
+            System.err.println("[CrudView] Error fetching items for script injection: " + e.getMessage());
+        }
+
+        if (this.editable && items != null) {
+            for (Object item : items) {
+                String idValue;
+                try {
+                    idValue = (handler != null) ? ((CrudHandler<Object>)handler).getIdValue(item) : getIdValue(item);
+                } catch (Exception e) {
+                    continue;
+                }
+                
+                // Add Compute logic for each row
+                for (Field field : modelClass.getDeclaredFields()) {
+                    if (field.isAnnotationPresent(Compute.class)) {
+                        Compute computeAnno = field.getAnnotation(Compute.class);
+                        String targetId = "table_" + field.getName() + "_" + idValue;
+                        String[] sourceFields = computeAnno.fields();
+                        
+                        if (sourceFields != null && sourceFields.length > 0) {
+                            script.append("function compute_row_").append(field.getName()).append("_").append(idValue).append("_").append(uniqueId).append("() {\n")
+                                  .append("  const target = document.getElementById('").append(targetId).append("');\n");
+                            
+                            for (String source : sourceFields) {
+                                script.append("  const el_").append(source).append(" = document.getElementById('table_").append(source).append("_").append(idValue).append("');\n")
+                                      .append("  const val_").append(source).append(" = el_").append(source).append(" ? (parseFloat(el_").append(source).append(".value) || 0) : 0;\n");
+                            }
+                            
+                            script.append("  let result = 0;\n");
+                            
+                            OperationType op = computeAnno.operation();
+                            if (op == OperationType.SUM) {
+                                for (String source : sourceFields) script.append("  result += val_").append(source).append(";\n");
+                            } else if (op == OperationType.SUBTRACTION) {
+                                script.append("  result = val_").append(sourceFields[0]).append(";\n");
+                                for (int i = 1; i < sourceFields.length; i++) script.append("  result -= val_").append(sourceFields[i]).append(";\n");
+                            } else if (op == OperationType.MULT) {
+                                script.append("  result = 1;\n");
+                                for (String source : sourceFields) script.append("  result *= val_").append(source).append(";\n");
+                            } else if (op == OperationType.DIV) {
+                                script.append("  result = val_").append(sourceFields[0]).append(";\n");
+                                for (int i = 1; i < sourceFields.length; i++) script.append("  if(val_").append(sourceFields[i]).append(" !== 0) result /= val_").append(sourceFields[i]).append(";\n");
+                            } else if (op == OperationType.PERCENTAGE) {
+                                if (sourceFields.length >= 2) script.append("  result = (val_").append(sourceFields[0]).append(" * val_").append(sourceFields[1]).append(") / 100;\n");
+                            }
+                            
+                            script.append("  if(target) target.value = result.toFixed(2);\n")
+                                  .append("  calculateGrandTotal_").append(uniqueId).append("();\n")
+                                  .append("}\n");
+                            
+                            for (String source : sourceFields) {
+                                script.append("const el_src_").append(source).append("_").append(idValue).append(" = document.getElementById('table_").append(source).append("_").append(idValue).append("');\n")
+                                      .append("if(el_src_").append(source).append("_").append(idValue).append(") {\n")
+                                      .append("  el_src_").append(source).append("_").append(idValue).append(".addEventListener('input', compute_row_").append(field.getName()).append("_").append(idValue).append("_").append(uniqueId).append(");\n")
+                                      .append("}\n");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Category to Price trigger for ArticuloModel (Modal Form)
+        if (modelClass.getSimpleName().equalsIgnoreCase("ArticuloModel")) {
+            script.append("function updateModalCategory_").append(uniqueId).append("() {\n")
+                  .append("  const catEl = document.getElementById('input_categoria_").append(uniqueId).append("');\n")
+                  .append("  const priceEl = document.getElementById('input_precio_").append(uniqueId).append("');\n")
+                  .append("  if (catEl && priceEl) {\n")
+                  .append("    const cat = catEl.value;\n")
+                  .append("    let newPrice = 0;\n")
+                  .append("    if (cat === 'electronic') newPrice = 10000.00;\n")
+                  .append("    else if (cat === 'accessory') newPrice = 456.00;\n")
+                  .append("    else if (cat === 'office') newPrice = 231.00;\n")
+                  .append("    priceEl.value = newPrice.toFixed(2);\n")
+                  .append("    const inputEvent = new Event('input', { bubbles: true });\n")
+                  .append("    priceEl.dispatchEvent(inputEvent);\n")
+                  .append("  }\n")
+                  .append("}\n")
+                  .append("const modalCatEl = document.getElementById('input_categoria_").append(uniqueId).append("');\n")
+                  .append("if(modalCatEl) {\n")
+                  .append("  modalCatEl.addEventListener('change', updateModalCategory_").append(uniqueId).append(");\n")
+                  .append("}\n");
+        }
+
+        // Category to Price trigger for ArticuloModel (Table Rows)
+        if (this.editable && modelClass.getSimpleName().equalsIgnoreCase("ArticuloModel") && items != null) {
+            for (Object item : items) {
+                String idValue;
+                try {
+                    idValue = (handler != null) ? ((CrudHandler<Object>)handler).getIdValue(item) : getIdValue(item);
+                } catch (Exception e) {
+                    continue;
+                }
+                script.append("function updateRowCategory_").append(idValue).append("_").append(uniqueId).append("() {\n")
+                      .append("  const catEl = document.getElementById('table_categoria_").append(idValue).append("');\n")
+                      .append("  const priceEl = document.getElementById('table_precio_").append(idValue).append("');\n")
+                      .append("  if (catEl && priceEl) {\n")
+                      .append("    const cat = catEl.value;\n")
+                      .append("    let newPrice = 0;\n")
+                      .append("    if (cat === 'electronic') newPrice = 10000.00;\n")
+                      .append("    else if (cat === 'accessory') newPrice = 456.00;\n")
+                      .append("    else if (cat === 'office') newPrice = 231.00;\n")
+                      .append("    priceEl.value = newPrice.toFixed(2);\n")
+                      .append("    const inputEvent = new Event('input', { bubbles: true });\n")
+                      .append("    priceEl.dispatchEvent(inputEvent);\n")
+                      .append("  }\n")
+                      .append("}\n")
+                      .append("const rowCatEl_").append(idValue).append(" = document.getElementById('table_categoria_").append(idValue).append("');\n")
+                      .append("if(rowCatEl_").append(idValue).append(") {\n")
+                      .append("  rowCatEl_").append(idValue).append(".addEventListener('change', updateRowCategory_").append(idValue).append("_").append(uniqueId).append(");\n")
+                      .append("}\n");
+            }
+        }
+
+        if (this.editable) {
+            Field computeField = null;
+            for (Field field : modelClass.getDeclaredFields()) {
+                if (field.isAnnotationPresent(Compute.class)) {
+                    computeField = field;
+                    break;
+                }
+            }
+            if (computeField != null) {
+                script.append("function calculateGrandTotal_").append(uniqueId).append("() {\n")
+                      .append("  let grandTotal = 0;\n")
+                      .append("  const rows = document.querySelectorAll('[id^=\"table_").append(computeField.getName()).append("_\"]');\n")
+                      .append("  rows.forEach(row => {\n")
+                      .append("    grandTotal += parseFloat(row.value) || parseFloat(row.innerText) || 0;\n")
+                      .append("  });\n")
+                      .append("  const gtEl = document.getElementById('gran_total_").append(uniqueId).append("');\n")
+                      .append("  if (gtEl) gtEl.innerText = grandTotal.toLocaleString('en-US', {minimumFractionDigits: 2});\n")
+                      .append("}\n")
+                      .append("document.addEventListener('DOMContentLoaded', calculateGrandTotal_").append(uniqueId).append(");\n")
+                      .append("setTimeout(calculateGrandTotal_").append(uniqueId).append(", 100);\n");
             }
         }
 
