@@ -768,7 +768,9 @@ public class CrudView extends UIComponent {
                   .append("  }\n");
         }
 
+        script.append("  const formEl = document.getElementById('crudForm_").append(uniqueId).append("');\n");
         script.append("  if(action === 'delete') {\n")
+              .append("    if(formEl) formEl.noValidate = true;\n")
               .append("    if(deleteMsg) deleteMsg.style.display = 'block';\n")
               .append("    if(submitBtn) {\n")
               .append("       submitBtn.innerText = '").append(getLabel("btn.confirm.delete", "Eliminar")).append("';\n")
@@ -778,6 +780,7 @@ public class CrudView extends UIComponent {
             script.append("    if(group_").append(field.getName()).append(") group_").append(field.getName()).append(".style.display = 'none';\n");
         }
         script.append("  } else {\n")
+              .append("    if(formEl) formEl.noValidate = false;\n")
               .append("    if(deleteMsg) deleteMsg.style.display = 'none';\n")
               .append("    if(submitBtn) {\n")
               .append("       submitBtn.innerText = '").append(getLabel("btn.save", "Guardar")).append("';\n")

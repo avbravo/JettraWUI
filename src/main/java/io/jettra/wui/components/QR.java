@@ -54,11 +54,15 @@ public class QR extends UIComponent {
         // Ensure library is imported securely
         js.append("<script src=\"https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js\"></script>\n");
         js.append("<script>\n");
-        js.append("document.addEventListener('DOMContentLoaded', function() {\n");
-        js.append("  setTimeout(function() {\n");
+        js.append("(function() {\n");
+        js.append("  function initQR() {\n");
         js.append("    var el = document.getElementById('").append(qrId).append("');\n");
-        js.append("    if(!el) return;\n");
-        js.append("    el.innerHTML = '';\n"); // Clear context if navigating back
+        js.append("    if (!el) return;\n");
+        js.append("    if (typeof QRCode === 'undefined') {\n");
+        js.append("      setTimeout(initQR, 50);\n");
+        js.append("      return;\n");
+        js.append("    }\n");
+        js.append("    el.innerHTML = '';\n");
         js.append("    new QRCode(el, {\n");
         js.append("      text: \"").append(text.replace("\"", "\\\"")).append("\",\n");
         js.append("      width: ").append(width).append(",\n");
@@ -67,8 +71,13 @@ public class QR extends UIComponent {
         js.append("      colorLight : \"").append(colorLight).append("\",\n");
         js.append("      correctLevel : QRCode.CorrectLevel.H\n");
         js.append("    });\n");
-        js.append("  }, 100);\n");
-        js.append("});\n");
+        js.append("  }\n");
+        js.append("  if (document.readyState === 'loading') {\n");
+        js.append("    document.addEventListener('DOMContentLoaded', initQR);\n");
+        js.append("  } else {\n");
+        js.append("    initQR();\n");
+        js.append("  }\n");
+        js.append("})();\n");
         js.append("</script>\n");
         
         return super.render() + js.toString();
