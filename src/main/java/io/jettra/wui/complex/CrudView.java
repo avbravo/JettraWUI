@@ -188,7 +188,16 @@ public class CrudView extends UIComponent {
                         }
                         
                         TD td = new TD();
-                        if (this.editable && !field.isAnnotationPresent(Hidden.class)) {
+                        boolean masterEditable = this.editable;
+                        for (Field f : fields) {
+                            if (f.isAnnotationPresent(ViewDataTable.class)) {
+                                if (!f.getAnnotation(ViewDataTable.class).editableRowMaster()) {
+                                    masterEditable = false;
+                                    break;
+                                }
+                            }
+                        }
+                        if (masterEditable && !field.isAnnotationPresent(Hidden.class)) {
                             boolean isReadonly = field.isAnnotationPresent(NoEditable.class);
                             if (field.isAnnotationPresent(Compute.class) && !field.getAnnotation(Compute.class).editable()) {
                                 isReadonly = true;
@@ -544,10 +553,128 @@ public class CrudView extends UIComponent {
                     datePicker.setEditable(false);
                 }
                 input = datePicker;
+            } else if (field.isAnnotationPresent(ViewDataTable.class)) {
+                ViewDataTable anno = field.getAnnotation(ViewDataTable.class);
+                Div dataTableDiv = new Div().setId("viewdatatable_" + field.getName() + "_" + uniqueId);
+                dataTableDiv.setStyle("border", "1px solid var(--jettra-border)").setStyle("padding", "10px").setStyle("border-radius", "8px").setStyle("margin-top", "10px").setStyle("background-color", "rgba(0,0,0,0.2)");
+                
+                Header dtHeader = new Header(5, getFieldLabel(field));
+                dtHeader.setStyle("margin-top", "0").setStyle("color", "var(--jettra-accent)").setStyle("text-transform", "uppercase").setStyle("font-size", "11px");
+                dataTableDiv.add(dtHeader);
+                
+                Datatable subTable = new Datatable().setId("table_" + field.getName() + "_" + uniqueId);
+                Row headerRow = new Row();
+                String[] rows = anno.row().split(",");
+                for (String r : rows) {
+                    if (!r.trim().isEmpty()) headerRow.add(new TD(r.trim().toUpperCase()).setStyle("font-size", "10px").setStyle("color", "#8b949e"));
+                }
+                headerRow.add(new TD("ACCIONES").setStyle("font-size", "10px").setStyle("color", "#8b949e"));
+                subTable.addHeaderRow(headerRow);
+                
+                // Fetch initial data if possible
+                try {
+                    if (!anno.source().isEmpty() && !anno.method().isEmpty()) {
+                        Class<?> sourceClass = null;
+                        String pkg = modelClass.getPackageName();
+                        List<String> attempts = Arrays.asList(
+                            anno.source(),
+                            pkg + "." + anno.source(),
+                            pkg.replace(".model", ".repository") + "." + anno.source(),
+                            pkg.replace(".model", ".services") + "." + anno.source(),
+                            pkg.replace(".model", ".controller") + "." + anno.source()
+                        );
+                        for (String attempt : attempts) {
+                            try { sourceClass = Class.forName(attempt, true, modelClass.getClassLoader()); break; } catch (Exception e) {}
+                        }
+                        if (sourceClass != null) {
+                            Method m;
+                            Object result;
+                            if (anno.filter() != null && !anno.filter().isEmpty()) {
+                                m = sourceClass.getMethod(anno.method(), String.class);
+                                result = m.invoke(null, anno.filter());
+                            } else {
+                                m = sourceClass.getMethod(anno.method());
+                                result = m.invoke(null);
+                            }
+                            if (result instanceof List) {
+                                List<?> items = (List<?>) result;
+                                for (Object item : items) {
+                                    Row tr = new Row();
+                                    for (String r : rows) {
+                                        String rClean = r.trim();
+                                        if (rClean.isEmpty()) continue;
+                                        Field itemField = null;
+                                        try {
+                                            itemField = item.getClass().getDeclaredField(rClean);
+                                        } catch(Exception ex) {}
+                                        if (itemField != null) {
+                                            itemField.setAccessible(true);
+                                            Object val = itemField.get(item);
+                                            
+                                            // Check if editable
+                                            boolean isEditable = Arrays.asList(anno.editablerow().split(",")).stream().map(String::trim).anyMatch(e -> e.equals(rClean));
+                                            if (isEditable) {
+                                                if (itemField.isAnnotationPresent(ViewSelectOne.class)) {
+                                                    ViewSelectOne vso = itemField.getAnnotation(ViewSelectOne.class);
+                                                    SelectOne select = new SelectOne("dt_" + field.getName() + "_" + rClean);
+                                                    populateSelectOptions(select, vso.source(), vso.method(), vso.label(), vso.filter());
+                                                    if(val != null) select.setProperty("value", val.toString());
+                                                    select.setStyle("width", "100%").setStyle("background", "rgba(0,0,0,0.3)").setStyle("color", "white").setStyle("border", "1px solid var(--jettra-border)");
+                                                    select.setProperty("data-col", rClean);
+                                                    select.setProperty("onchange", "this.closest('tr').dataset.prodChanged='true'; updateRowCalculation_" + uniqueId + "(this.closest('tr'))");
+                                                    tr.add(new TD().add(select));
+                                                } else {
+                                                    TextBox txt = new TextBox("text", "dt_" + field.getName() + "_" + rClean);
+                                                    if(val != null) txt.setProperty("value", val.toString());
+                                                    txt.setStyle("width", "100%").setStyle("background", "rgba(0,0,0,0.3)").setStyle("color", "white").setStyle("border", "1px solid var(--jettra-border)").setStyle("padding", "4px");
+                                                    txt.setProperty("data-col", rClean);
+                                                    txt.setProperty("oninput", "updateRowCalculation_" + uniqueId + "(this.closest('tr'))");
+                                                    tr.add(new TD().add(txt));
+                                                }
+                                            } else {
+                                                String displayValue = (val != null) ? val.toString() : "";
+                                                if (itemField.isAnnotationPresent(ViewSelectOne.class)) {
+                                                    displayValue = getIdValueForSource(val);
+                                                }
+                                                TextBox txt = new TextBox("text", "dt_" + field.getName() + "_" + rClean);
+                                                txt.setProperty("value", displayValue);
+                                                txt.setStyle("width", "100%").setStyle("background", "transparent").setStyle("color", "white").setStyle("border", "none").setStyle("padding", "4px");
+                                                txt.setReadonly(true);
+                                                txt.setProperty("data-col", rClean);
+                                                tr.add(new TD().add(txt));
+                                            }
+                                        } else {
+                                            tr.add(new TD(""));
+                                        }
+                                    }
+                                    Button delLineBtn = new Button("🗑️").setType("button").setBackgroundColor("transparent").setStyle("padding", "4px").setStyle("border", "none").setStyle("color", "#f85149");
+                                    delLineBtn.setProperty("onclick", "this.closest('tr').remove(); calculateGrandTotal_" + uniqueId + "();");
+                                    tr.add(new TD().add(delLineBtn));
+                                    subTable.addRow(tr);
+                                }
+                            }
+                        }
+                    }
+                } catch(Exception e) {
+                    System.err.println("Error fetching ViewDataTable data: " + e.getMessage());
+                }
+
+                Button addLineBtn = new Button("➕ Agregar Línea").setType("button").setBackgroundColor("#1f6feb").setStyle("margin-top", "10px").setStyle("font-size", "11px").setStyle("padding", "6px 12px");
+                addLineBtn.setProperty("onclick", "addNestedRow_" + uniqueId + "('" + field.getName() + "')");
+                
+                dataTableDiv.add(subTable).add(addLineBtn);
+                
+                TextBox hiddenData = new TextBox("hidden", field.getName()).setId("input_" + field.getName() + "_" + uniqueId);
+                dataTableDiv.add(hiddenData);
+                
+                input = dataTableDiv;
             } else {
                 TextBox text = new TextBox(isHidden ? "hidden" : "text", field.getName()).setId("input_" + field.getName() + "_" + uniqueId);
                 if (!isHidden) {
                     JettraValidations.apply(text, modelClass, field.getName());
+                }
+                if (field.getName().equalsIgnoreCase("descuento") || field.getName().equalsIgnoreCase("porcentajeImpuesto")) {
+                    text.setProperty("oninput", "calculateGrandTotal_" + uniqueId + "()");
                 }
                 
                 boolean isReadonly = false;
@@ -790,6 +917,126 @@ public class CrudView extends UIComponent {
             script.append("    if(group_").append(field.getName()).append(") group_").append(field.getName()).append(".style.display = 'block';\n");
         }
         script.append("  }\n")
+              .append("}\n\n");
+
+        // ViewDataTable JavaScript support
+        for (Field field : modelClass.getDeclaredFields()) {
+            if (field.isAnnotationPresent(ViewDataTable.class)) {
+                ViewDataTable vdt = field.getAnnotation(ViewDataTable.class);
+                Class<?> itemClass = null;
+                if (field.getGenericType() instanceof java.lang.reflect.ParameterizedType) {
+                    itemClass = (Class<?>) ((java.lang.reflect.ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
+                }
+                if (itemClass != null) {
+                    script.append("const productPrices_").append(uniqueId).append(" = {};\n");
+                    script.append("const productOptions_").append(uniqueId).append(" = [];\n");
+                    for (Field itemF : itemClass.getDeclaredFields()) {
+                        if (itemF.isAnnotationPresent(ViewSelectOne.class)) {
+                            ViewSelectOne vso = itemF.getAnnotation(ViewSelectOne.class);
+                            Class<?> sourceClass = null;
+                            String pkg = modelClass.getPackageName();
+                            List<String> attempts = Arrays.asList(vso.source(), pkg + "." + vso.source(), pkg.replace(".model", ".repository") + "." + vso.source(), pkg.replace(".model", ".services") + "." + vso.source(), pkg.replace(".model", ".controller") + "." + vso.source());
+                            for (String att : attempts) {
+                                try { sourceClass = Class.forName(att, true, modelClass.getClassLoader()); break; } catch (Exception e) {}
+                            }
+                            if (sourceClass != null) {
+                                try {
+                                    Method m = (vso.filter() != null && !vso.filter().isEmpty()) ? sourceClass.getMethod(vso.method(), String.class) : sourceClass.getMethod(vso.method());
+                                    Object res = (vso.filter() != null && !vso.filter().isEmpty()) ? m.invoke(null, vso.filter()) : m.invoke(null);
+                                    if (res instanceof List) {
+                                        for (Object obj : (List<?>) res) {
+                                            String idVal = getIdValueForSource(obj);
+                                            String lblVal = resolveLabel(obj, vso.label());
+                                            String priceVal = resolveObjectField(obj, "precio");
+                                            if (priceVal.isEmpty()) priceVal = "0";
+                                            script.append("productPrices_").append(uniqueId).append("['").append(idVal).append("'] = ").append(priceVal).append(";\n");
+                                            script.append("productOptions_").append(uniqueId).append(".push({val:'").append(idVal).append("', lbl:'").append(lblVal.replace("'", "\\'")).append("'});\n");
+                                        }
+                                    }
+                                } catch(Exception ex) {}
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        script.append("function updateRowCalculation_").append(uniqueId).append("(rowEl) {\n")
+              .append("  const prodSelect = rowEl.querySelector('[data-col=\"productoId\"]');\n")
+              .append("  const precioInput = rowEl.querySelector('[data-col=\"precio\"]');\n")
+              .append("  const cantInput = rowEl.querySelector('[data-col=\"cantidad\"]');\n")
+              .append("  const totalInput = rowEl.querySelector('[data-col=\"total\"]');\n")
+              .append("  if (prodSelect && precioInput && window['productPrices_").append(uniqueId).append("']) {\n")
+              .append("    const prodId = prodSelect.value;\n")
+              .append("    if (window['productPrices_").append(uniqueId).append("'][prodId] !== undefined && rowEl.dataset.prodChanged === 'true') {\n")
+              .append("      precioInput.value = window['productPrices_").append(uniqueId).append("'][prodId];\n")
+              .append("      rowEl.dataset.prodChanged = 'false';\n")
+              .append("    }\n")
+              .append("  }\n")
+              .append("  if (precioInput && cantInput && totalInput) {\n")
+              .append("    const p = parseFloat(precioInput.value) || 0;\n")
+              .append("    const c = parseInt(cantInput.value) || 0;\n")
+              .append("    const t = p * c;\n")
+              .append("    totalInput.value = t.toFixed(2);\n")
+              .append("  }\n")
+              .append("  calculateGrandTotal_").append(uniqueId).append("();\n")
+              .append("}\n\n");
+
+        script.append("function calculateGrandTotal_").append(uniqueId).append("() {\n")
+              .append("  const subTable = document.querySelector('[id^=\"table_lineaFacturaModel_\"]');\n")
+              .append("  if (!subTable) return;\n")
+              .append("  let sum = 0;\n")
+              .append("  subTable.querySelectorAll('tbody tr').forEach(tr => {\n")
+              .append("    const totInp = tr.querySelector('[data-col=\"total\"]');\n")
+              .append("    if (totInp) sum += parseFloat(totInp.value) || 0;\n")
+              .append("  });\n")
+              .append("  const subtotalInp = document.getElementById('input_subtotal_").append(uniqueId).append("');\n")
+              .append("  const totalInp = document.getElementById('input_total_").append(uniqueId).append("');\n")
+              .append("  const descInp = document.getElementById('input_descuento_").append(uniqueId).append("');\n")
+              .append("  const impInp = document.getElementById('input_porcentajeImpuesto_").append(uniqueId).append("');\n")
+              .append("  const subtotal = sum;\n")
+              .append("  const desc = descInp ? (parseFloat(descInp.value) || 0) : 0;\n")
+              .append("  const impPorc = impInp ? (parseFloat(impInp.value) || 0) : 0;\n")
+              .append("  const impVal = (subtotal - desc) * (impPorc / 100.0);\n")
+              .append("  const total = subtotal - desc + impVal;\n")
+              .append("  if (subtotalInp) subtotalInp.value = subtotal.toFixed(2);\n")
+              .append("  if (totalInp) totalInp.value = total.toFixed(2);\n")
+              .append("}\n\n");
+
+        script.append("function addNestedRow_").append(uniqueId).append("(fieldName) {\n")
+              .append("  const table = document.getElementById('table_' + fieldName + '_").append(uniqueId).append("');\n")
+              .append("  if(!table) return;\n")
+              .append("  const tbody = table.querySelector('tbody') || table;\n")
+              .append("  const tr = document.createElement('tr');\n")
+              .append("  tr.dataset.prodChanged = 'true';\n")
+              .append("  if (fieldName === 'lineaFacturaModel') {\n")
+              .append("    const td1 = document.createElement('td'); const sel = document.createElement('select'); sel.setAttribute('data-col', 'productoId');\n")
+              .append("    sel.style.width = '100%'; sel.style.background = 'rgba(0,0,0,0.3)'; sel.style.color = 'white'; sel.style.border = '1px solid var(--jettra-border)';\n")
+              .append("    if (window['productOptions_").append(uniqueId).append("']) {\n")
+              .append("      window['productOptions_").append(uniqueId).append("'].forEach(opt => {\n")
+              .append("        const o = document.createElement('option'); o.value = opt.val; o.innerText = opt.lbl; sel.appendChild(o);\n")
+              .append("      });\n")
+              .append("    }\n")
+              .append("    sel.onchange = function() { tr.dataset.prodChanged = 'true'; updateRowCalculation_").append(uniqueId).append("(tr); };\n")
+              .append("    td1.appendChild(sel); tr.appendChild(td1);\n")
+              .append("    const td2 = document.createElement('td'); const inpP = document.createElement('input'); inpP.type = 'text'; inpP.setAttribute('data-col', 'precio');\n")
+              .append("    inpP.style.width = '100%'; inpP.style.background = 'rgba(0,0,0,0.3)'; inpP.style.color = 'white'; inpP.style.border = '1px solid var(--jettra-border)'; inpP.style.padding = '4px';\n")
+              .append("    inpP.oninput = function() { updateRowCalculation_").append(uniqueId).append("(tr); };\n")
+              .append("    td2.appendChild(inpP); tr.appendChild(td2);\n")
+              .append("    const td3 = document.createElement('td'); const inpC = document.createElement('input'); inpC.type = 'text'; inpC.setAttribute('data-col', 'cantidad');\n")
+              .append("    inpC.style.width = '100%'; inpC.style.background = 'rgba(0,0,0,0.3)'; inpC.style.color = 'white'; inpC.style.border = '1px solid var(--jettra-border)'; inpC.style.padding = '4px';\n")
+              .append("    inpC.oninput = function() { updateRowCalculation_").append(uniqueId).append("(tr); };\n")
+              .append("    td3.appendChild(inpC); tr.appendChild(td3);\n")
+              .append("    const td4 = document.createElement('td'); const inpT = document.createElement('input'); inpT.type = 'text'; inpT.setAttribute('data-col', 'total'); inpT.readOnly = true;\n")
+              .append("    inpT.style.width = '100%'; inpT.style.background = 'transparent'; inpT.style.color = 'white'; inpT.style.border = 'none'; inpT.style.padding = '4px';\n")
+              .append("    td4.appendChild(inpT); tr.appendChild(td4);\n")
+              .append("  }\n")
+              .append("  const tdAction = document.createElement('td'); const delBtn = document.createElement('button'); delBtn.type = 'button'; delBtn.innerText = '🗑️';\n")
+              .append("  delBtn.style.background = 'transparent'; delBtn.style.border = 'none'; delBtn.style.padding = '4px'; delBtn.style.color = '#f85149';\n")
+              .append("  delBtn.onclick = function() { tr.remove(); calculateGrandTotal_").append(uniqueId).append("(); };\n")
+              .append("  tdAction.appendChild(delBtn); tr.appendChild(tdAction);\n")
+              .append("  tbody.appendChild(tr);\n")
+              .append("  updateRowCalculation_").append(uniqueId).append("(tr);\n")
               .append("}\n");
 
         // Helper for toast notifications
@@ -854,6 +1101,19 @@ public class CrudView extends UIComponent {
               .append("    showToast_").append(uniqueId).append("('Error: ' + errs[0], 'error');\n")
               .append("    e.preventDefault();\n")
               .append("    return false;\n")
+              .append("  }\n")
+              .append("  const subTable = document.getElementById('table_lineaFacturaModel_' + '").append(uniqueId).append("');\n")
+              .append("  if (subTable) {\n")
+              .append("    const rows = [];\n")
+              .append("    subTable.querySelectorAll('tbody tr').forEach(tr => {\n")
+              .append("      const rowObj = {};\n")
+              .append("      tr.querySelectorAll('[data-col]').forEach(input => {\n")
+              .append("        rowObj[input.getAttribute('data-col')] = input.value;\n")
+              .append("      });\n")
+              .append("      if (Object.keys(rowObj).length > 0) rows.push(rowObj);\n")
+              .append("    });\n")
+              .append("    const hidden = document.getElementById('input_lineaFacturaModel_' + '").append(uniqueId).append("');\n")
+              .append("    if (hidden) hidden.value = JSON.stringify(rows);\n")
               .append("  }\n")
               .append("  return true;\n")
               .append("};\n");

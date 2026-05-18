@@ -19,7 +19,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Properties;
 import java.util.List;
+import java.util.Arrays;
+import java.util.ArrayList;
 import com.sun.net.httpserver.HttpExchange;
+import io.jettra.wui.core.annotations.ViewSelectOne;
+import io.jettra.wui.core.annotations.ViewDataTable;
 
 /**
  * Utility class to handle MVC binding between ViewModels and UIComponents.
@@ -151,12 +155,118 @@ public class JettraMVC {
                         field.set(model, java.time.LocalDate.parse(value));
                     } else if (field.getType().equals(java.util.Date.class)) {
                         field.set(model, new java.text.SimpleDateFormat("yyyy-MM-dd").parse(value));
+                    } else if (field.isAnnotationPresent(ViewSelectOne.class)) {
+                        ViewSelectOne vso = field.getAnnotation(ViewSelectOne.class);
+                        Class<?> sourceClass = null;
+                        String pkg = model.getClass().getPackageName();
+                        List<String> attempts = Arrays.asList(vso.source(), pkg + "." + vso.source(), pkg.replace(".model", ".repository") + "." + vso.source(), pkg.replace(".model", ".services") + "." + vso.source(), pkg.replace(".model", ".controller") + "." + vso.source());
+                        for (String att : attempts) {
+                            try { sourceClass = Class.forName(att, true, model.getClass().getClassLoader()); break; } catch(Exception ex) {}
+                        }
+                        if (sourceClass != null) {
+                            try {
+                                Method findById = sourceClass.getMethod("findById", String.class);
+                                Object relObj = findById.invoke(null, value);
+                                field.set(model, relObj);
+                            } catch(Exception ex) {
+                                try {
+                                    Method findAll = sourceClass.getMethod(vso.method());
+                                    Object res = findAll.invoke(null);
+                                    if (res instanceof List) {
+                                        for (Object obj : (List<?>) res) {
+                                            if (value.equals(getIdValueForSource(obj))) {
+                                                field.set(model, obj);
+                                                break;
+                                            }
+                                        }
+                                    }
+                                } catch(Exception e2) {}
+                            }
+                        }
+                    } else if (field.isAnnotationPresent(ViewDataTable.class)) {
+                        Class<?> itemClass = null;
+                        if (field.getGenericType() instanceof java.lang.reflect.ParameterizedType) {
+                            itemClass = (Class<?>) ((java.lang.reflect.ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
+                        }
+                        if (itemClass != null && value.startsWith("[") && value.endsWith("]")) {
+                            List<Object> list = new ArrayList<>();
+                            String content = value.substring(1, value.length() - 1).trim();
+                            if (!content.isEmpty()) {
+                                String[] items = content.split("\\},\\s*\\{");
+                                for (String itemStr : items) {
+                                    itemStr = itemStr.replace("{", "").replace("}", "").trim();
+                                    if (itemStr.isEmpty()) continue;
+                                    Object itemObj = itemClass.getDeclaredConstructor().newInstance();
+                                    String[] pairs = itemStr.split(",");
+                                    for (String pair : pairs) {
+                                        String[] kv = pair.split(":");
+                                        if (kv.length >= 2) {
+                                            String k = kv[0].replace("\"", "").replace("'", "").trim();
+                                            String v = kv[1].replace("\"", "").replace("'", "").trim();
+                                            try {
+                                                Field itemF = itemClass.getDeclaredField(k);
+                                                itemF.setAccessible(true);
+                                                if (itemF.getType().equals(String.class)) {
+                                                    itemF.set(itemObj, v);
+                                                } else if (itemF.getType().equals(int.class) || itemF.getType().equals(Integer.class)) {
+                                                    itemF.set(itemObj, Integer.parseInt(v));
+                                                } else if (itemF.getType().equals(double.class) || itemF.getType().equals(Double.class)) {
+                                                    itemF.set(itemObj, Double.parseDouble(v));
+                                                } else if (itemF.getType().equals(float.class) || itemF.getType().equals(Float.class)) {
+                                                    itemF.set(itemObj, Float.parseFloat(v));
+                                                } else if (itemF.getType().equals(long.class) || itemF.getType().equals(Long.class)) {
+                                                    itemF.set(itemObj, Long.parseLong(v));
+                                                } else if (itemF.getType().equals(boolean.class) || itemF.getType().equals(Boolean.class)) {
+                                                    itemF.set(itemObj, Boolean.parseBoolean(v));
+                                                }
+                                            } catch(Exception ex) {}
+                                        }
+                                    }
+                                    list.add(itemObj);
+                                }
+                            }
+                            field.set(model, list);
+                        }
                     }
                 } catch (Exception e) {
                     System.err.println("Error setting field " + field.getName() + ": " + e.getMessage());
                 }
             }
         }
+    }
+
+    private static String getIdValueForSource(Object item) {
+        if (item == null) return "";
+        if (item instanceof String) return (String) item;
+        if (item instanceof Number) return item.toString();
+        
+        Class<?> clazz = item.getClass();
+        try {
+            List<String> commonNames = Arrays.asList("code", "id", "id" + clazz.getSimpleName());
+            for (Field f : clazz.getDeclaredFields()) {
+                if (commonNames.stream().anyMatch(name -> name.equalsIgnoreCase(f.getName()))) {
+                    f.setAccessible(true);
+                    Object val = f.get(item);
+                    if (val != null) return val.toString();
+                }
+            }
+            for (Method m : clazz.getMethods()) {
+                if (m.getName().equalsIgnoreCase("getCode") || m.getName().equalsIgnoreCase("getId") || m.getName().equalsIgnoreCase("getid" + clazz.getSimpleName())) {
+                    if (m.getParameterCount() == 0) {
+                        Object val = m.invoke(item);
+                        if (val != null) return val.toString();
+                    }
+                }
+            }
+            for (Field f : clazz.getDeclaredFields()) {
+                if (f.getName().toLowerCase().contains("id") || f.getName().toLowerCase().contains("code")) {
+                    f.setAccessible(true);
+                    Object val = f.get(item);
+                    if (val != null) return val.toString();
+                }
+            }
+        } catch (Exception e) {}
+        return item.toString();
     }
 
     /**
@@ -358,6 +468,18 @@ public class JettraMVC {
                 } else if ("delete".equals(action)) {
                     String code = params.get("code"); 
                     if (code == null) code = params.get("id");
+                    if (code == null && modelClass.getDeclaredFields().length > 0) {
+                        String firstFieldName = modelClass.getDeclaredFields()[0].getName();
+                        code = params.get(firstFieldName);
+                    }
+                    if (code == null) {
+                        for (Field f : modelClass.getDeclaredFields()) {
+                            if (f.getName().toLowerCase().contains("id") || f.getName().toLowerCase().contains("code")) {
+                                code = params.get(f.getName());
+                                if (code != null) break;
+                            }
+                        }
+                    }
                     
                     if (handler != null) {
                         handler.delete(code);
