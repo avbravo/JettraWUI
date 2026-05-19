@@ -632,6 +632,15 @@ public class JettraMVC {
                     String finalLabel = label;
                     String targetSection = "HEADER";
                     String alignment = "LEFT";
+                    
+                    String labelFontName = "Helvetica";
+                    int labelFontSize = 10;
+                    String labelTextColor = "#000000";
+                    boolean labelBold = false;
+                    boolean labelItalic = false;
+                    boolean labelUnderline = false;
+                    boolean labelStrikethrough = false;
+
                     Class<? extends java.lang.annotation.Annotation> mrlClass = null;
                     try {
                         mrlClass = (Class<? extends java.lang.annotation.Annotation>) loader.loadClass("com.jettra.report.annotations.ModelReportLabel");
@@ -652,12 +661,34 @@ public class JettraMVC {
                             if (orientationObj != null) {
                                 alignment = orientationObj.toString();
                             }
+                            
+                            labelFontName = (String) mrlClass.getMethod("font").invoke(mrl);
+                            labelFontSize = (int) mrlClass.getMethod("size").invoke(mrl);
+                            labelTextColor = (String) mrlClass.getMethod("textColor").invoke(mrl);
+                            
+                            Object[] styles = (Object[]) mrlClass.getMethod("style").invoke(mrl);
+                            if (styles != null) {
+                                for (Object s : styles) {
+                                    String styleName = s.toString();
+                                    if (styleName.equals("BOLD")) labelBold = true;
+                                    else if (styleName.equals("ITALIC")) labelItalic = true;
+                                    else if (styleName.equals("SUBLINE")) labelUnderline = true;
+                                    else if (styleName.equals("STRIKETHROUGH")) labelStrikethrough = true;
+                                }
+                            }
                         } catch (Exception e) {}
                     }
                     
                     Object labelValEl = textElementClass.getConstructor(String.class).newInstance(finalLabel + ": " + valStr);
-                    textElementClass.getMethod("setBold", boolean.class).invoke(labelValEl, false);
-                    textElementClass.getMethod("setFontSize", int.class).invoke(labelValEl, 10);
+                    textElementClass.getMethod("setFontName", String.class).invoke(labelValEl, labelFontName);
+                    textElementClass.getMethod("setFontSize", int.class).invoke(labelValEl, labelFontSize);
+                    textElementClass.getMethod("setFontColor", String.class).invoke(labelValEl, labelTextColor);
+                    textElementClass.getMethod("setBold", boolean.class).invoke(labelValEl, labelBold);
+                    try {
+                        textElementClass.getMethod("setItalic", boolean.class).invoke(labelValEl, labelItalic);
+                        textElementClass.getMethod("setUnderline", boolean.class).invoke(labelValEl, labelUnderline);
+                        textElementClass.getMethod("setStrikethrough", boolean.class).invoke(labelValEl, labelStrikethrough);
+                    } catch(Exception e) {}
                     textElementClass.getMethod("setAlignment", String.class).invoke(labelValEl, alignment);
                     
                     if (targetSection.equalsIgnoreCase("HEADER")) {
