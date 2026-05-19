@@ -540,6 +540,7 @@ public class JettraMVC {
             Class<?> headerClass = Class.forName("com.jettra.report.Report$Header", true, loader);
             Class<?> footerClass = Class.forName("com.jettra.report.Report$Footer", true, loader);
             Class<?> detailClass = Class.forName("com.jettra.report.Report$Detail", true, loader);
+            Class<?> summaryClass = Class.forName("com.jettra.report.Report$Summary", true, loader);
 
             Object report = reportClass.getConstructor(String.class).newInstance("Reporte de " + modelClass.getSimpleName());
 
@@ -555,8 +556,11 @@ public class JettraMVC {
             Object orientationVal = Enum.valueOf((Class<Enum>)orientationEnum, orientationStr.toUpperCase());
             pageSettings.getClass().getMethod("setOrientation", orientationEnum).invoke(pageSettings, orientationVal);
 
-            // Header
+            // Header, Footer, Summary
             Object header = reportClass.getMethod("getHeader").invoke(report);
+            Object footer = reportClass.getMethod("getFooter").invoke(report);
+            Object summary = reportClass.getMethod("getSummary").invoke(report);
+
             String finalTitle = (customTitle != null && !customTitle.isEmpty()) ? customTitle : "REPORTE DE " + modelClass.getSimpleName().toUpperCase();
             Object titleEl = textElementClass.getConstructor(String.class).newInstance(finalTitle);
             
@@ -590,7 +594,7 @@ public class JettraMVC {
                 Method setData = reportClass.getMethod("setData", List.class);
                 setData.invoke(report, detailsList);
 
-                // Agregar los campos simples del Master como etiquetas en el Header
+                // Agregar los campos simples del Master como etiquetas
                 for (Field f : modelClass.getDeclaredFields()) {
                     if (f.equals(detailField)) continue;
                     if (f.getName().equals("serialVersionUID")) continue;
@@ -624,10 +628,35 @@ public class JettraMVC {
                         label = f.getAnnotation(io.jettra.wui.core.annotations.PropertiesLabel.class).label();
                     }
                     
-                    Object labelValEl = textElementClass.getConstructor(String.class).newInstance(label + ": " + valStr);
+                    // Procesar @ModelReportLabel si existe
+                    String finalLabel = label;
+                    String targetSection = "HEADER";
+                    String alignment = "LEFT";
+                    if (f.isAnnotationPresent(io.jettra.wui.core.annotations.ModelReportLabel.class)) {
+                        io.jettra.wui.core.annotations.ModelReportLabel mrl = f.getAnnotation(io.jettra.wui.core.annotations.ModelReportLabel.class);
+                        if (mrl.label() != null && !mrl.label().isEmpty()) {
+                            finalLabel = mrl.label();
+                        }
+                        if (mrl.section() != null) {
+                            targetSection = mrl.section().name();
+                        }
+                        if (mrl.orientation() != null) {
+                            alignment = mrl.orientation().name();
+                        }
+                    }
+                    
+                    Object labelValEl = textElementClass.getConstructor(String.class).newInstance(finalLabel + ": " + valStr);
                     textElementClass.getMethod("setBold", boolean.class).invoke(labelValEl, false);
                     textElementClass.getMethod("setFontSize", int.class).invoke(labelValEl, 10);
-                    headerClass.getMethod("addElement", Class.forName("com.jettra.report.Report$ReportElement")).invoke(header, labelValEl);
+                    textElementClass.getMethod("setAlignment", String.class).invoke(labelValEl, alignment);
+                    
+                    if (targetSection.equalsIgnoreCase("HEADER")) {
+                        headerClass.getMethod("addElement", Class.forName("com.jettra.report.Report$ReportElement")).invoke(header, labelValEl);
+                    } else if (targetSection.equalsIgnoreCase("FOOTER")) {
+                        footerClass.getMethod("addElement", Class.forName("com.jettra.report.Report$ReportElement")).invoke(footer, labelValEl);
+                    } else if (targetSection.equalsIgnoreCase("LASTPAGE")) {
+                        summaryClass.getMethod("addElement", Class.forName("com.jettra.report.Report$ReportElement")).invoke(summary, labelValEl);
+                    }
                 }
 
                 // Línea separadora
@@ -698,7 +727,7 @@ public class JettraMVC {
             detailClass.getMethod("addElement", Class.forName("com.jettra.report.Report$ReportElement", true, loader)).invoke(detail, table);
 
             // Footer
-            Object footer = reportClass.getMethod("getFooter").invoke(report);
+            footer = reportClass.getMethod("getFooter").invoke(report);
             Object footerEl = textElementClass.getConstructor(String.class).newInstance("Generado por JettraStack");
             footerClass.getMethod("addElement", Class.forName("com.jettra.report.Report$ReportElement")).invoke(footer, footerEl);
 
