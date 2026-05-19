@@ -516,17 +516,12 @@ public class JettraMVC {
 
     public static void generateReport(Page page, Class<?> modelClass, Class<?> repoClass, String format, boolean print, String id) {
         try {
-            // 1. Obtener datos
+            // 1. Obtener datos y chequear si es Master-Detail de un solo registro
             List<Object> data = new ArrayList<>();
+            Object singleObj = null;
             if (id != null && !id.trim().isEmpty()) {
                 Method findById = repoClass.getMethod("findById", String.class);
-                Object singleObj = findById.invoke(null, id);
-                if (singleObj != null) {
-                    data.add(singleObj);
-                }
-            } else {
-                Method findAll = repoClass.getMethod("findAll");
-                data.addAll((List<?>) findAll.invoke(null));
+                singleObj = findById.invoke(null, id);
             }
 
             // 2. Cargar JettraReport vía reflexión para evitar dependencia circular
@@ -547,10 +542,6 @@ public class JettraMVC {
             Class<?> detailClass = Class.forName("com.jettra.report.Report$Detail", true, loader);
 
             Object report = reportClass.getConstructor(String.class).newInstance("Reporte de " + modelClass.getSimpleName());
-            
-            // Set Data
-            Method setData = reportClass.getMethod("setData", List.class);
-            setData.invoke(report, data);
 
             // Orientation
             Object pageSettings = reportClass.getMethod("getPageSettings").invoke(report);
@@ -572,38 +563,135 @@ public class JettraMVC {
             textElementClass.getMethod("setFontColor", String.class).invoke(titleEl, headerColor);
             textElementClass.getMethod("setBold", boolean.class).invoke(titleEl, true);
             textElementClass.getMethod("setFontSize", int.class).invoke(titleEl, 14);
-
             headerClass.getMethod("addElement", Class.forName("com.jettra.report.Report$ReportElement")).invoke(header, titleEl);
 
-            // Table
-            Object table = tableClass.getConstructor().newInstance();
-            Method addColumn = tableClass.getMethod("addColumn", columnClass);
-            
-            Field[] fields = modelClass.getDeclaredFields();
-            for (Field field : fields) {
-                if (field.isAnnotationPresent(io.jettra.wui.core.annotations.ViewDataTable.class) && !field.getAnnotation(io.jettra.wui.core.annotations.ViewDataTable.class).showRowInMasterTable()) {
-                    continue;
-                }
-                String detailExpression = field.getName();
-                if (field.isAnnotationPresent(io.jettra.wui.core.annotations.TableColumnField.class)) {
-                    io.jettra.wui.core.annotations.TableColumnField tcf = field.getAnnotation(io.jettra.wui.core.annotations.TableColumnField.class);
-                    if (!tcf.field().isEmpty()) {
-                        // JettraReport doesn't support nested expressions like field.subfield directly yet
-                        // but we can pass the field name and handle it in the viewer/exporter if needed.
-                        // For now, we use the field name.
-                        detailExpression = field.getName(); 
+            // Buscar si hay un campo ViewDataTable en el modelo
+            Field detailField = null;
+            if (singleObj != null) {
+                for (Field f : modelClass.getDeclaredFields()) {
+                    if (f.isAnnotationPresent(io.jettra.wui.core.annotations.ViewDataTable.class)) {
+                        detailField = f;
+                        break;
                     }
                 }
-                
-                Object col = columnClass.getConstructor(String.class, String.class, int.class)
-                        .newInstance(field.getName().toUpperCase(), detailExpression, 100);
-                
-                if (field.getName().equalsIgnoreCase("id") || field.getName().equalsIgnoreCase("code")) {
-                    columnClass.getMethod("setFontColor", String.class).invoke(col, headerColor);
-                    columnClass.getMethod("setBold", boolean.class).invoke(col, true);
+            }
+
+            Object table = tableClass.getConstructor().newInstance();
+            Method addColumn = tableClass.getMethod("addColumn", columnClass);
+
+            if (singleObj != null && detailField != null) {
+                // Modo Master-Detail: El Report Data es la lista de detalles
+                detailField.setAccessible(true);
+                List<?> detailsList = (List<?>) detailField.get(singleObj);
+                if (detailsList == null) {
+                    detailsList = new ArrayList<>();
                 }
                 
-                addColumn.invoke(table, col);
+                Method setData = reportClass.getMethod("setData", List.class);
+                setData.invoke(report, detailsList);
+
+                // Agregar los campos simples del Master como etiquetas en el Header
+                for (Field f : modelClass.getDeclaredFields()) {
+                    if (f.equals(detailField)) continue;
+                    if (f.getName().equals("serialVersionUID")) continue;
+                    if (f.isAnnotationPresent(io.jettra.wui.core.annotations.Hidden.class)) continue;
+
+                    f.setAccessible(true);
+                    Object val = f.get(singleObj);
+                    String valStr = "";
+                    if (val != null) {
+                        if (f.isAnnotationPresent(io.jettra.wui.core.annotations.ViewSelectOne.class)) {
+                            io.jettra.wui.core.annotations.ViewSelectOne vso = f.getAnnotation(io.jettra.wui.core.annotations.ViewSelectOne.class);
+                            String fieldOnly = vso.fieldOnlyMasterTable();
+                            if (fieldOnly != null && !fieldOnly.isEmpty()) {
+                                try {
+                                    Class<?> ruClass = Class.forName("com.jettra.report.ReportUtils", true, loader);
+                                    Method getFV = ruClass.getMethod("getFieldValue", Object.class, String.class);
+                                    valStr = String.valueOf(getFV.invoke(null, singleObj, f.getName()));
+                                } catch(Exception ex) {
+                                    valStr = val.toString();
+                                }
+                            } else {
+                                valStr = val.toString();
+                            }
+                        } else {
+                            valStr = val.toString();
+                        }
+                    }
+                    
+                    String label = f.getName();
+                    if (f.isAnnotationPresent(io.jettra.wui.core.annotations.PropertiesLabel.class)) {
+                        label = f.getAnnotation(io.jettra.wui.core.annotations.PropertiesLabel.class).label();
+                    }
+                    
+                    Object labelValEl = textElementClass.getConstructor(String.class).newInstance(label + ": " + valStr);
+                    textElementClass.getMethod("setBold", boolean.class).invoke(labelValEl, false);
+                    textElementClass.getMethod("setFontSize", int.class).invoke(labelValEl, 10);
+                    headerClass.getMethod("addElement", Class.forName("com.jettra.report.Report$ReportElement")).invoke(header, labelValEl);
+                }
+
+                // Línea separadora
+                Object separatorEl = textElementClass.getConstructor(String.class).newInstance("-----------------------------------------------------------------------------------------");
+                headerClass.getMethod("addElement", Class.forName("com.jettra.report.Report$ReportElement")).invoke(header, separatorEl);
+
+                // Agregar columnas basadas en la clase del Detalle
+                Class<?> detailClassType = null;
+                if (detailField.getGenericType() instanceof java.lang.reflect.ParameterizedType) {
+                    detailClassType = (Class<?>) ((java.lang.reflect.ParameterizedType) detailField.getGenericType()).getActualTypeArguments()[0];
+                }
+                
+                if (detailClassType != null) {
+                    String[] rowFields = detailField.getAnnotation(io.jettra.wui.core.annotations.ViewDataTable.class).row().split(",");
+                    for (String rf : rowFields) {
+                        String rfClean = rf.trim();
+                        if (rfClean.isEmpty()) continue;
+                        
+                        Field df = detailClassType.getDeclaredField(rfClean);
+                        String colLabel = rfClean.toUpperCase();
+                        if (df.isAnnotationPresent(io.jettra.wui.core.annotations.PropertiesLabel.class)) {
+                            colLabel = df.getAnnotation(io.jettra.wui.core.annotations.PropertiesLabel.class).label();
+                        }
+                        
+                        Object col = columnClass.getConstructor(String.class, String.class, int.class)
+                                .newInstance(colLabel, rfClean, 100);
+                        addColumn.invoke(table, col);
+                    }
+                }
+            } else {
+                // Modo estándar: Tabla simple del Master
+                if (singleObj != null) {
+                    data.add(singleObj);
+                } else {
+                    Method findAll = repoClass.getMethod("findAll");
+                    data.addAll((List<?>) findAll.invoke(null));
+                }
+
+                Method setData = reportClass.getMethod("setData", List.class);
+                setData.invoke(report, data);
+
+                Field[] fields = modelClass.getDeclaredFields();
+                for (Field field : fields) {
+                    if (field.isAnnotationPresent(io.jettra.wui.core.annotations.ViewDataTable.class) && !field.getAnnotation(io.jettra.wui.core.annotations.ViewDataTable.class).showRowInMasterTable()) {
+                        continue;
+                    }
+                    String detailExpression = field.getName();
+                    if (field.isAnnotationPresent(io.jettra.wui.core.annotations.TableColumnField.class)) {
+                        io.jettra.wui.core.annotations.TableColumnField tcf = field.getAnnotation(io.jettra.wui.core.annotations.TableColumnField.class);
+                        if (!tcf.field().isEmpty()) {
+                            detailExpression = field.getName(); 
+                        }
+                    }
+                    
+                    Object col = columnClass.getConstructor(String.class, String.class, int.class)
+                            .newInstance(field.getName().toUpperCase(), detailExpression, 100);
+                    
+                    if (field.getName().equalsIgnoreCase("id") || field.getName().equalsIgnoreCase("code")) {
+                        columnClass.getMethod("setFontColor", String.class).invoke(col, headerColor);
+                        columnClass.getMethod("setBold", boolean.class).invoke(col, true);
+                    }
+                    
+                    addColumn.invoke(table, col);
+                }
             }
 
             Object detail = reportClass.getMethod("getDetail").invoke(report);
