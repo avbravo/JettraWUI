@@ -59,3 +59,21 @@ SelectMany cities = new SelectMany("ciudades")
 Esto añadirá una opción "Add item..." al final de la lista. Si el usuario la selecciona (manteniendo o no otras selecciones), se le mostrará un cuadro de diálogo para ingresar el nuevo valor.
 
 > **Nota Adicional:** El componente contiene el atributo `multiple="multiple"`, lo que permite capturar múltiples valores en el envío de formularios. Si no se establece un valor por defecto mediante `setDefault()`, el navegador (o el renderizado de Jettra) seleccionará el primer elemento de la lista.
+
+## Uso con la Anotación `@ViewSelectMany`
+
+Al declarar una relación de selección múltiple `@ViewSelectMany` dentro de un modelo de datos que se renderiza mediante un `@ViewDataTable`, se puede definir el atributo `fieldOnlyMasterTable` para controlar qué campo(s) de los objetos de la lista seleccionada serán renderizados en la tabla maestra (los valores se unirán automáticamente separados por comas).
+
+### Ejemplo:
+
+```java
+@ViewSelectMany(
+    label = "nombre",
+    fieldOnlyMasterTable = "nombre",
+    source = "RolRepository",
+    method = "findAll"
+)
+private List<RolModel> roles;
+```
+
+Esto hará que la celda correspondiente en la tabla maestra renderice los nombres de los roles seleccionados (por ejemplo: "Administrador, Editor") en lugar de llamar al método `toString()` de cada objeto `RolModel`.

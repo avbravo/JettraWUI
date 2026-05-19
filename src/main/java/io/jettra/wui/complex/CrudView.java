@@ -120,9 +120,13 @@ public class CrudView extends UIComponent {
 
         Field[] fields = modelClass.getDeclaredFields();
         for (Field field : fields) {
-            if (!field.isAnnotationPresent(io.jettra.wui.core.annotations.Hidden.class)) {
-                headerRow.add(new TD(getFieldLabel(field)));
+            if (field.isAnnotationPresent(io.jettra.wui.core.annotations.Hidden.class)) {
+                continue;
             }
+            if (field.isAnnotationPresent(ViewDataTable.class) && !field.getAnnotation(ViewDataTable.class).showRowInMasterTable()) {
+                continue;
+            }
+            headerRow.add(new TD(getFieldLabel(field)));
         }
 
         TD actionsTdHeader = new TD();
@@ -157,9 +161,11 @@ public class CrudView extends UIComponent {
                 for (Object item : items) {
                     Row dataRow = new Row();
                     String idValue = (handler != null) ? ((CrudHandler<Object>)handler).getIdValue(item) : getIdValue(item);
-                    
-                    for (Field field : fields) {
+                               for (Field field : fields) {
                         if (field.isAnnotationPresent(io.jettra.wui.core.annotations.Hidden.class)) {
+                            continue;
+                        }
+                        if (field.isAnnotationPresent(ViewDataTable.class) && !field.getAnnotation(ViewDataTable.class).showRowInMasterTable()) {
                             continue;
                         }
                         field.setAccessible(true);
@@ -182,71 +188,141 @@ public class CrudView extends UIComponent {
                                 } else {
                                     displayValue = val.toString();
                                 }
+                            } else if (field.isAnnotationPresent(ViewSelectOne.class)) {
+                                ViewSelectOne vso = field.getAnnotation(ViewSelectOne.class);
+                                String fomt = vso.fieldOnlyMasterTable();
+                                if (fomt != null && !fomt.trim().isEmpty()) {
+                                    displayValue = resolveLabel(val, fomt);
+                                } else {
+                                    String labelFields = vso.label();
+                                    if (labelFields != null && !labelFields.trim().isEmpty()) {
+                                        displayValue = resolveLabel(val, labelFields);
+                                    } else {
+                                        displayValue = val.toString();
+                                    }
+                                }
+                            } else if (field.isAnnotationPresent(ViewSelectMany.class)) {
+                                ViewSelectMany vsm = field.getAnnotation(ViewSelectMany.class);
+                                String fomt = vsm.fieldOnlyMasterTable();
+                                String finalFomt = (fomt != null && !fomt.trim().isEmpty()) ? fomt : vsm.label();
+                                if (val instanceof List) {
+                                    List<?> list = (List<?>) val;
+                                    displayValue = list.stream()
+                                        .map(obj -> resolveLabel(obj, finalFomt))
+                                        .collect(Collectors.joining(", "));
+                                } else {
+                                    displayValue = resolveLabel(val, finalFomt);
+                                }
                             } else {
                                 displayValue = val.toString();
                             }
                         }
                         
                         TD td = new TD();
-                        boolean masterEditable = this.editable;
-                        for (Field f : fields) {
-                            if (f.isAnnotationPresent(ViewDataTable.class)) {
-                                if (!f.getAnnotation(ViewDataTable.class).editableRowMaster()) {
-                                    masterEditable = false;
-                                    break;
+                        if (field.isAnnotationPresent(ViewDataTable.class)) {
+                            ViewDataTable anno = field.getAnnotation(ViewDataTable.class);
+                            Datatable cellTable = new Datatable();
+                            cellTable.setStyle("font-size", "11px").setStyle("margin", "5px 0").setStyle("width", "100%");
+                            
+                            Row cellHeader = new Row();
+                            String[] colNames = anno.row().split(",");
+                            for (String colName : colNames) {
+                                String cleanCol = colName.trim();
+                                if (!cleanCol.isEmpty()) {
+                                    cellHeader.add(new TD(cleanCol.toUpperCase()).setStyle("font-size", "9px").setStyle("color", "#8b949e").setStyle("padding", "2px 5px"));
                                 }
                             }
-                        }
-                        if (masterEditable && !field.isAnnotationPresent(Hidden.class)) {
-                            boolean isReadonly = field.isAnnotationPresent(NoEditable.class);
-                            if (field.isAnnotationPresent(Compute.class) && !field.getAnnotation(Compute.class).editable()) {
-                                isReadonly = true;
+                            cellTable.addHeaderRow(cellHeader);
+                            
+                            if (val instanceof List) {
+                                List<?> list = (List<?>) val;
+                                for (Object rowObj : list) {
+                                    Row cellRow = new Row();
+                                    for (String colName : colNames) {
+                                        String cleanCol = colName.trim();
+                                        if (cleanCol.isEmpty()) continue;
+                                        try {
+                                            Field itemField = rowObj.getClass().getDeclaredField(cleanCol);
+                                            itemField.setAccessible(true);
+                                            Object itemVal = itemField.get(rowObj);
+                                            String valStr = "";
+                                            if (itemVal != null) {
+                                                if (itemField.isAnnotationPresent(ViewSelectOne.class)) {
+                                                    valStr = getIdValueForSource(itemVal);
+                                                } else {
+                                                    valStr = itemVal.toString();
+                                                }
+                                            }
+                                            cellRow.add(new TD(valStr).setStyle("padding", "2px 5px"));
+                                        } catch (Exception ex) {
+                                            cellRow.add(new TD("").setStyle("padding", "2px 5px"));
+                                        }
+                                    }
+                                    cellTable.addRow(cellRow);
+                                }
                             }
-                            if (field.isAnnotationPresent(ViewSelectOne.class)) {
-                                ViewSelectOne anno = field.getAnnotation(ViewSelectOne.class);
-                                SelectOne select = new SelectOne("table_" + field.getName() + "_" + idValue);
-                                select.setId("table_" + field.getName() + "_" + idValue);
-                                populateSelectOptions(select, anno.source(), anno.method(), anno.label(), anno.filter());
-                                if (val != null) select.setProperty("value", getIdValueForSource(val));
-                                if (isReadonly) {
-                                    select.setStyle("pointer-events", "none")
-                                          .setStyle("background", "transparent")
-                                          .setStyle("color", "var(--jettra-text, #ffffff)")
-                                          .setStyle("border", "none");
-                                } else {
-                                    select.setStyle("background", "var(--jettra-glass, rgba(0,0,0,0.3))").setStyle("color", "var(--jettra-text, #ffffff)");
-                                    select.setProperty("onchange", "saveInlineEdit_" + uniqueId + "('" + idValue + "', '" + field.getName() + "', this.value)");
-                                }
-                                td.add(select);
-                            } else if (field.getType() == java.time.LocalDate.class || field.getType() == java.util.Date.class) {
-                                DatePicker datePicker = new DatePicker("table_" + field.getName() + "_" + idValue, "");
-                                if (val != null) datePicker.setValue(val.toString());
-                                datePicker.setStyle("width", "100%").setStyle("box-sizing", "border-box");
-                                if (isReadonly) {
-                                    datePicker.setEditable(false);
-                                } else {
-                                    datePicker.setOnChange("saveInlineEdit_" + uniqueId + "('" + idValue + "', '" + field.getName() + "', this.value)");
-                                }
-                                td.add(datePicker);
-                            } else {
-                                TextBox textBox = new TextBox("text", "table_" + field.getName() + "_" + idValue);
-                                textBox.setId("table_" + field.getName() + "_" + idValue);
-                                textBox.setProperty("value", displayValue);
-                                textBox.setStyle("width", "100%").setStyle("box-sizing", "border-box").setStyle("padding", "4px").setStyle("border", "1px solid var(--jettra-border, #ccc)");
-                                if (isReadonly) {
-                                    textBox.setReadonly(true);
-                                    textBox.setStyle("background", "transparent");
-                                    textBox.setStyle("color", "var(--jettra-text, #ffffff)");
-                                    textBox.setStyle("cursor", "not-allowed");
-                                    textBox.setStyle("border", "none");
-                                } else {
-                                    textBox.setStyle("background", "var(--jettra-glass, rgba(0,0,0,0.3))").setStyle("color", "var(--jettra-text, #ffffff)");
-                                    textBox.setProperty("onchange", "saveInlineEdit_" + uniqueId + "('" + idValue + "', '" + field.getName() + "', this.value)");
-                                }
-                                td.add(textBox);
-                            }
+                            td.add(cellTable);
                         } else {
-                            td.setContent(displayValue);
+                            boolean masterEditable = this.editable;
+                            for (Field f : fields) {
+                                if (f.isAnnotationPresent(ViewDataTable.class)) {
+                                    if (!f.getAnnotation(ViewDataTable.class).editableRowMaster()) {
+                                        masterEditable = false;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (masterEditable && !field.isAnnotationPresent(Hidden.class)) {
+                                boolean isReadonly = field.isAnnotationPresent(NoEditable.class);
+                                if (field.isAnnotationPresent(Compute.class) && !field.getAnnotation(Compute.class).editable()) {
+                                    isReadonly = true;
+                                }
+                                if (field.isAnnotationPresent(ViewSelectOne.class)) {
+                                    ViewSelectOne anno = field.getAnnotation(ViewSelectOne.class);
+                                    SelectOne select = new SelectOne("table_" + field.getName() + "_" + idValue);
+                                    select.setId("table_" + field.getName() + "_" + idValue);
+                                    populateSelectOptions(select, anno.source(), anno.method(), anno.label(), anno.filter());
+                                    if (val != null) select.setProperty("value", getIdValueForSource(val));
+                                    if (isReadonly) {
+                                        select.setStyle("pointer-events", "none")
+                                              .setStyle("background", "transparent")
+                                              .setStyle("color", "var(--jettra-text, #ffffff)")
+                                              .setStyle("border", "none");
+                                    } else {
+                                        select.setStyle("background", "var(--jettra-glass, rgba(0,0,0,0.3))").setStyle("color", "var(--jettra-text, #ffffff)");
+                                        select.setProperty("onchange", "saveInlineEdit_" + uniqueId + "('" + idValue + "', '" + field.getName() + "', this.value)");
+                                    }
+                                    td.add(select);
+                                } else if (field.getType() == java.time.LocalDate.class || field.getType() == java.util.Date.class) {
+                                    DatePicker datePicker = new DatePicker("table_" + field.getName() + "_" + idValue, "");
+                                    if (val != null) datePicker.setValue(val.toString());
+                                    datePicker.setStyle("width", "100%").setStyle("box-sizing", "border-box");
+                                    if (isReadonly) {
+                                        datePicker.setEditable(false);
+                                    } else {
+                                        datePicker.setOnChange("saveInlineEdit_" + uniqueId + "('" + idValue + "', '" + field.getName() + "', this.value)");
+                                    }
+                                    td.add(datePicker);
+                                } else {
+                                    TextBox textBox = new TextBox("text", "table_" + field.getName() + "_" + idValue);
+                                    textBox.setId("table_" + field.getName() + "_" + idValue);
+                                    textBox.setProperty("value", displayValue);
+                                    textBox.setStyle("width", "100%").setStyle("box-sizing", "border-box").setStyle("padding", "4px").setStyle("border", "1px solid var(--jettra-border, #ccc)");
+                                    if (isReadonly) {
+                                        textBox.setReadonly(true);
+                                        textBox.setStyle("background", "transparent");
+                                        textBox.setStyle("color", "var(--jettra-text, #ffffff)");
+                                        textBox.setStyle("cursor", "not-allowed");
+                                        textBox.setStyle("border", "none");
+                                    } else {
+                                        textBox.setStyle("background", "var(--jettra-glass, rgba(0,0,0,0.3))").setStyle("color", "var(--jettra-text, #ffffff)");
+                                        textBox.setProperty("onchange", "saveInlineEdit_" + uniqueId + "('" + idValue + "', '" + field.getName() + "', this.value)");
+                                    }
+                                    td.add(textBox);
+                                }
+                            } else {
+                                td.setContent(displayValue);
+                            }
                         }
                         dataRow.add(td);
                     }
@@ -401,6 +477,9 @@ public class CrudView extends UIComponent {
 
                 Field[] fields = modelClass.getDeclaredFields();
                 for (Field field : fields) {
+                    if (field.isAnnotationPresent(ViewDataTable.class) && !field.getAnnotation(ViewDataTable.class).showRowInMasterTable()) {
+                        continue;
+                    }
                     String lbl = getFieldLabel(field);
                     Object col = columnClass.getConstructor(String.class, String.class, int.class).newInstance(lbl, field.getName(), 150);
                     

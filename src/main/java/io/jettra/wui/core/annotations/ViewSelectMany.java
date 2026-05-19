@@ -12,4 +12,5 @@ public @interface ViewSelectMany {
     String source();
     String method();
     String filter() default "";
+    String fieldOnlyMasterTable() default "";
 }

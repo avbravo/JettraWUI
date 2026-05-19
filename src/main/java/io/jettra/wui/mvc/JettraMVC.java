@@ -566,6 +566,9 @@ public class JettraMVC {
             
             Field[] fields = modelClass.getDeclaredFields();
             for (Field field : fields) {
+                if (field.isAnnotationPresent(io.jettra.wui.core.annotations.ViewDataTable.class) && !field.getAnnotation(io.jettra.wui.core.annotations.ViewDataTable.class).showRowInMasterTable()) {
+                    continue;
+                }
                 String detailExpression = field.getName();
                 if (field.isAnnotationPresent(io.jettra.wui.core.annotations.TableColumnField.class)) {
                     io.jettra.wui.core.annotations.TableColumnField tcf = field.getAnnotation(io.jettra.wui.core.annotations.TableColumnField.class);

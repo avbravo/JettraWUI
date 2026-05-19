@@ -55,3 +55,22 @@ When this property is enabled, an "Add item..." option is automatically appended
 
 ## 5. Styling
 By default, `SelectOne` applies the classes `j-select j-component` which styles the dropdown with JettraWUI's modern theme (dark backgrounds, borders, and typography). You can use `.setStyle("width", "100%")` to make it span a container.
+
+
+## 6. Integration with `@ViewSelectOne` annotation
+
+When declaring a field-level `@ViewSelectOne` relationship inside a master-detail model, you can use the `fieldOnlyMasterTable` attribute to specify which property or properties of the related object should be displayed in the master table's cells instead of calling the object's default `toString()` method.
+
+### Example:
+
+```java
+@ViewSelectOne(
+    label = "nombre",
+    fieldOnlyMasterTable = "nombre",
+    source = "ClienteRepository",
+    method = "findAll"
+)
+private ClienteModel cliente;
+```
+
+This tells the renderer to display only the `nombre` field of the selected `ClienteModel` in the master table.
