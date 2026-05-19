@@ -338,7 +338,11 @@ public class CrudView extends UIComponent {
                             .setId("deleteBtn_" + idValue + "_" + uniqueId)
                             .setOnclick("showCrudModal_" + uniqueId + "('delete', true, " + jsonData + ")");
 
-                    actionsTd.add(editBtn).add(deleteBtn);
+                    Button printBtn = new Button("🖨️")
+                            .setId("printBtn_" + idValue + "_" + uniqueId)
+                            .setOnclick("window.open('?action=report&format=pdf&print=true&id=" + idValue + "', '_blank')");
+
+                    actionsTd.add(editBtn).add(deleteBtn).add(printBtn);
                     dataRow.add(actionsTd);
                     table.addRow(dataRow);
                 }
@@ -579,7 +583,7 @@ public class CrudView extends UIComponent {
     private void setupModal(String uniqueId) {
         this.crudModal = new Modal("crudModal_" + uniqueId)
                 .setPadding("35px")
-                .setMaxWidth("650px")
+                .setMaxWidth("900px")
                 .setZIndex("9999");
         this.crudModal.setStyle("display", "none");
 
@@ -1007,8 +1011,8 @@ public class CrudView extends UIComponent {
                     itemClass = (Class<?>) ((java.lang.reflect.ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
                 }
                 if (itemClass != null) {
-                    script.append("const productPrices_").append(uniqueId).append(" = {};\n");
-                    script.append("const productOptions_").append(uniqueId).append(" = [];\n");
+                    script.append("window.productPrices_").append(uniqueId).append(" = {};\n");
+                    script.append("window.productOptions_").append(uniqueId).append(" = [];\n");
                     for (Field itemF : itemClass.getDeclaredFields()) {
                         if (itemF.isAnnotationPresent(ViewSelectOne.class)) {
                             ViewSelectOne vso = itemF.getAnnotation(ViewSelectOne.class);
@@ -1028,8 +1032,8 @@ public class CrudView extends UIComponent {
                                             String lblVal = resolveLabel(obj, vso.label());
                                             String priceVal = resolveObjectField(obj, "precio");
                                             if (priceVal.isEmpty()) priceVal = "0";
-                                            script.append("productPrices_").append(uniqueId).append("['").append(idVal).append("'] = ").append(priceVal).append(";\n");
-                                            script.append("productOptions_").append(uniqueId).append(".push({val:'").append(idVal).append("', lbl:'").append(lblVal.replace("'", "\\'")).append("'});\n");
+                                            script.append("window.productPrices_").append(uniqueId).append("['").append(idVal).append("'] = ").append(priceVal).append(";\n");
+                                            script.append("window.productOptions_").append(uniqueId).append(".push({val:'").append(idVal).append("', lbl:'").append(lblVal.replace("'", "\\'")).append("'});\n");
                                         }
                                     }
                                 } catch(Exception ex) {}

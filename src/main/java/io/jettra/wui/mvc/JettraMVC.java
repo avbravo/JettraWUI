@@ -416,7 +416,8 @@ public class JettraMVC {
                     String format = params.get("format");
                     if (format == null) format = "pdf";
                     boolean print = "true".equals(params.get("print"));
-                    generateReport(page, modelClass, repoClass, format, print);
+                    String id = params.get("id");
+                    generateReport(page, modelClass, repoClass, format, print, id);
                     return true;
                 }
             } catch (Exception e) {
@@ -498,7 +499,8 @@ public class JettraMVC {
                     String format = params.get("format");
                     if (format == null) format = "pdf";
                     boolean print = "true".equals(params.get("print"));
-                    generateReport(page, modelClass, repoClass, format, print);
+                    String id = params.get("id");
+                    generateReport(page, modelClass, repoClass, format, print, id);
                     return true;
                 }
             } catch (Exception e) {
@@ -509,10 +511,23 @@ public class JettraMVC {
     }
 
     public static void generateReport(Page page, Class<?> modelClass, Class<?> repoClass, String format, boolean print) {
+        generateReport(page, modelClass, repoClass, format, print, null);
+    }
+
+    public static void generateReport(Page page, Class<?> modelClass, Class<?> repoClass, String format, boolean print, String id) {
         try {
             // 1. Obtener datos
-            Method findAll = repoClass.getMethod("findAll");
-            List<?> data = (List<?>) findAll.invoke(null);
+            List<Object> data = new ArrayList<>();
+            if (id != null && !id.trim().isEmpty()) {
+                Method findById = repoClass.getMethod("findById", String.class);
+                Object singleObj = findById.invoke(null, id);
+                if (singleObj != null) {
+                    data.add(singleObj);
+                }
+            } else {
+                Method findAll = repoClass.getMethod("findAll");
+                data.addAll((List<?>) findAll.invoke(null));
+            }
 
             // 2. Cargar JettraReport vía reflexión para evitar dependencia circular
             ClassLoader loader = Thread.currentThread().getContextClassLoader();
