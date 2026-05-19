@@ -320,6 +320,9 @@ public class JettraMVC {
         if (page.getClass().isAnnotationPresent(CrudView.class)) {
             try {
                 CrudView anno = page.getClass().getAnnotation(CrudView.class);
+                if (!anno.autoRender()) {
+                    return;
+                }
                 Class<?> modelClass = anno.model();
                 Class<?> repoClass = anno.repository();
 

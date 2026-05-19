@@ -71,4 +71,9 @@ public @interface CrudView {
      * Enable inline editable datatable.
      */
     boolean editable() default false;
+
+    /**
+     * Automatically render the CrudView. If false, the page must manually build and add the component.
+     */
+    boolean autoRender() default true;
 }

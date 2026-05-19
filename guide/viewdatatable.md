@@ -35,3 +35,38 @@ En este ejemplo, la tabla renderizará las columnas `productoId`, `precio`, `can
 Cuando `@ViewDataTable` se detecta en un campo durante el renderizado de `@CrudView`, el motor `JettraWUI` crea de forma autónoma una sub-tabla dentro de la tarjeta de edición. 
 
 Los componentes internos generados respetan las anotaciones del modelo detallado (por ejemplo `@ViewSelectOne` o `@Hidden` en `LineaFacturaModel`).
+
+
+## Cuando se usa en Master-Details
+Se puede especificarshowRowInMasterTable:
+ Cuando se usa en un formulario Master-details en la tabla maestra donde
+     * se anexa de manera predeterminada no se muestra. Si lo cambia a true
+     * se muestra la tabla dentro de la otra tabla
+
+```java
+
+@JettraViewModel
+public class FacturaModel {
+    @NotNull
+    @PropertiesLabel(value = "factura.id", label = "ID Factura")
+    private Long idFactura;
+
+
+    @NotNull
+    @ViewSelectOne(label = "nombre", source = "ClienteRepository", method = "findAll")
+    @PropertiesLabel(value = "factura.cliente", label = "Cliente")
+    private ClienteModel clienteModel;
+    
+    
+    @NotNull
+    @PropertiesLabel(value = "factura.fechaEmision", label = "Fecha de Emisión")
+    private LocalDate fechaEmision;
+
+    @ViewDataTable(showRowInMasterTable = false,row="productoId, precio, cantidad, total", editablerow="productoId, cantidad", source="FacturaRepository", method="getLineas")
+    @PropertiesLabel(value = "factura.lineas", label = "Detalle de Líneas")
+    private List<LineaFacturaModel> lineaFacturaModel;
+```
+
+No muestra el datatable correspondiente a LineaFacturaModel, en la tabla maestra de Factura, si no que esta se habilita mediante jun modal donde se puede interactuar con ella.
+
+En El componente ViewDatatable.java debe añadirse la propiedad editableRowMaster que demanera prederterminada esta en true, si se coloca en false las columnas del datatable master no 

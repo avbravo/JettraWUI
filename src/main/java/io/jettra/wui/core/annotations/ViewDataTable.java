@@ -24,6 +24,13 @@ public @interface ViewDataTable {
      * Example: "name"
      */
     String editablerow() default "";
+    /**
+     * Cuando se usa en un formulario Master-details en la tabla maestra donde
+     * se anexa de manera predeterminada no se muestra. Si lo cambia a true
+     * se muestra la tabla dentro de la otra tabla
+     * Example: false
+     */
+    boolean showRowInMasterTable() default false;
 
     /**
      * The class managing the data source (Repository, Controller, Service)
