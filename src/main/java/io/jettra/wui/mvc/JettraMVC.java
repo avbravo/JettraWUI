@@ -632,17 +632,27 @@ public class JettraMVC {
                     String finalLabel = label;
                     String targetSection = "HEADER";
                     String alignment = "LEFT";
-                    if (f.isAnnotationPresent(io.jettra.wui.core.annotations.ModelReportLabel.class)) {
-                        io.jettra.wui.core.annotations.ModelReportLabel mrl = f.getAnnotation(io.jettra.wui.core.annotations.ModelReportLabel.class);
-                        if (mrl.label() != null && !mrl.label().isEmpty()) {
-                            finalLabel = mrl.label();
-                        }
-                        if (mrl.section() != null) {
-                            targetSection = mrl.section().name();
-                        }
-                        if (mrl.orientation() != null) {
-                            alignment = mrl.orientation().name();
-                        }
+                    Class<? extends java.lang.annotation.Annotation> mrlClass = null;
+                    try {
+                        mrlClass = (Class<? extends java.lang.annotation.Annotation>) loader.loadClass("com.jettra.report.annotations.ModelReportLabel");
+                    } catch (Exception e) {}
+
+                    if (mrlClass != null && f.isAnnotationPresent(mrlClass)) {
+                        java.lang.annotation.Annotation mrl = f.getAnnotation(mrlClass);
+                        try {
+                            String mrlLabel = (String) mrlClass.getMethod("label").invoke(mrl);
+                            if (mrlLabel != null && !mrlLabel.isEmpty()) {
+                                finalLabel = mrlLabel;
+                            }
+                            Object sectionObj = mrlClass.getMethod("section").invoke(mrl);
+                            if (sectionObj != null) {
+                                targetSection = sectionObj.toString();
+                            }
+                            Object orientationObj = mrlClass.getMethod("orientation").invoke(mrl);
+                            if (orientationObj != null) {
+                                alignment = orientationObj.toString();
+                            }
+                        } catch (Exception e) {}
                     }
                     
                     Object labelValEl = textElementClass.getConstructor(String.class).newInstance(finalLabel + ": " + valStr);
