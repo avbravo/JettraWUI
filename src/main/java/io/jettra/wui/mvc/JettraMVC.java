@@ -561,12 +561,25 @@ public class JettraMVC {
             Object footer = reportClass.getMethod("getFooter").invoke(report);
             Object summary = reportClass.getMethod("getSummary").invoke(report);
 
+            // Determinar tipo de reporte (MASTER/DETAILS o NORMAL)
+            boolean isMasterDetail = false;
+            if (singleObj != null) {
+                for (Field f : modelClass.getDeclaredFields()) {
+                    if (f.isAnnotationPresent(io.jettra.wui.core.annotations.ViewDataTable.class)) {
+                        isMasterDetail = true;
+                        break;
+                    }
+                }
+            }
+
             // Cargar anotaciones de cabecera custom vía reflexión para evitar dependencia circular
             Class<? extends java.lang.annotation.Annotation> disabledHeaderClass = null;
             Class<? extends java.lang.annotation.Annotation> mrhClass = null;
+            Class<? extends java.lang.annotation.Annotation> mrfClass = null;
             try {
                 disabledHeaderClass = (Class<? extends java.lang.annotation.Annotation>) loader.loadClass("com.jettra.report.annotations.ModelReportDisabledHeader");
                 mrhClass = (Class<? extends java.lang.annotation.Annotation>) loader.loadClass("com.jettra.report.annotations.ModelReportHeader");
+                mrfClass = (Class<? extends java.lang.annotation.Annotation>) loader.loadClass("com.jettra.report.annotations.ModelReportFooter");
             } catch (Exception e) {}
 
             boolean headerDisabled = false;
@@ -586,17 +599,45 @@ public class JettraMVC {
                 headerClass.getMethod("addElement", Class.forName("com.jettra.report.Report$ReportElement")).invoke(header, titleEl);
             }
 
-            // Procesar cabecera personalizada con @ModelReportHeader si existe
+            // Procesar cabeceras repetibles con @ModelReportHeader y ReportType
+            java.lang.annotation.Annotation[] headers = null;
             if (mrhClass != null) {
-                java.lang.annotation.Annotation mrh = null;
-                if (modelClass.isAnnotationPresent(mrhClass)) {
-                    mrh = modelClass.getAnnotation(mrhClass);
-                } else if (page.getClass().isAnnotationPresent(mrhClass)) {
-                    mrh = page.getClass().getAnnotation(mrhClass);
-                }
-
-                if (mrh != null) {
+                try {
+                    Class<? extends java.lang.annotation.Annotation> headersContainer = (Class<? extends java.lang.annotation.Annotation>) loader.loadClass("com.jettra.report.annotations.ModelReportHeaders");
+                    if (modelClass.isAnnotationPresent(mrhClass) || modelClass.isAnnotationPresent(headersContainer)) {
+                        headers = modelClass.getAnnotationsByType(mrhClass);
+                    } else if (page.getClass().isAnnotationPresent(mrhClass) || page.getClass().isAnnotationPresent(headersContainer)) {
+                        headers = page.getClass().getAnnotationsByType(mrhClass);
+                    }
+                } catch(Exception e) {
                     try {
+                        headers = modelClass.getAnnotationsByType(mrhClass);
+                        if (headers == null || headers.length == 0) {
+                            headers = page.getClass().getAnnotationsByType(mrhClass);
+                        }
+                    } catch(Exception ex) {}
+                }
+            }
+
+            if (headers != null) {
+                for (java.lang.annotation.Annotation mrh : headers) {
+                    try {
+                        Object typeEnumVal = mrhClass.getMethod("type").invoke(mrh);
+                        String typeStr = (typeEnumVal != null) ? typeEnumVal.toString() : "NORMAL";
+                        
+                        boolean match = false;
+                        if (isMasterDetail) {
+                            if (typeStr.equals("MASTER") || typeStr.equals("DETAILS")) {
+                                match = true;
+                            }
+                        } else {
+                            if (typeStr.equals("NORMAL")) {
+                                match = true;
+                            }
+                        }
+                        
+                        if (!match) continue;
+
                         String mrhValue = (String) mrhClass.getMethod("value").invoke(mrh);
                         String mrhLabel = (String) mrhClass.getMethod("label").invoke(mrh);
                         String headerText = (mrhValue != null && !mrhValue.isEmpty()) ? mrhValue : mrhLabel;
@@ -639,7 +680,93 @@ public class JettraMVC {
                             headerClass.getMethod("addElement", Class.forName("com.jettra.report.Report$ReportElement", true, loader)).invoke(header, customTitleEl);
                         }
                     } catch (Exception e) {
-                        System.err.println("Error processing @ModelReportHeader in JettraMVC: " + e.getMessage());
+                        System.err.println("Error processing @ModelReportHeader: " + e.getMessage());
+                    }
+                }
+            }
+
+            // Procesar pies de página repetibles con @ModelReportFooter y ReportType
+            java.lang.annotation.Annotation[] footers = null;
+            if (mrfClass != null) {
+                try {
+                    Class<? extends java.lang.annotation.Annotation> footersContainer = (Class<? extends java.lang.annotation.Annotation>) loader.loadClass("com.jettra.report.annotations.ModelReportFooters");
+                    if (modelClass.isAnnotationPresent(mrfClass) || modelClass.isAnnotationPresent(footersContainer)) {
+                        footers = modelClass.getAnnotationsByType(mrfClass);
+                    } else if (page.getClass().isAnnotationPresent(mrfClass) || page.getClass().isAnnotationPresent(footersContainer)) {
+                        footers = page.getClass().getAnnotationsByType(mrfClass);
+                    }
+                } catch(Exception e) {
+                    try {
+                        footers = modelClass.getAnnotationsByType(mrfClass);
+                        if (footers == null || footers.length == 0) {
+                            footers = page.getClass().getAnnotationsByType(mrfClass);
+                        }
+                    } catch(Exception ex) {}
+                }
+            }
+
+            if (footers != null) {
+                for (java.lang.annotation.Annotation mrf : footers) {
+                    try {
+                        Object typeEnumVal = mrfClass.getMethod("type").invoke(mrf);
+                        String typeStr = (typeEnumVal != null) ? typeEnumVal.toString() : "NORMAL";
+                        
+                        boolean match = false;
+                        if (isMasterDetail) {
+                            if (typeStr.equals("MASTER") || typeStr.equals("DETAILS")) {
+                                match = true;
+                            }
+                        } else {
+                            if (typeStr.equals("NORMAL")) {
+                                match = true;
+                            }
+                        }
+                        
+                        if (!match) continue;
+
+                        String mrfValue = (String) mrfClass.getMethod("value").invoke(mrf);
+                        String mrfLabel = (String) mrfClass.getMethod("label").invoke(mrf);
+                        String footerText = (mrfValue != null && !mrfValue.isEmpty()) ? mrfValue : mrfLabel;
+
+                        if (footerText != null && !footerText.isEmpty()) {
+                            String fontName = (String) mrfClass.getMethod("font").invoke(mrf);
+                            int fontSize = (int) mrfClass.getMethod("size").invoke(mrf);
+                            String textColorVal = (String) mrfClass.getMethod("textColor").invoke(mrf);
+                            Object orientationObj = mrfClass.getMethod("orientation").invoke(mrf);
+                            String alignment = (orientationObj != null) ? orientationObj.toString() : "LEFT";
+
+                            boolean isBold = false;
+                            boolean isItalic = false;
+                            boolean isUnderline = false;
+                            boolean isStrikethrough = false;
+
+                            Object[] styles = (Object[]) mrfClass.getMethod("style").invoke(mrf);
+                            if (styles != null) {
+                                for (Object s : styles) {
+                                    String styleName = s.toString();
+                                    if (styleName.equals("BOLD")) isBold = true;
+                                    else if (styleName.equals("ITALIC")) isItalic = true;
+                                    else if (styleName.equals("SUBLINE")) isUnderline = true;
+                                    else if (styleName.equals("STRIKETHROUGH")) isStrikethrough = true;
+                                }
+                            }
+
+                            Object customFooterEl = textElementClass.getConstructor(String.class).newInstance(footerText);
+                            textElementClass.getMethod("setFontName", String.class).invoke(customFooterEl, fontName);
+                            textElementClass.getMethod("setFontSize", int.class).invoke(customFooterEl, fontSize);
+                            textElementClass.getMethod("setFontColor", String.class).invoke(customFooterEl, textColorVal);
+                            textElementClass.getMethod("setAlignment", String.class).invoke(customFooterEl, alignment);
+                            textElementClass.getMethod("setBold", boolean.class).invoke(customFooterEl, isBold);
+                            try {
+                                textElementClass.getMethod("setItalic", boolean.class).invoke(customFooterEl, isItalic);
+                                textElementClass.getMethod("setUnderline", boolean.class).invoke(customFooterEl, isUnderline);
+                                textElementClass.getMethod("setStrikethrough", boolean.class).invoke(customFooterEl, isStrikethrough);
+                            } catch(Exception e) {}
+
+                            footerClass.getMethod("addElement", Class.forName("com.jettra.report.Report$ReportElement", true, loader)).invoke(footer, customFooterEl);
+                        }
+                    } catch (Exception e) {
+                        System.err.println("Error processing @ModelReportFooter: " + e.getMessage());
                     }
                 }
             }
