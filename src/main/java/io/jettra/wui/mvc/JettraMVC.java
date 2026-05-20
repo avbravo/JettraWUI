@@ -561,13 +561,88 @@ public class JettraMVC {
             Object footer = reportClass.getMethod("getFooter").invoke(report);
             Object summary = reportClass.getMethod("getSummary").invoke(report);
 
-            String finalTitle = (customTitle != null && !customTitle.isEmpty()) ? customTitle : "REPORTE DE " + modelClass.getSimpleName().toUpperCase();
-            Object titleEl = textElementClass.getConstructor(String.class).newInstance(finalTitle);
-            
-            textElementClass.getMethod("setFontColor", String.class).invoke(titleEl, headerColor);
-            textElementClass.getMethod("setBold", boolean.class).invoke(titleEl, true);
-            textElementClass.getMethod("setFontSize", int.class).invoke(titleEl, 14);
-            headerClass.getMethod("addElement", Class.forName("com.jettra.report.Report$ReportElement")).invoke(header, titleEl);
+            // Cargar anotaciones de cabecera custom vía reflexión para evitar dependencia circular
+            Class<? extends java.lang.annotation.Annotation> disabledHeaderClass = null;
+            Class<? extends java.lang.annotation.Annotation> mrhClass = null;
+            try {
+                disabledHeaderClass = (Class<? extends java.lang.annotation.Annotation>) loader.loadClass("com.jettra.report.annotations.ModelReportDisabledHeader");
+                mrhClass = (Class<? extends java.lang.annotation.Annotation>) loader.loadClass("com.jettra.report.annotations.ModelReportHeader");
+            } catch (Exception e) {}
+
+            boolean headerDisabled = false;
+            if (disabledHeaderClass != null) {
+                if (modelClass.isAnnotationPresent(disabledHeaderClass) || page.getClass().isAnnotationPresent(disabledHeaderClass)) {
+                    headerDisabled = true;
+                }
+            }
+
+            if (!headerDisabled) {
+                String finalTitle = (customTitle != null && !customTitle.isEmpty()) ? customTitle : "REPORTE DE " + modelClass.getSimpleName().toUpperCase();
+                Object titleEl = textElementClass.getConstructor(String.class).newInstance(finalTitle);
+                
+                textElementClass.getMethod("setFontColor", String.class).invoke(titleEl, headerColor);
+                textElementClass.getMethod("setBold", boolean.class).invoke(titleEl, true);
+                textElementClass.getMethod("setFontSize", int.class).invoke(titleEl, 14);
+                headerClass.getMethod("addElement", Class.forName("com.jettra.report.Report$ReportElement")).invoke(header, titleEl);
+            }
+
+            // Procesar cabecera personalizada con @ModelReportHeader si existe
+            if (mrhClass != null) {
+                java.lang.annotation.Annotation mrh = null;
+                if (modelClass.isAnnotationPresent(mrhClass)) {
+                    mrh = modelClass.getAnnotation(mrhClass);
+                } else if (page.getClass().isAnnotationPresent(mrhClass)) {
+                    mrh = page.getClass().getAnnotation(mrhClass);
+                }
+
+                if (mrh != null) {
+                    try {
+                        String mrhValue = (String) mrhClass.getMethod("value").invoke(mrh);
+                        String mrhLabel = (String) mrhClass.getMethod("label").invoke(mrh);
+                        String headerText = (mrhValue != null && !mrhValue.isEmpty()) ? mrhValue : mrhLabel;
+
+                        if (headerText != null && !headerText.isEmpty()) {
+                            String fontName = (String) mrhClass.getMethod("font").invoke(mrh);
+                            int fontSize = (int) mrhClass.getMethod("size").invoke(mrh);
+                            String textColorVal = (String) mrhClass.getMethod("textColor").invoke(mrh);
+                            Object orientationObj = mrhClass.getMethod("orientation").invoke(mrh);
+                            String alignment = (orientationObj != null) ? orientationObj.toString() : "LEFT";
+
+                            boolean isBold = false;
+                            boolean isItalic = false;
+                            boolean isUnderline = false;
+                            boolean isStrikethrough = false;
+
+                            Object[] styles = (Object[]) mrhClass.getMethod("style").invoke(mrh);
+                            if (styles != null) {
+                                for (Object s : styles) {
+                                    String styleName = s.toString();
+                                    if (styleName.equals("BOLD")) isBold = true;
+                                    else if (styleName.equals("ITALIC")) isItalic = true;
+                                    else if (styleName.equals("SUBLINE")) isUnderline = true;
+                                    else if (styleName.equals("STRIKETHROUGH")) isStrikethrough = true;
+                                }
+                            }
+
+                            Object customTitleEl = textElementClass.getConstructor(String.class).newInstance(headerText);
+                            textElementClass.getMethod("setFontName", String.class).invoke(customTitleEl, fontName);
+                            textElementClass.getMethod("setFontSize", int.class).invoke(customTitleEl, fontSize);
+                            textElementClass.getMethod("setFontColor", String.class).invoke(customTitleEl, textColorVal);
+                            textElementClass.getMethod("setAlignment", String.class).invoke(customTitleEl, alignment);
+                            textElementClass.getMethod("setBold", boolean.class).invoke(customTitleEl, isBold);
+                            try {
+                                textElementClass.getMethod("setItalic", boolean.class).invoke(customTitleEl, isItalic);
+                                textElementClass.getMethod("setUnderline", boolean.class).invoke(customTitleEl, isUnderline);
+                                textElementClass.getMethod("setStrikethrough", boolean.class).invoke(customTitleEl, isStrikethrough);
+                            } catch(Exception e) {}
+
+                            headerClass.getMethod("addElement", Class.forName("com.jettra.report.Report$ReportElement", true, loader)).invoke(header, customTitleEl);
+                        }
+                    } catch (Exception e) {
+                        System.err.println("Error processing @ModelReportHeader in JettraMVC: " + e.getMessage());
+                    }
+                }
+            }
 
             // Buscar si hay un campo ViewDataTable en el modelo
             Field detailField = null;
