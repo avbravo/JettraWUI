@@ -352,6 +352,7 @@ public class JettraMVC {
                 crudComponent.setReportAllowPdf(anno.reportAllowPdf());
                 crudComponent.setReportAllowExcel(anno.reportAllowExcel());
                 crudComponent.setReportAllowCsv(anno.reportAllowCsv());
+                crudComponent.setReportAllowWord(anno.reportAllowWord());
                 crudComponent.setReportOrientation(anno.reportOrientation());
                 crudComponent.setReportCustomTitle(anno.reportTitle());
                 crudComponent.setReportHeaderColor(anno.reportHeaderColor());
@@ -627,7 +628,9 @@ public class JettraMVC {
                         
                         boolean match = false;
                         if (isMasterDetail) {
-                            if (typeStr.equals("MASTER") || typeStr.equals("DETAILS")) {
+                            if (singleObj == null && typeStr.equals("MASTER")) {
+                                match = true;
+                            } else if (singleObj != null && typeStr.equals("DETAILS")) {
                                 match = true;
                             }
                         } else {
@@ -713,7 +716,9 @@ public class JettraMVC {
                         
                         boolean match = false;
                         if (isMasterDetail) {
-                            if (typeStr.equals("MASTER") || typeStr.equals("DETAILS")) {
+                            if (singleObj == null && typeStr.equals("MASTER")) {
+                                match = true;
+                            } else if (singleObj != null && typeStr.equals("DETAILS")) {
                                 match = true;
                             }
                         } else {

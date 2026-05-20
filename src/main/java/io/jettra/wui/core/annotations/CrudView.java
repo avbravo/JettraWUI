@@ -53,6 +53,11 @@ public @interface CrudView {
     boolean reportAllowCsv() default true;
 
     /**
+     * Enable Word option in report viewer.
+     */
+    boolean reportAllowWord() default true;
+
+    /**
      * Report orientation (PORTRAIT or LANDSCAPE).
      */
     String reportOrientation() default "PORTRAIT";

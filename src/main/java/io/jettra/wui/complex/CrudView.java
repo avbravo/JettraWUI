@@ -31,6 +31,7 @@ public class CrudView extends UIComponent {
     private boolean reportAllowPdf = true;
     private boolean reportAllowExcel = true;
     private boolean reportAllowCsv = true;
+    private boolean reportAllowWord = true;
     private String reportOrientation = "PORTRAIT";
     private String reportHeaderColor = "#000000";
     private String reportCustomTitle = "";
@@ -73,7 +74,15 @@ public class CrudView extends UIComponent {
     public CrudView setReportAllowPrint(boolean allow) { this.reportAllowPrint = allow; return this; }
     public CrudView setReportAllowPdf(boolean allow) { this.reportAllowPdf = allow; return this; }
     public CrudView setReportAllowExcel(boolean allow) { this.reportAllowExcel = allow; return this; }
-    public CrudView setReportAllowCsv(boolean allow) { this.reportAllowCsv = allow; return this; }
+    public CrudView setReportAllowCsv(boolean reportAllowCsv) {
+        this.reportAllowCsv = reportAllowCsv;
+        return this;
+    }
+
+    public CrudView setReportAllowWord(boolean reportAllowWord) {
+        this.reportAllowWord = reportAllowWord;
+        return this;
+    }
     public CrudView setReportOrientation(String orientation) { this.reportOrientation = orientation; return this; }
     public CrudView setReportHeaderColor(String color) { this.reportHeaderColor = color; return this; }
     public CrudView setReportCustomTitle(String title) { this.reportCustomTitle = title; return this; }
@@ -528,7 +537,7 @@ public class CrudView extends UIComponent {
                             
                             boolean match = false;
                             if (isMasterDetail) {
-                                if (typeStr.equals("MASTER") || typeStr.equals("DETAILS")) {
+                                if (typeStr.equals("MASTER")) {
                                     match = true;
                                 }
                             } else {
@@ -619,7 +628,7 @@ public class CrudView extends UIComponent {
                                 
                                 boolean match = false;
                                 if (isMasterDetail) {
-                                    if (typeStr.equals("MASTER") || typeStr.equals("DETAILS")) {
+                                    if (typeStr.equals("MASTER")) {
                                         match = true;
                                     }
                                 } else {
@@ -714,6 +723,7 @@ public class CrudView extends UIComponent {
             optionsClass.getMethod("setAllowPdf", boolean.class).invoke(optionsObj, reportAllowPdf);
             optionsClass.getMethod("setAllowExcel", boolean.class).invoke(optionsObj, reportAllowExcel);
             optionsClass.getMethod("setAllowCsv", boolean.class).invoke(optionsObj, reportAllowCsv);
+            optionsClass.getMethod("setAllowWord", boolean.class).invoke(optionsObj, reportAllowWord);
             
             // Create Viewer
             Method createViewer = reportClass.getMethod("createViewer", String.class);
@@ -755,9 +765,11 @@ public class CrudView extends UIComponent {
                 .setStyle("height", "60px").setStyle("width", "70px").setStyle("display", "flex").setStyle("flex-direction", "column").setStyle("align-items", "center").setStyle("justify-content", "center")
                 .setOnclick("location.href='?action=report&format=csv';"));
         }
-        toolbar.add(new Button("📘\nWord").setBackgroundColor("#0969da")
+        if (reportAllowWord) {
+            toolbar.add(new Button("📘\nWord").setBackgroundColor("#0969da")
                 .setStyle("height", "60px").setStyle("width", "70px").setStyle("display", "flex").setStyle("flex-direction", "column").setStyle("align-items", "center").setStyle("justify-content", "center")
                 .setOnclick("location.href='?action=report&format=word';"));
+        }
         
         if (reportAllowPrint) {
             toolbar.add(new Button("🖨️\nImprimir").setBackgroundColor("#007bff")
