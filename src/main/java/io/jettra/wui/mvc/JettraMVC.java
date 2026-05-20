@@ -564,12 +564,10 @@ public class JettraMVC {
 
             // Determinar tipo de reporte (MASTER/DETAILS o NORMAL)
             boolean isMasterDetail = false;
-            if (singleObj != null) {
-                for (Field f : modelClass.getDeclaredFields()) {
-                    if (f.isAnnotationPresent(io.jettra.wui.core.annotations.ViewDataTable.class)) {
-                        isMasterDetail = true;
-                        break;
-                    }
+            for (Field f : modelClass.getDeclaredFields()) {
+                if (f.isAnnotationPresent(io.jettra.wui.core.annotations.ViewDataTable.class)) {
+                    isMasterDetail = true;
+                    break;
                 }
             }
 
