@@ -120,6 +120,14 @@ public class JettraTheme {
             "  --jettra-text: #fff;\n" +
             "  --jettra-accent: #e50914;\n" +
             "}\n" +
+            "body.theme-sai {\n" +
+            "  --jettra-bg: #040408;\n" +
+            "  --jettra-glow: rgba(255, 90, 0, 0.45);\n" +
+            "  --jettra-glass: rgba(12, 10, 20, 0.8);\n" +
+            "  --jettra-border: rgba(255, 90, 0, 0.2);\n" +
+            "  --jettra-text: #f3f4f6;\n" +
+            "  --jettra-accent: #ff5a00;\n" +
+            "}\n" +
             "@keyframes jtGlowPulse { 0% { box-shadow: 0 0 5px var(--jettra-glow); } 50% { box-shadow: 0 0 20px var(--jettra-glow); } 100% { box-shadow: 0 0 5px var(--jettra-glow); } }\n" +
             "body {\n" +
             "  background-color: var(--jettra-bg);\n" +
@@ -147,6 +155,14 @@ public class JettraTheme {
             "body.theme-nx .j-left { background: #000; border: none; border-radius: 0; }\n" +
             "body.theme-nx .j-center { background: #141414; border: none; border-radius: 0; }\n" +
             "body.theme-nx .j-card { background: #181818; border-radius: 8px; border: 1px solid #333; }\n" +
+            "body.theme-sai { background-image: radial-gradient(circle at 50% 50%, #110e26 0%, #040408 100%); }\n" +
+            "body.theme-sai .j-btn { border-radius: 20px; font-weight: 600; text-transform: none; }\n" +
+            "body.theme-sai .j-btn-primary { background: linear-gradient(135deg, #ff5a00, #ff8a00); color: #000; box-shadow: 0 4px 15px rgba(255,90,0,0.3); }\n" +
+            "body.theme-sai .j-btn-primary:hover { background: linear-gradient(135deg, #ff7a00, #ffa500); box-shadow: 0 6px 20px rgba(255,90,0,0.5); }\n" +
+            "body.theme-sai .j-card { background: rgba(12, 10, 20, 0.85); border-radius: 16px; border: 1px solid rgba(255, 90, 0, 0.15); }\n" +
+            "body.theme-sai .j-top { background: rgba(12, 10, 20, 0.9); border: 1px solid rgba(255, 90, 0, 0.15); border-radius: 16px; }\n" +
+            "body.theme-sai .j-left { background: rgba(12, 10, 20, 0.85); border: 1px solid rgba(255, 90, 0, 0.15); border-radius: 16px; }\n" +
+            "body.theme-sai .j-center { background: rgba(12, 10, 20, 0.8); border: 1px solid rgba(255, 90, 0, 0.15); border-radius: 16px; }\n" +
             "body.theme-material-plain .j-3d-effect, body.theme-plain .j-3d-effect, body.theme-white .j-3d-effect { box-shadow: none !important; transform: none !important; }\n" +
             ".j-dashboard {\n" +
             "  display: grid; grid-template-columns: 260px 1fr; grid-template-rows: 64px 1fr auto;\n" +

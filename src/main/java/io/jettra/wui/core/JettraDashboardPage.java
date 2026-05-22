@@ -168,6 +168,7 @@ public abstract class JettraDashboardPage extends Page {
         themeSelect.addOption("plain", "Plain Style", "\uD83D\uDCCB");
         themeSelect.addOption("astro", "Astro Theme", "\uD83D\uDE80");
         themeSelect.addOption("nx", "Nx", "\uD83C\uDFA6");
+        themeSelect.addOption("sai", "SAI", "\uD83C\uDFB5");
         
         String themeVal = defaultConfigTheme.toLowerCase();
         String themeIcon = "\uD83D\uDE80";
@@ -183,6 +184,7 @@ public abstract class JettraDashboardPage extends Page {
         else if (themeVal.equals("plain")) themeIcon = "\uD83D\uDCCB";
         else if (themeVal.equals("astro")) themeIcon = "\uD83D\uDE80";
         else if (themeVal.equals("nx")) themeIcon = "\uD83C\uDFA6";
+        else if (themeVal.equals("sai")) themeIcon = "\uD83C\uDFB5";
         
         themeSelect.setSelectedValue(themeVal, "", themeIcon);
             
