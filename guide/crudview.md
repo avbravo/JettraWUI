@@ -25,6 +25,7 @@ public class PaisPage extends Page {
 
 - **model**: La clase del modelo (ej. `Pais.class`).
 - **repository**: La clase del repositorio (ej. `PaisRepository.class`). El repositorio debe contar con métodos estáticos `findAll()`, `save(model)` y `delete(id)`.
+- **controller**: La clase del controlador (ej. `PaisController.class`). Alternativa a `repository`, permite la integración con un endpoint que cuenta con los mismos métodos estáticos de acceso a datos.
 - **editable**: Convierte el listado de datos en una tabla (datatable) con campos editables en línea para el modelo proporcionado. Por defecto es `false`.
 - **report**: Activa el botón de impresión en la vista. Por defecto es `false`.
 - **reportShowViewer**: Muestra un visor de reporte antes de generar el archivo. Por defecto es `true`.

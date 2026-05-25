@@ -20,7 +20,12 @@ public @interface CrudView {
     /**
      * The Repository class.
      */
-    Class<?> repository();
+    Class<?> repository() default void.class;
+
+    /**
+     * The Controller class for endpoint integration.
+     */
+    Class<?> controller() default void.class;
 
     /**
      * Enable reporting for this view.

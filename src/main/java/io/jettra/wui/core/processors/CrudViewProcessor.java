@@ -33,13 +33,17 @@ public class CrudViewProcessor extends AbstractProcessor {
         
         TypeMirror modelType = getModelType(annotation);
         TypeMirror repoType = getRepoType(annotation);
+        TypeMirror controllerType = getControllerType(annotation);
         
         String packageName = processingEnv.getElementUtils().getPackageOf(pageElement).getQualifiedName().toString();
         String pageClassName = pageElement.getSimpleName().toString();
         String handlerClassName = pageClassName + "CrudHandler";
 
         TypeName modelTypeName = TypeName.get(modelType);
-        TypeName repoTypeName = TypeName.get(repoType);
+        
+        boolean useController = controllerType != null && !controllerType.toString().equals("void");
+        TypeMirror dataAccessType = useController ? controllerType : repoType;
+        TypeName dataAccessTypeName = TypeName.get(dataAccessType);
 
         TypeSpec.Builder classBuilder = TypeSpec.classBuilder(handlerClassName)
                 .addModifiers(Modifier.PUBLIC)
@@ -50,7 +54,7 @@ public class CrudViewProcessor extends AbstractProcessor {
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
                 .returns(ParameterizedTypeName.get(ClassName.get(List.class), modelTypeName))
-                .addStatement("return $T.findAll()", repoTypeName)
+                .addStatement("return $T.findAll()", dataAccessTypeName)
                 .build());
 
         // save(M model)
@@ -58,7 +62,7 @@ public class CrudViewProcessor extends AbstractProcessor {
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
                 .addParameter(modelTypeName, "model")
-                .addStatement("$T.save(model)", repoTypeName)
+                .addStatement("$T.save(model)", dataAccessTypeName)
                 .build());
 
         // delete(String id)
@@ -66,7 +70,7 @@ public class CrudViewProcessor extends AbstractProcessor {
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
                 .addParameter(String.class, "id")
-                .addStatement("$T.delete(id)", repoTypeName)
+                .addStatement("$T.delete(id)", dataAccessTypeName)
                 .build());
 
         // getIdValue(M item)
@@ -157,6 +161,15 @@ public class CrudViewProcessor extends AbstractProcessor {
     private TypeMirror getRepoType(CrudView annotation) {
         try {
             annotation.repository();
+        } catch (MirroredTypeException mte) {
+            return mte.getTypeMirror();
+        }
+        return null;
+    }
+
+    private TypeMirror getControllerType(CrudView annotation) {
+        try {
+            annotation.controller();
         } catch (MirroredTypeException mte) {
             return mte.getTypeMirror();
         }
