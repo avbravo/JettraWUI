@@ -50,7 +50,7 @@ public class ModelToRecordProcessor extends AbstractProcessor {
 
         TypeSpec.Builder classBuilder = TypeSpec.classBuilder(conversorClassName)
                 .addModifiers(Modifier.PUBLIC)
-                .addAnnotation(ClassName.get("jettra.scoped", "ApplicationScoped"));
+                .addAnnotation(ClassName.get("com.jettra.scoped", "ApplicationScoped"));
 
         // toModel
         MethodSpec.Builder toModelBuilder = MethodSpec.methodBuilder("toModel")
