@@ -15,7 +15,7 @@ import java.util.*;
 
 @AutoService(Processor.class)
 @SupportedAnnotationTypes("io.jettra.wui.core.annotations.CrudView")
-@SupportedSourceVersion(SourceVersion.RELEASE_21)
+@SupportedSourceVersion(SourceVersion.RELEASE_25)
 public class CrudViewProcessor extends AbstractProcessor {
 
     @Override
