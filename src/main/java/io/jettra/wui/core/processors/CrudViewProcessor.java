@@ -4,6 +4,7 @@ import com.google.auto.service.AutoService;
 import com.squareup.javapoet.*;
 import io.jettra.wui.core.annotations.CrudHandler;
 import io.jettra.wui.core.annotations.CrudView;
+import io.jettra.wui.core.annotations.ModelToRecordConversor;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
@@ -45,25 +46,59 @@ public class CrudViewProcessor extends AbstractProcessor {
         TypeMirror dataAccessType = useController ? controllerType : repoType;
         TypeName dataAccessTypeName = TypeName.get(dataAccessType);
 
+        TypeElement modelElement = (TypeElement) processingEnv.getTypeUtils().asElement(modelType);
+        ModelToRecordConversor conversorAnno = modelElement.getAnnotation(ModelToRecordConversor.class);
+        boolean hasConversor = conversorAnno != null && !useController;
+        TypeName conversorTypeName = null;
+        if (hasConversor) {
+            String modelPackageName = processingEnv.getElementUtils().getPackageOf(modelElement).getQualifiedName().toString();
+            String modelClassName = modelElement.getSimpleName().toString();
+            TypeMirror goalType = getGoalType(conversorAnno);
+            String recordClassName;
+            if (goalType != null && !goalType.toString().equals("void")) {
+                recordClassName = ((TypeElement) processingEnv.getTypeUtils().asElement(goalType)).getSimpleName().toString();
+            } else {
+                recordClassName = modelClassName.endsWith("Model") ? modelClassName.substring(0, modelClassName.length() - 5) : modelClassName + "Record";
+            }
+            String conversorClassName = recordClassName + "RecordModelConverter";
+            conversorTypeName = ClassName.get(modelPackageName, conversorClassName);
+        }
+
         TypeSpec.Builder classBuilder = TypeSpec.classBuilder(handlerClassName)
                 .addModifiers(Modifier.PUBLIC)
                 .addSuperinterface(ParameterizedTypeName.get(ClassName.get(CrudHandler.class), modelTypeName));
 
+        if (hasConversor) {
+            classBuilder.addField(FieldSpec.builder(conversorTypeName, "converter")
+                    .addModifiers(Modifier.PRIVATE, Modifier.FINAL)
+                    .initializer("new $T()", conversorTypeName)
+                    .build());
+        }
+
         // findAll()
-        classBuilder.addMethod(MethodSpec.methodBuilder("findAll")
+        MethodSpec.Builder findAllBuilder = MethodSpec.methodBuilder("findAll")
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
-                .returns(ParameterizedTypeName.get(ClassName.get(List.class), modelTypeName))
-                .addStatement("return $T.findAll()", dataAccessTypeName)
-                .build());
+                .returns(ParameterizedTypeName.get(ClassName.get(List.class), modelTypeName));
+        if (hasConversor) {
+            findAllBuilder.addStatement("return $T.findAll().stream().map(converter::toModel).collect($T.toList())",
+                    dataAccessTypeName, ClassName.get("java.util.stream", "Collectors"));
+        } else {
+            findAllBuilder.addStatement("return $T.findAll()", dataAccessTypeName);
+        }
+        classBuilder.addMethod(findAllBuilder.build());
 
         // save(M model)
-        classBuilder.addMethod(MethodSpec.methodBuilder("save")
+        MethodSpec.Builder saveBuilder = MethodSpec.methodBuilder("save")
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
-                .addParameter(modelTypeName, "model")
-                .addStatement("$T.save(model)", dataAccessTypeName)
-                .build());
+                .addParameter(modelTypeName, "model");
+        if (hasConversor) {
+            saveBuilder.addStatement("$T.save(converter.toRecord(model))", dataAccessTypeName);
+        } else {
+            saveBuilder.addStatement("$T.save(model)", dataAccessTypeName);
+        }
+        classBuilder.addMethod(saveBuilder.build());
 
         // delete(String id)
         classBuilder.addMethod(MethodSpec.methodBuilder("delete")
@@ -174,6 +209,15 @@ public class CrudViewProcessor extends AbstractProcessor {
     private TypeMirror getControllerType(CrudView annotation) {
         try {
             annotation.controller();
+        } catch (MirroredTypeException mte) {
+            return mte.getTypeMirror();
+        }
+        return null;
+    }
+
+    private TypeMirror getGoalType(ModelToRecordConversor annotation) {
+        try {
+            annotation.goal();
         } catch (MirroredTypeException mte) {
             return mte.getTypeMirror();
         }
