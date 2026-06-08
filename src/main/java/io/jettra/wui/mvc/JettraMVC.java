@@ -506,6 +506,11 @@ public class JettraMVC {
                 }
             } catch (Exception e) {
                 System.err.println("[JettraMVC] Error in handleCrudPost: " + e.getMessage());
+                Throwable cause = e.getCause() != null ? e.getCause() : e;
+                io.jettra.wui.components.Notification errorNotif = new io.jettra.wui.components.Notification();
+                errorNotif.setType("error");
+                errorNotif.showMessage("Error: " + cause.getMessage());
+                page.add(errorNotif);
             }
         }
         return false;
