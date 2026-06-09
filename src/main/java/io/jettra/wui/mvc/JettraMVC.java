@@ -325,6 +325,9 @@ public class JettraMVC {
                 }
                 Class<?> modelClass = anno.model();
                 Class<?> repoClass = anno.repository();
+                if (repoClass == void.class) {
+                    repoClass = anno.controller();
+                }
 
                 if (modelClass == null || repoClass == null) {
                     System.err.println("[JettraMVC] Error: Could not resolve model or repository class for @CrudView");
@@ -414,6 +417,9 @@ public class JettraMVC {
                     CrudView anno = page.getClass().getAnnotation(CrudView.class);
                     Class<?> modelClass = anno.model();
                     Class<?> repoClass = anno.repository();
+                    if (repoClass == void.class) {
+                        repoClass = anno.controller();
+                    }
                     String format = params.get("format");
                     if (format == null) format = "pdf";
                     boolean print = "true".equals(params.get("print"));
@@ -451,6 +457,9 @@ public class JettraMVC {
                 CrudView anno = page.getClass().getAnnotation(CrudView.class);
                 Class<?> modelClass = anno.model();
                 Class<?> repoClass = anno.repository();
+                if (repoClass == void.class) {
+                    repoClass = anno.controller();
+                }
                 String action = params.get("action");
                 if (action == null || action.isEmpty()) return false;
 
@@ -507,9 +516,26 @@ public class JettraMVC {
             } catch (Exception e) {
                 System.err.println("[JettraMVC] Error in handleCrudPost: " + e.getMessage());
                 Throwable cause = e.getCause() != null ? e.getCause() : e;
+                String errorMsg = cause.getMessage() != null ? cause.getMessage() : cause.toString();
+                
+                com.sun.net.httpserver.HttpExchange exchange = page.getCurrentExchange();
+                if (exchange != null && "XMLHttpRequest".equals(exchange.getRequestHeaders().getFirst("X-Requested-With"))) {
+                    try {
+                        String json = "{\"error\": \"" + errorMsg.replace("\"", "\\\"").replace("\n", " ") + "\"}";
+                        byte[] bytes = json.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+                        exchange.getResponseHeaders().set("Content-Type", "application/json; charset=UTF-8");
+                        exchange.sendResponseHeaders(400, bytes.length);
+                        exchange.getResponseBody().write(bytes);
+                        exchange.getResponseBody().close();
+                        return true; 
+                    } catch (java.io.IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+
                 io.jettra.wui.components.Notification errorNotif = new io.jettra.wui.components.Notification();
                 errorNotif.setType("error");
-                errorNotif.showMessage("Error: " + cause.getMessage());
+                errorNotif.showMessage("Error: " + errorMsg);
                 page.add(errorNotif);
             }
         }

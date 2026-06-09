@@ -65,6 +65,11 @@ public abstract class Page extends UIComponent implements HttpHandler {
             return;
         }
 
+        if (allParams.containsKey("_jtConsolePoll")) {
+            handleConsolePoll(exchange, allParams);
+            return;
+        }
+
         // 1. MVC Sink: Update models from form data
         if (!formParams.isEmpty()) {
             System.out.println("[Page] Updating models from request...");
@@ -325,5 +330,29 @@ public abstract class Page extends UIComponent implements HttpHandler {
                .append("  \n")
                .append("  setInterval(checkJettraSync, 5000);\n")
                .append("</script>\n");
+    }
+
+    private void handleConsolePoll(HttpExchange exchange, Map<String, String> params) throws IOException {
+        String consoleId = params.get("_jtConsolePoll");
+        java.util.Queue<String> q = io.jettra.wui.components.Console.getQueue(consoleId);
+        StringBuilder json = new StringBuilder("[");
+        if (q != null) {
+            String item;
+            boolean first = true;
+            while ((item = q.poll()) != null) {
+                if (!first) json.append(",");
+                int pipeIdx = item.indexOf('|');
+                String type = item.substring(0, pipeIdx);
+                String msg = item.substring(pipeIdx + 1).replace("\"", "\\\"").replace("\n", "\\n");
+                json.append("{\"type\":\"").append(type).append("\",\"msg\":\"").append(msg).append("\"}");
+                first = false;
+            }
+        }
+        json.append("]");
+        byte[] bytes = json.toString().getBytes(StandardCharsets.UTF_8);
+        exchange.getResponseHeaders().set("Content-Type", "application/json");
+        exchange.sendResponseHeaders(200, bytes.length);
+        exchange.getResponseBody().write(bytes);
+        exchange.getResponseBody().close();
     }
 }

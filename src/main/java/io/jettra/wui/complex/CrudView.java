@@ -1398,11 +1398,14 @@ public class CrudView extends UIComponent {
               .append("}\n");
 
         script.append("document.getElementById('crudForm_").append(uniqueId).append("').onsubmit = function(e) {\n")
-              .append("  if(document.getElementById('crudAction_").append(uniqueId).append("').value === 'delete') return true;\n")
+              .append("  e.preventDefault();\n")
+              .append("  if(document.getElementById('crudAction_").append(uniqueId).append("').value === 'delete') {\n")
+              .append("    submitFormAjax_").append(uniqueId).append("(this);\n")
+              .append("    return false;\n")
+              .append("  }\n")
               .append("  const errs = validateRules_").append(uniqueId).append("();\n")
               .append("  if(errs.length > 0) {\n")
               .append("    showToast_").append(uniqueId).append("('Error: ' + errs[0], 'error');\n")
-              .append("    e.preventDefault();\n")
               .append("    return false;\n")
               .append("  }\n")
               .append("  const subTable = document.getElementById('table_lineaFacturaModel_' + '").append(uniqueId).append("');\n")
@@ -1418,8 +1421,26 @@ public class CrudView extends UIComponent {
               .append("    const hidden = document.getElementById('input_lineaFacturaModel_' + '").append(uniqueId).append("');\n")
               .append("    if (hidden) hidden.value = JSON.stringify(rows);\n")
               .append("  }\n")
-              .append("  return true;\n")
-              .append("};\n");
+              .append("  submitFormAjax_").append(uniqueId).append("(this);\n")
+              .append("  return false;\n")
+              .append("};\n")
+              .append("function submitFormAjax_").append(uniqueId).append("(form) {\n")
+              .append("  const formData = new FormData(form);\n")
+              .append("  const urlParams = new URLSearchParams();\n")
+              .append("  for (const pair of formData.entries()) { urlParams.append(pair[0], pair[1]); }\n")
+              .append("  fetch(window.location.pathname + window.location.search, {\n")
+              .append("    method: 'POST',\n")
+              .append("    headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-Requested-With': 'XMLHttpRequest' },\n")
+              .append("    body: urlParams.toString()\n")
+              .append("  }).then(r => {\n")
+              .append("    if (r.ok) {\n")
+              .append("      window.location.reload();\n")
+              .append("    } else {\n")
+              .append("      r.json().then(data => showToast_").append(uniqueId).append("('Error: ' + (data.error || 'Unknown'), 'error'))\n")
+              .append("       .catch(() => showToast_").append(uniqueId).append("('Error: ' + r.statusText, 'error'));\n")
+              .append("    }\n")
+              .append("  }).catch(err => showToast_").append(uniqueId).append("('Error de red', 'error'));\n")
+              .append("}\n");
 
         // Real-time notification support
         for (Field field : modelClass.getDeclaredFields()) {
