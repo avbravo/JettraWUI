@@ -48,7 +48,7 @@ public class CrudViewProcessor extends AbstractProcessor {
 
         TypeElement modelElement = (TypeElement) processingEnv.getTypeUtils().asElement(modelType);
         ModelToRecordConversor conversorAnno = modelElement.getAnnotation(ModelToRecordConversor.class);
-        boolean hasConversor = conversorAnno != null && !useController;
+        boolean hasConversor = conversorAnno != null;
         TypeName conversorTypeName = null;
         if (hasConversor) {
             String modelPackageName = processingEnv.getElementUtils().getPackageOf(modelElement).getQualifiedName().toString();
