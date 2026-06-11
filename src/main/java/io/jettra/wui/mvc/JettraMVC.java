@@ -440,7 +440,7 @@ public class JettraMVC {
     public static CrudHandler<?> getCrudHandler(Class<?> pageClass) {
         try {
             String handlerClassName = pageClass.getName() + "CrudHandler";
-            Class<?> handlerClass = Class.forName(handlerClassName);
+            Class<?> handlerClass = Class.forName(handlerClassName, true, pageClass.getClassLoader());
             return (CrudHandler<?>) handlerClass.getDeclaredConstructor().newInstance();
         } catch (Exception e) {
             return null;
