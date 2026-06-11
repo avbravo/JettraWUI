@@ -9,8 +9,11 @@ import io.jettra.wui.core.annotations.ModelToRecordConversor;
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.*;
+import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.MirroredTypeException;
+import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.ElementFilter;
 import java.io.IOException;
 import java.util.*;
 
@@ -113,39 +116,29 @@ public class CrudViewProcessor extends AbstractProcessor {
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
                 .addParameter(modelTypeName, "item")
-                .beginControlFlow("try")
-                .addStatement("var field = item.getClass().getDeclaredField(\"code\")")
-                .addStatement("field.setAccessible(true)")
-                .addStatement("return field.get(item).toString()")
-                .nextControlFlow("catch (Exception e)")
-                .beginControlFlow("try")
-                .addStatement("var field = item.getClass().getDeclaredField(\"id\")")
-                .addStatement("field.setAccessible(true)")
-                .addStatement("return field.get(item).toString()")
-                .nextControlFlow("catch (Exception e2)")
+                .addStatement("Object val = getFieldValue(item, \"code\")")
+                .addStatement("if (val != null) return val.toString()")
+                .addStatement("val = getFieldValue(item, \"id\")")
+                .addStatement("if (val != null) return val.toString()")
                 .addStatement("return \"0\"")
-                .endControlFlow()
-                .endControlFlow()
                 .returns(String.class)
                 .build());
 
         // getJsonMap(M item)
-        classBuilder.addMethod(MethodSpec.methodBuilder("getJsonMap")
+        MethodSpec.Builder getJsonMapBuilder = MethodSpec.methodBuilder("getJsonMap")
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
                 .addParameter(modelTypeName, "item")
-                .addStatement("$T<String, String> map = new $T<>()", Map.class, HashMap.class)
-                .beginControlFlow("for (var field : item.getClass().getDeclaredFields())")
-                .beginControlFlow("try")
-                .addStatement("field.setAccessible(true)")
-                .addStatement("Object val = field.get(item)")
-                .addStatement("map.put(field.getName(), val != null ? val.toString() : \"\")")
-                .nextControlFlow("catch (Exception e)")
-                .endControlFlow()
-                .endControlFlow()
-                .addStatement("return map")
-                .returns(ParameterizedTypeName.get(Map.class, String.class, String.class))
-                .build());
+                .addStatement("$T<String, String> map = new $T<>()", Map.class, HashMap.class);
+        
+        for (VariableElement field : ElementFilter.fieldsIn(modelElement.getEnclosedElements())) {
+            String name = field.getSimpleName().toString();
+            getJsonMapBuilder.addStatement("Object val_$L = getFieldValue(item, $S)", name, name);
+            getJsonMapBuilder.addStatement("map.put($S, val_$L != null ? val_$L.toString() : \"\")", name, name, name);
+        }
+        getJsonMapBuilder.addStatement("return map")
+                .returns(ParameterizedTypeName.get(Map.class, String.class, String.class));
+        classBuilder.addMethod(getJsonMapBuilder.build());
 
         // createInstance()
         classBuilder.addMethod(MethodSpec.methodBuilder("createInstance")
@@ -162,23 +155,40 @@ public class CrudViewProcessor extends AbstractProcessor {
                 .addParameter(modelTypeName, "model")
                 .addParameter(ParameterizedTypeName.get(Map.class, String.class, String.class), "data");
         
-        updateBuilder.beginControlFlow("for (var entry : data.entrySet())")
-                .beginControlFlow("try")
-                .addStatement("var field = model.getClass().getDeclaredField(entry.getKey())")
-                .addStatement("field.setAccessible(true)")
-                .addCode("    if (field.getType().equals(String.class)) field.set(model, entry.getValue());\n")
-                .addCode("    else if (field.getType().equals(int.class) || field.getType().equals(Integer.class)) field.set(model, Integer.parseInt(entry.getValue()));\n")
-                .addCode("    else if (field.getType().equals(double.class) || field.getType().equals(Double.class)) field.set(model, Double.parseDouble(entry.getValue()));\n")
-                .addCode("    else if (field.getType().equals(float.class) || field.getType().equals(Float.class)) field.set(model, Float.parseFloat(entry.getValue()));\n")
-                .addCode("    else if (field.getType().equals(long.class) || field.getType().equals(Long.class)) field.set(model, Long.parseLong(entry.getValue()));\n")
-                .addCode("    else if (field.getType().equals(boolean.class) || field.getType().equals(Boolean.class)) field.set(model, Boolean.parseBoolean(entry.getValue()));\n")
-                .addCode("    else if (field.getType().equals(java.time.LocalDate.class)) field.set(model, java.time.LocalDate.parse(entry.getValue()));\n")
-                .addCode("    else if (field.getType().equals(java.util.Date.class)) field.set(model, new java.text.SimpleDateFormat(\"yyyy-MM-dd\").parse(entry.getValue()));\n")
-                .nextControlFlow("catch (Exception e)")
-                .endControlFlow()
-                .endControlFlow();
+        updateBuilder.beginControlFlow("for (var entry : data.entrySet())");
+        updateBuilder.beginControlFlow("try");
+        updateBuilder.beginControlFlow("switch (entry.getKey())");
+        
+        for (VariableElement field : ElementFilter.fieldsIn(modelElement.getEnclosedElements())) {
+            String name = field.getSimpleName().toString();
+            TypeMirror type = field.asType();
+            updateBuilder.addCode("case $S:\n", name);
+            if (type.toString().equals("java.lang.String")) {
+                updateBuilder.addStatement("  setFieldValue(model, $S, entry.getValue())", name);
+            } else if (type.toString().equals("int") || type.toString().equals("java.lang.Integer")) {
+                updateBuilder.addStatement("  setFieldValue(model, $S, Integer.parseInt(entry.getValue()))", name);
+            } else if (type.toString().equals("double") || type.toString().equals("java.lang.Double")) {
+                updateBuilder.addStatement("  setFieldValue(model, $S, Double.parseDouble(entry.getValue()))", name);
+            } else if (type.toString().equals("boolean") || type.toString().equals("java.lang.Boolean")) {
+                updateBuilder.addStatement("  setFieldValue(model, $S, Boolean.parseBoolean(entry.getValue()))", name);
+            } else if (type.toString().equals("java.time.LocalDate")) {
+                updateBuilder.addStatement("  setFieldValue(model, $S, java.time.LocalDate.parse(entry.getValue()))", name);
+            } else if (type.toString().equals("java.util.Date")) {
+                updateBuilder.addStatement("  setFieldValue(model, $S, new java.text.SimpleDateFormat(\"yyyy-MM-dd\").parse(entry.getValue()))", name);
+            } else {
+                updateBuilder.addStatement("  // Unsupported type for updateFields: " + type.toString());
+            }
+            updateBuilder.addStatement("  break");
+        }
+        updateBuilder.endControlFlow(); // switch
+        updateBuilder.nextControlFlow("catch (Exception e)");
+        updateBuilder.endControlFlow(); // try
+        updateBuilder.endControlFlow(); // for
         
         classBuilder.addMethod(updateBuilder.build());
+
+        // Generate Metadata and Reflection-free access
+        generateReflectionFreeMethods(classBuilder, modelTypeName, modelElement);
 
         JavaFile javaFile = JavaFile.builder(packageName, classBuilder.build()).build();
         try {
@@ -186,6 +196,281 @@ public class CrudViewProcessor extends AbstractProcessor {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void generateReflectionFreeMethods(TypeSpec.Builder classBuilder, TypeName modelTypeName, TypeElement modelElement) {
+        ClassName metadataClass = ClassName.get("io.jettra.wui.core.annotations", "FieldMetadata");
+
+        // getFieldsMetadata
+        MethodSpec.Builder metaBuilder = MethodSpec.methodBuilder("getFieldsMetadata")
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.PUBLIC)
+                .returns(ParameterizedTypeName.get(ClassName.get(List.class), metadataClass))
+                .addStatement("$T<$T> list = new $T<>()", List.class, metadataClass, ArrayList.class);
+
+        // getFieldValue
+        MethodSpec.Builder getValBuilder = MethodSpec.methodBuilder("getFieldValue")
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.PUBLIC)
+                .addParameter(modelTypeName, "item")
+                .addParameter(String.class, "fieldName")
+                .returns(Object.class)
+                .beginControlFlow("switch (fieldName)");
+
+        // setFieldValue
+        MethodSpec.Builder setValBuilder = MethodSpec.methodBuilder("setFieldValue")
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.PUBLIC)
+                .addParameter(modelTypeName, "item")
+                .addParameter(String.class, "fieldName")
+                .addParameter(Object.class, "value")
+                .beginControlFlow("switch (fieldName)");
+
+        Set<TypeMirror> nestedTypes = new HashSet<>();
+
+        for (VariableElement field : ElementFilter.fieldsIn(modelElement.getEnclosedElements())) {
+            String name = field.getSimpleName().toString();
+            String capName = name.substring(0, 1).toUpperCase() + name.substring(1);
+            TypeMirror type = field.asType();
+            
+            // extract raw type name for Class object
+            TypeName fieldTypeName = TypeName.get(type);
+            TypeName rawType = fieldTypeName;
+            if (fieldTypeName instanceof ParameterizedTypeName) {
+                rawType = ((ParameterizedTypeName) fieldTypeName).rawType;
+            }
+
+            metaBuilder.addStatement("$T fm_$L = new $T($S, $T.class)", metadataClass, name, metadataClass, name, rawType);
+
+            // Copy annotations to metadata
+            addAnnotationCheck(metaBuilder, field, "io.jettra.wui.core.annotations.Hidden", name, "isHidden = true");
+            addAnnotationCheck(metaBuilder, field, "io.jettra.wui.core.annotations.NoEditable", name, "isNoEditable = true");
+            addAnnotationCheck(metaBuilder, field, "io.jettra.rules.annotations.Compute", name, "hasCompute = true");
+            
+            // Complex annotations...
+            // PropertiesLabel
+            AnnotationMirror propLabel = getAnnotationMirror(field, "io.jettra.wui.core.annotations.PropertiesLabel");
+            if (propLabel != null) {
+                String val = getAnnotationValue(propLabel, "value", "");
+                String lbl = getAnnotationValue(propLabel, "label", "");
+                metaBuilder.addStatement("fm_$L.propertiesLabelValue = $S", name, val);
+                metaBuilder.addStatement("fm_$L.propertiesLabelLabel = $S", name, lbl);
+            }
+
+            // ViewSelectOne
+            AnnotationMirror vso = getAnnotationMirror(field, "io.jettra.wui.core.annotations.ViewSelectOne");
+            if (vso != null) {
+                metaBuilder.addStatement("fm_$L.hasViewSelectOne = true", name);
+                metaBuilder.addStatement("fm_$L.vsoSource = $S", name, getAnnotationValue(vso, "source", ""));
+                metaBuilder.addStatement("fm_$L.vsoMethod = $S", name, getAnnotationValue(vso, "method", ""));
+                metaBuilder.addStatement("fm_$L.vsoLabel = $S", name, getAnnotationValue(vso, "label", ""));
+                metaBuilder.addStatement("fm_$L.vsoFilter = $S", name, getAnnotationValue(vso, "filter", ""));
+                metaBuilder.addStatement("fm_$L.vsoFieldOnlyMasterTable = $S", name, getAnnotationValue(vso, "fieldOnlyMasterTable", ""));
+            }
+
+            // ViewSelectMany
+            AnnotationMirror vsm = getAnnotationMirror(field, "io.jettra.wui.core.annotations.ViewSelectMany");
+            if (vsm != null) {
+                metaBuilder.addStatement("fm_$L.hasViewSelectMany = true", name);
+                metaBuilder.addStatement("fm_$L.vsmSource = $S", name, getAnnotationValue(vsm, "source", ""));
+                metaBuilder.addStatement("fm_$L.vsmMethod = $S", name, getAnnotationValue(vsm, "method", ""));
+                metaBuilder.addStatement("fm_$L.vsmLabel = $S", name, getAnnotationValue(vsm, "label", ""));
+                metaBuilder.addStatement("fm_$L.vsmFilter = $S", name, getAnnotationValue(vsm, "filter", ""));
+                metaBuilder.addStatement("fm_$L.vsmFieldOnlyMasterTable = $S", name, getAnnotationValue(vsm, "fieldOnlyMasterTable", ""));
+            }
+
+            // ViewDataTable
+            AnnotationMirror vdt = getAnnotationMirror(field, "io.jettra.wui.core.annotations.ViewDataTable");
+            if (vdt != null) {
+                metaBuilder.addStatement("fm_$L.hasViewDataTable = true", name);
+                metaBuilder.addStatement("fm_$L.vdtRow = $S", name, getAnnotationValue(vdt, "row", ""));
+                metaBuilder.addStatement("fm_$L.vdtSource = $S", name, getAnnotationValue(vdt, "source", ""));
+                metaBuilder.addStatement("fm_$L.vdtMethod = $S", name, getAnnotationValue(vdt, "method", ""));
+                metaBuilder.addStatement("fm_$L.vdtFilter = $S", name, getAnnotationValue(vdt, "filter", ""));
+                metaBuilder.addStatement("fm_$L.vdtEditableRow = $S", name, getAnnotationValue(vdt, "editablerow", ""));
+                metaBuilder.addStatement("fm_$L.vdtShowRowInMasterTable = $L", name, getAnnotationValue(vdt, "showRowInMasterTable", "true"));
+                metaBuilder.addStatement("fm_$L.vdtEditableRowMaster = $L", name, getAnnotationValue(vdt, "editableRowMaster", "true"));
+
+                // Save nested type for getNestedFieldValue
+                if (type instanceof DeclaredType) {
+                    List<? extends TypeMirror> typeArgs = ((DeclaredType) type).getTypeArguments();
+                    if (!typeArgs.isEmpty()) {
+                        nestedTypes.add(typeArgs.get(0));
+                    }
+                }
+            }
+
+            // TableColumnField
+            AnnotationMirror tcf = getAnnotationMirror(field, "io.jettra.wui.core.annotations.TableColumnField");
+            if (tcf != null) {
+                metaBuilder.addStatement("fm_$L.hasTableColumnField = true", name);
+                metaBuilder.addStatement("fm_$L.tcfField = $S", name, getAnnotationValue(tcf, "field", ""));
+            }
+
+            // Compute
+            AnnotationMirror cmp = getAnnotationMirror(field, "io.jettra.rules.annotations.Compute");
+            if (cmp != null) {
+                metaBuilder.addStatement("fm_$L.hasCompute = true", name);
+                metaBuilder.addStatement("fm_$L.computeEditable = $L", name, getAnnotationValue(cmp, "editable", "false"));
+            }
+
+            metaBuilder.addStatement("list.add(fm_$L)", name);
+
+            String getter = type.getKind() == TypeKind.BOOLEAN ? "is" + capName : "get" + capName;
+            String setter = "set" + capName;
+
+            getValBuilder.addStatement("case $S: return item.$L()", name, getter);
+            
+            // setFieldValue requires casting
+            if (type.getKind().isPrimitive()) {
+                if (type.getKind() == TypeKind.INT) {
+                    setValBuilder.addStatement("case $S: item.$L((Integer) value); break", name, setter);
+                } else if (type.getKind() == TypeKind.BOOLEAN) {
+                    setValBuilder.addStatement("case $S: item.$L((Boolean) value); break", name, setter);
+                } else if (type.getKind() == TypeKind.DOUBLE) {
+                    setValBuilder.addStatement("case $S: item.$L((Double) value); break", name, setter);
+                }
+            } else {
+                setValBuilder.addStatement("case $S: item.$L(($T) value); break", name, setter, rawType);
+            }
+        }
+        metaBuilder.addStatement("return list");
+        getValBuilder.addStatement("default: return null");
+        getValBuilder.endControlFlow();
+        
+        setValBuilder.endControlFlow();
+
+        classBuilder.addMethod(metaBuilder.build());
+        classBuilder.addMethod(getValBuilder.build());
+        classBuilder.addMethod(setValBuilder.build());
+
+        // Nested methods
+        generateNestedMethods(classBuilder, nestedTypes, metadataClass);
+    }
+
+    private void generateNestedMethods(TypeSpec.Builder classBuilder, Set<TypeMirror> nestedTypes, ClassName metadataClass) {
+        MethodSpec.Builder getNestedValBuilder = MethodSpec.methodBuilder("getNestedFieldValue")
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.PUBLIC)
+                .addParameter(Object.class, "item")
+                .addParameter(String.class, "fieldName")
+                .returns(Object.class);
+
+        MethodSpec.Builder setNestedValBuilder = MethodSpec.methodBuilder("setNestedFieldValue")
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.PUBLIC)
+                .addParameter(Object.class, "item")
+                .addParameter(String.class, "fieldName")
+                .addParameter(Object.class, "value");
+
+        MethodSpec.Builder getNestedMetaBuilder = MethodSpec.methodBuilder("getNestedFieldMetadata")
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.PUBLIC)
+                .addParameter(Object.class, "item")
+                .addParameter(String.class, "fieldName")
+                .returns(metadataClass);
+
+        for (TypeMirror nestedType : nestedTypes) {
+            TypeElement nestedElement = (TypeElement) processingEnv.getTypeUtils().asElement(nestedType);
+            if (nestedElement != null) {
+                TypeName rawType = TypeName.get(nestedType);
+                if (rawType instanceof ParameterizedTypeName) rawType = ((ParameterizedTypeName) rawType).rawType;
+
+                getNestedValBuilder.beginControlFlow("if (item instanceof $T)", rawType);
+                getNestedValBuilder.addStatement("$T nestedItem = ($T) item", rawType, rawType);
+                getNestedValBuilder.beginControlFlow("switch (fieldName)");
+
+                setNestedValBuilder.beginControlFlow("if (item instanceof $T)", rawType);
+                setNestedValBuilder.addStatement("$T nestedItem = ($T) item", rawType, rawType);
+                setNestedValBuilder.beginControlFlow("switch (fieldName)");
+
+                getNestedMetaBuilder.beginControlFlow("if (item instanceof $T)", rawType);
+                getNestedMetaBuilder.beginControlFlow("switch (fieldName)");
+
+                for (VariableElement field : ElementFilter.fieldsIn(nestedElement.getEnclosedElements())) {
+                    String name = field.getSimpleName().toString();
+                    String capName = name.substring(0, 1).toUpperCase() + name.substring(1);
+                    TypeMirror type = field.asType();
+                    TypeName fieldRawType = TypeName.get(type);
+                    if (fieldRawType instanceof ParameterizedTypeName) fieldRawType = ((ParameterizedTypeName) fieldRawType).rawType;
+
+                    String getter = type.getKind() == TypeKind.BOOLEAN ? "is" + capName : "get" + capName;
+                    String setter = "set" + capName;
+
+                    getNestedValBuilder.addStatement("case $S: return nestedItem.$L()", name, getter);
+
+                    if (type.getKind().isPrimitive()) {
+                        if (type.getKind() == TypeKind.INT) {
+                            setNestedValBuilder.addStatement("case $S: nestedItem.$L((Integer) value); break", name, setter);
+                        } else if (type.getKind() == TypeKind.BOOLEAN) {
+                            setNestedValBuilder.addStatement("case $S: nestedItem.$L((Boolean) value); break", name, setter);
+                        } else if (type.getKind() == TypeKind.DOUBLE) {
+                            setNestedValBuilder.addStatement("case $S: nestedItem.$L((Double) value); break", name, setter);
+                        }
+                    } else {
+                        setNestedValBuilder.addStatement("case $S: nestedItem.$L(($T) value); break", name, setter, fieldRawType);
+                    }
+
+                    // Metadata for nested field
+                    getNestedMetaBuilder.beginControlFlow("case $S:", name);
+                    getNestedMetaBuilder.addStatement("$T fm_$L = new $T($S, $T.class)", metadataClass, name, metadataClass, name, fieldRawType);
+                    addAnnotationCheck(getNestedMetaBuilder, field, "io.jettra.wui.core.annotations.ViewSelectOne", name, "hasViewSelectOne = true");
+                    AnnotationMirror vso = getAnnotationMirror(field, "io.jettra.wui.core.annotations.ViewSelectOne");
+                    if (vso != null) {
+                        getNestedMetaBuilder.addStatement("fm_$L.vsoSource = $S", name, getAnnotationValue(vso, "source", ""));
+                        getNestedMetaBuilder.addStatement("fm_$L.vsoMethod = $S", name, getAnnotationValue(vso, "method", ""));
+                        getNestedMetaBuilder.addStatement("fm_$L.vsoLabel = $S", name, getAnnotationValue(vso, "label", ""));
+                        getNestedMetaBuilder.addStatement("fm_$L.vsoFilter = $S", name, getAnnotationValue(vso, "filter", ""));
+                    }
+                    getNestedMetaBuilder.addStatement("return fm_$L", name);
+                    getNestedMetaBuilder.endControlFlow();
+                }
+                
+                getNestedValBuilder.addStatement("default: return null");
+                getNestedValBuilder.endControlFlow(); // switch
+                getNestedValBuilder.endControlFlow(); // if
+
+                setNestedValBuilder.endControlFlow(); // switch
+                setNestedValBuilder.endControlFlow(); // if
+
+                getNestedMetaBuilder.endControlFlow(); // switch
+                getNestedMetaBuilder.endControlFlow(); // if
+            }
+        }
+        getNestedValBuilder.addStatement("return null");
+        getNestedMetaBuilder.addStatement("return null");
+
+        classBuilder.addMethod(getNestedValBuilder.build());
+        classBuilder.addMethod(setNestedValBuilder.build());
+        classBuilder.addMethod(getNestedMetaBuilder.build());
+    }
+
+    private void addAnnotationCheck(MethodSpec.Builder builder, VariableElement field, String annotationClass, String name, String assignment) {
+        if (getAnnotationMirror(field, annotationClass) != null) {
+            builder.addStatement("fm_$L.$L", name, assignment);
+        }
+    }
+
+    private AnnotationMirror getAnnotationMirror(VariableElement field, String className) {
+        for (AnnotationMirror mirror : field.getAnnotationMirrors()) {
+            if (mirror.getAnnotationType().toString().equals(className)) {
+                return mirror;
+            }
+        }
+        return null;
+    }
+
+    private String getAnnotationValue(AnnotationMirror mirror, String key, String defaultValue) {
+        for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : mirror.getElementValues().entrySet()) {
+            if (entry.getKey().getSimpleName().toString().equals(key)) {
+                String val = entry.getValue().getValue().toString();
+                if (val.startsWith("\"") && val.endsWith("\"")) {
+                    val = val.substring(1, val.length() - 1);
+                }
+                return val;
+            }
+        }
+        return defaultValue;
     }
 
     private TypeMirror getModelType(CrudView annotation) {

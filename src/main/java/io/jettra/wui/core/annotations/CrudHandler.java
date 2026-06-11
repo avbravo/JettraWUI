@@ -14,4 +14,12 @@ public interface CrudHandler<M> {
     Map<String, String> getJsonMap(M item);
     M createInstance();
     void updateFields(M model, Map<String, String> data);
+    
+    // UI Metadata & Reflection-free access
+    List<io.jettra.wui.core.annotations.FieldMetadata> getFieldsMetadata();
+    Object getFieldValue(M item, String fieldName);
+    void setFieldValue(M item, String fieldName, Object value);
+    Object getNestedFieldValue(Object item, String fieldName);
+    void setNestedFieldValue(Object item, String fieldName, Object value);
+    io.jettra.wui.core.annotations.FieldMetadata getNestedFieldMetadata(Object item, String fieldName);
 }
