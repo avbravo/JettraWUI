@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
  * When applied to a Page, the framework will automatically generate the CRUD UI.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
+@Target({ElementType.TYPE})
 public @interface CrudView {
     /**
      * The ViewModel class.
@@ -86,4 +86,14 @@ public @interface CrudView {
      * Automatically render the CrudView. If false, the page must manually build and add the component.
      */
     boolean autoRender() default true;
+
+    /**
+     * Base class to extend when generating the page class.
+     */
+    Class<?> extendsClass() default io.jettra.wui.core.Page.class;
+
+    /**
+     * The title of the page to be generated.
+     */
+    String title() default "";
 }

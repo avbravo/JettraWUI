@@ -27,6 +27,9 @@ public class CrudViewProcessor extends AbstractProcessor {
         for (Element element : roundEnv.getElementsAnnotatedWith(CrudView.class)) {
             if (element.getKind() == ElementKind.CLASS) {
                 generateHandler((TypeElement) element);
+            } else if (element.getKind() == ElementKind.INTERFACE) {
+                generateHandler((TypeElement) element);
+                generatePage((TypeElement) element);
             }
         }
         return true;
@@ -507,5 +510,126 @@ public class CrudViewProcessor extends AbstractProcessor {
             return mte.getTypeMirror();
         }
         return null;
+    }
+
+    private TypeMirror getExtendsType(CrudView annotation) {
+        try {
+            annotation.extendsClass();
+        } catch (MirroredTypeException mte) {
+            return mte.getTypeMirror();
+        }
+        return null;
+    }
+
+    private void generatePage(TypeElement interfaceElement) {
+        CrudView annotation = interfaceElement.getAnnotation(CrudView.class);
+        String packageName = processingEnv.getElementUtils().getPackageOf(interfaceElement).getQualifiedName().toString();
+        
+        String interfaceName = interfaceElement.getSimpleName().toString();
+        String generatedClassName = interfaceName;
+        if (generatedClassName.endsWith("Def")) {
+            generatedClassName = generatedClassName.substring(0, generatedClassName.length() - 3);
+        } else if (generatedClassName.endsWith("Config")) {
+            generatedClassName = generatedClassName.substring(0, generatedClassName.length() - 6);
+        } else {
+            generatedClassName = generatedClassName + "Impl";
+        }
+        
+        TypeMirror extendsType = getExtendsType(annotation);
+        TypeName extendsTypeName = TypeName.get(extendsType);
+        
+        TypeSpec.Builder classBuilder = TypeSpec.classBuilder(generatedClassName)
+                .addModifiers(Modifier.PUBLIC)
+                .superclass(extendsTypeName)
+                .addSuperinterface(TypeName.get(interfaceElement.asType()));
+
+        // Copy annotations from interface to class (like @JettraPageSincronized)
+        for (AnnotationMirror mirror : interfaceElement.getAnnotationMirrors()) {
+            if (!mirror.getAnnotationType().toString().equals("io.jettra.wui.core.annotations.CrudView")) {
+                classBuilder.addAnnotation(AnnotationSpec.get(mirror));
+            }
+        }
+        
+        // @CrudView still applied to the class to satisfy any remaining runtime checks like JettraMVC routing if any, but autoRender=false
+        AnnotationSpec.Builder crudViewBuilder = AnnotationSpec.builder(CrudView.class)
+                .addMember("model", "$T.class", TypeName.get(getModelType(annotation)))
+                .addMember("autoRender", "false")
+                .addMember("editable", "$L", annotation.editable())
+                .addMember("report", "$L", annotation.report())
+                .addMember("reportOrientation", "$S", annotation.reportOrientation())
+                .addMember("reportTitle", "$S", annotation.reportTitle())
+                .addMember("reportHeaderColor", "$S", annotation.reportHeaderColor());
+
+        TypeMirror repoType = getRepoType(annotation);
+        if (repoType != null && !repoType.toString().equals("void")) {
+            crudViewBuilder.addMember("repository", "$T.class", TypeName.get(repoType));
+        }
+        TypeMirror controllerType = getControllerType(annotation);
+        if (controllerType != null && !controllerType.toString().equals("void")) {
+            crudViewBuilder.addMember("controller", "$T.class", TypeName.get(controllerType));
+        }
+        classBuilder.addAnnotation(crudViewBuilder.build());
+
+        // Field for properties
+        classBuilder.addField(FieldSpec.builder(Properties.class, "msg", Modifier.PRIVATE)
+                .addAnnotation(AnnotationSpec.builder(ClassName.get("io.jettra.wui.core.annotations", "InjectProperties"))
+                        .addMember("name", "$S", "messages")
+                        .build())
+                .build());
+
+        // Constructor
+        MethodSpec.Builder constructor = MethodSpec.constructorBuilder()
+                .addModifiers(Modifier.PUBLIC)
+                .addStatement("super($S)", annotation.title());
+        classBuilder.addMethod(constructor.build());
+
+        // initCenter
+        String handlerClassName = interfaceName + "CrudHandler";
+        ClassName handlerType = ClassName.get(packageName, handlerClassName);
+
+        MethodSpec.Builder initCenter = MethodSpec.methodBuilder("initCenter")
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.PROTECTED)
+                .addParameter(ClassName.get("io.jettra.wui.complex", "Center"), "center")
+                .addParameter(String.class, "username");
+
+        initCenter.addStatement("$T handler = new $T()", handlerType, handlerType);
+        
+        boolean useController = controllerType != null && !controllerType.toString().equals("void");
+        TypeName dataAccessTypeName = TypeName.get(useController ? controllerType : repoType);
+
+        initCenter.addStatement("io.jettra.wui.complex.CrudView crudComponent = new io.jettra.wui.complex.CrudView($T.class, $T.class, msg, handler)", 
+                TypeName.get(getModelType(annotation)), dataAccessTypeName);
+        
+        initCenter.addStatement("crudComponent.setEditable($L)", annotation.editable());
+        initCenter.addStatement("crudComponent.setReportEnabled($L)", annotation.report());
+        initCenter.addStatement("crudComponent.setReportShowViewer($L)", annotation.reportShowViewer());
+        initCenter.addStatement("crudComponent.setReportAllowPrint($L)", annotation.reportAllowPrint());
+        initCenter.addStatement("crudComponent.setReportAllowPdf($L)", annotation.reportAllowPdf());
+        initCenter.addStatement("crudComponent.setReportAllowExcel($L)", annotation.reportAllowExcel());
+        initCenter.addStatement("crudComponent.setReportAllowCsv($L)", annotation.reportAllowCsv());
+        initCenter.addStatement("crudComponent.setReportAllowWord($L)", annotation.reportAllowWord());
+        initCenter.addStatement("crudComponent.setReportOrientation($S)", annotation.reportOrientation());
+        initCenter.addStatement("crudComponent.setReportCustomTitle($S)", annotation.reportTitle());
+        initCenter.addStatement("crudComponent.setReportHeaderColor($S)", annotation.reportHeaderColor());
+        initCenter.addStatement("crudComponent.setParentPage(this)");
+        
+        if (annotation.autoRender()) {
+            initCenter.addStatement("crudComponent.build()");
+            initCenter.addStatement("center.add(crudComponent)");
+        }
+
+        // Call afterInitCenter
+        initCenter.addStatement("this.afterInitCenter(center, username)");
+
+        classBuilder.addMethod(initCenter.build());
+
+
+        JavaFile javaFile = JavaFile.builder(packageName, classBuilder.build()).build();
+        try {
+            javaFile.writeTo(processingEnv.getFiler());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
