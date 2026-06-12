@@ -619,8 +619,17 @@ public class CrudViewProcessor extends AbstractProcessor {
             initCenter.addStatement("center.add(crudComponent)");
         }
 
-        // Call afterInitCenter
-        initCenter.addStatement("this.afterInitCenter(center, username)");
+        // Call afterInitCenter only if defined
+        boolean hasAfterInit = false;
+        for (javax.lang.model.element.Element enclosed : interfaceElement.getEnclosedElements()) {
+            if (enclosed.getKind() == javax.lang.model.element.ElementKind.METHOD && enclosed.getSimpleName().toString().equals("afterInitCenter")) {
+                hasAfterInit = true;
+                break;
+            }
+        }
+        if (hasAfterInit) {
+            initCenter.addStatement("this.afterInitCenter(center, username)");
+        }
 
         classBuilder.addMethod(initCenter.build());
 
