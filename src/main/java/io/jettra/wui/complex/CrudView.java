@@ -214,8 +214,8 @@ public class CrudView extends UIComponent {
                                 ViewSelectMany vsm = field.getAnnotation(ViewSelectMany.class);
                                 String fomt = vsm.fieldOnlyMasterTable();
                                 String finalFomt = (fomt != null && !fomt.trim().isEmpty()) ? fomt : vsm.label();
-                                if (val instanceof List) {
-                                    List<?> list = (List<?>) val;
+                                if (val instanceof java.util.Collection) {
+                                    java.util.Collection<?> list = (java.util.Collection<?>) val;
                                     displayValue = list.stream()
                                         .map(obj -> resolveLabel(obj, finalFomt))
                                         .collect(Collectors.joining(", "));
@@ -243,8 +243,8 @@ public class CrudView extends UIComponent {
                             }
                             cellTable.addHeaderRow(cellHeader);
                             
-                            if (val instanceof List) {
-                                List<?> list = (List<?>) val;
+                            if (val instanceof java.util.Collection) {
+                                java.util.Collection<?> list = (java.util.Collection<?>) val;
                                 for (Object rowObj : list) {
                                     Row cellRow = new Row();
                                     for (String colName : colNames) {
@@ -302,7 +302,7 @@ public class CrudView extends UIComponent {
                                         select.setProperty("onchange", "saveInlineEdit_" + uniqueId + "('" + idValue + "', '" + field.getName() + "', this.value)");
                                     }
                                     td.add(select);
-                                } else if (field.getType() == java.time.LocalDate.class || field.getType() == java.util.Date.class) {
+                                } else if (field.getType() == java.time.LocalDate.class || field.getType() == java.util.Date.class || field.getType() == java.time.Instant.class) {
                                     DatePicker datePicker = new DatePicker("table_" + field.getName() + "_" + idValue, "");
                                     if (val != null) datePicker.setValue(val.toString());
                                     datePicker.setStyle("width", "100%").setStyle("box-sizing", "border-box");
@@ -337,7 +337,7 @@ public class CrudView extends UIComponent {
                     }
 
                     TD actionsTd = new TD();
-                    String jsonData = (handler != null) ? getJsonDataFromMap(((CrudHandler<Object>)handler).getJsonMap(item)) : getJsonData(item);
+                    String jsonData = getJsonData(item);
 
                     Button editBtn = new Button("✏️")
                             .setId("editBtn_" + idValue + "_" + uniqueId)
@@ -850,7 +850,7 @@ public class CrudView extends UIComponent {
                           .setStyle("border", "1px solid rgba(255,255,255,0.1)");
                 }
                 input = select;
-            } else if (field.getType() == java.time.LocalDate.class || field.getType() == java.util.Date.class) {
+            } else if (field.getType() == java.time.LocalDate.class || field.getType() == java.util.Date.class || field.getType() == java.time.Instant.class) {
                 DatePicker datePicker = new DatePicker("input_" + field.getName() + "_" + uniqueId, isHidden ? "" : getFieldLabel(field));
                 if (field.isAnnotationPresent(NoEditable.class)) {
                     datePicker.setEditable(false);
@@ -1099,8 +1099,8 @@ public class CrudView extends UIComponent {
                 if (field.isAnnotationPresent(ViewSelectOne.class)) {
                     valStr = getIdValueForSource(val);
                 } else if (field.isAnnotationPresent(ViewSelectMany.class)) {
-                    if (val instanceof List) {
-                        List<?> list = (List<?>) val;
+                    if (val instanceof java.util.Collection) {
+                        java.util.Collection<?> list = (java.util.Collection<?>) val;
                         valStr = list.stream()
                                 .map(this::getIdValueForSource)
                                 .collect(Collectors.joining(","));

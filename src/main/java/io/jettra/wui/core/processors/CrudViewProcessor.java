@@ -176,6 +176,8 @@ public class CrudViewProcessor extends AbstractProcessor {
                 updateBuilder.addStatement("  setFieldValue(model, $S, Boolean.parseBoolean(entry.getValue()))", name);
             } else if (type.toString().equals("java.time.LocalDate")) {
                 updateBuilder.addStatement("  setFieldValue(model, $S, java.time.LocalDate.parse(entry.getValue()))", name);
+            } else if (type.toString().equals("java.time.Instant")) {
+                updateBuilder.addStatement("  setFieldValue(model, $S, java.time.Instant.parse(entry.getValue()))", name);
             } else if (type.toString().equals("java.util.Date")) {
                 updateBuilder.addStatement("  setFieldValue(model, $S, new java.text.SimpleDateFormat(\"yyyy-MM-dd\").parse(entry.getValue()))", name);
             } else {
