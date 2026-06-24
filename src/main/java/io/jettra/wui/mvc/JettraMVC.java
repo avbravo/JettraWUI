@@ -2,10 +2,10 @@ package io.jettra.wui.mvc;
 
 import io.jettra.wui.core.Page;
 import io.jettra.wui.core.UIComponent;
-import io.jettra.wui.core.annotations.Inject;
-import io.jettra.wui.core.annotations.InjectViewModel;
+import com.jettra.core.inject.annotation.Inject;
+import com.jettra.core.inject.annotation.InjectViewModel;
 import io.jettra.wui.core.annotations.JettraViewModel;
-import io.jettra.wui.core.annotations.InjectProperties;
+import com.jettra.core.inject.annotation.InjectProperties;
 import io.jettra.wui.core.annotations.CrudView;
 import io.jettra.wui.core.annotations.CrudHandler;
 import io.jettra.wui.complex.Center;

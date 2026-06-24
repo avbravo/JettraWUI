@@ -574,7 +574,7 @@ public class CrudViewProcessor extends AbstractProcessor {
 
         // Field for properties
         classBuilder.addField(FieldSpec.builder(Properties.class, "msg", Modifier.PRIVATE)
-                .addAnnotation(AnnotationSpec.builder(ClassName.get("io.jettra.wui.core.annotations", "InjectProperties"))
+                .addAnnotation(AnnotationSpec.builder(ClassName.get("com.jettra.core.inject.annotation", "InjectProperties"))
                         .addMember("name", "$S", "messages")
                         .build())
                 .build());
