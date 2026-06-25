@@ -2,6 +2,7 @@ package io.jettra.wui.validations;
 
 import io.jettra.wui.core.UIComponent;
 import java.lang.reflect.Field;
+import io.jettra.rules.validations.*;
 
 public class JettraValidations {
 

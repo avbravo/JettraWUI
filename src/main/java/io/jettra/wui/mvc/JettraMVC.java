@@ -1,14 +1,13 @@
 package io.jettra.wui.mvc;
 
+import io.jettra.core.inject.annotation.Inject;
+import io.jettra.core.inject.annotation.InjectProperties;
+import io.jettra.core.inject.annotation.InjectViewModel;
 import io.jettra.wui.core.Page;
 import io.jettra.wui.core.UIComponent;
-import com.jettra.core.inject.annotation.Inject;
-import com.jettra.core.inject.annotation.InjectViewModel;
-import io.jettra.wui.core.annotations.JettraViewModel;
-import com.jettra.core.inject.annotation.InjectProperties;
+
 import io.jettra.wui.core.annotations.CrudView;
 import io.jettra.wui.core.annotations.CrudHandler;
-import io.jettra.wui.complex.Center;
 import io.jettra.wui.sync.JettraSyncManager;
 import io.jettra.wui.sync.SyncType;
 import java.io.InputStream;
@@ -21,7 +20,6 @@ import java.util.Properties;
 import java.util.List;
 import java.util.Arrays;
 import java.util.ArrayList;
-import com.sun.net.httpserver.HttpExchange;
 import io.jettra.wui.core.annotations.ViewSelectOne;
 import io.jettra.wui.core.annotations.ViewDataTable;
 
