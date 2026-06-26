@@ -1,6 +1,6 @@
 package io.jettra.wui.core;
 
-import com.jettra.server.JettraServer;
+import io.jettra.server.JettraServer;
 import com.sun.net.httpserver.HttpExchange;
 import io.jettra.wui.complex.Center;
 import io.jettra.wui.complex.Dashboard;
@@ -96,8 +96,8 @@ public abstract class JettraDashboardPage extends Page {
            .setStyle("box-sizing", "border-box")
            .setStyle("overflow", "visible");
 
-        String fullTitle = com.jettra.server.config.JettraConfig.getProperty("app.title");
-        String shortTitle = com.jettra.server.config.JettraConfig.getProperty("app.shorttitle");
+        String fullTitle = io.jettra.server.config.JettraConfig.getProperty("app.title");
+        String shortTitle = io.jettra.server.config.JettraConfig.getProperty("app.shorttitle");
         if (fullTitle == null) fullTitle = "Jettra Global Dashboard";
         if (shortTitle == null) shortTitle = fullTitle.substring(0, 1);
 
@@ -128,13 +128,13 @@ public abstract class JettraDashboardPage extends Page {
         rightSection.addClass("j-top-right");
         rightSection.setStyle("display", "flex").setStyle("align-items", "center").setStyle("gap", "6px").setStyle("flex-wrap", "nowrap").setStyle("overflow", "visible");
         
-        String defaultConfigLang = com.jettra.server.config.JettraConfig.getProperty("app.language");
+        String defaultConfigLang = io.jettra.server.config.JettraConfig.getProperty("app.language");
         if (defaultConfigLang == null) defaultConfigLang = "en";
         defaultConfigLang = defaultConfigLang.trim();
         
         String defaultConfigTheme = params.get("theme");
         if (defaultConfigTheme == null) {
-            defaultConfigTheme = com.jettra.server.config.JettraConfig.getProperty("app.theme");
+            defaultConfigTheme = io.jettra.server.config.JettraConfig.getProperty("app.theme");
         }
         if (defaultConfigTheme == null) defaultConfigTheme = "3d";
         defaultConfigTheme = defaultConfigTheme.trim();
@@ -221,7 +221,7 @@ public abstract class JettraDashboardPage extends Page {
         animCB.setLabels("ON", "OFF");
         animCB.setProperty("onchange", "toggleJettraAnimation(this.checked)");
         
-        String animatedValue = com.jettra.server.config.JettraConfig.getProperty("app.animated");
+        String animatedValue = io.jettra.server.config.JettraConfig.getProperty("app.animated");
         boolean isAnimatedConfig = animatedValue == null || animatedValue.trim().equalsIgnoreCase("true");
         if (isAnimatedConfig) {
             animCB.setProperty("checked", "checked");
@@ -334,7 +334,7 @@ public abstract class JettraDashboardPage extends Page {
     }
 
     protected void setupAdditionalComponents() {
-        String timeoutValue = com.jettra.server.config.JettraConfig.getProperty("server.session.timeout");
+        String timeoutValue = io.jettra.server.config.JettraConfig.getProperty("server.session.timeout");
         int timeoutMinutes = (timeoutValue != null && !timeoutValue.isBlank()) ? Integer.parseInt(timeoutValue.trim()) : 0;
         add(new io.jettra.wui.components.SessionTimeoutDialog(timeoutMinutes, 60));
 

@@ -14,7 +14,7 @@ public class SwaggerUIPage extends Page {
 
     @Override
     protected void onGet(Map<String, String> params) {
-        String resolvedUrl = com.jettra.server.JettraServer.resolvePath(openApiUrl);
+        String resolvedUrl = io.jettra.server.JettraServer.resolvePath(openApiUrl);
         
         String html = "<!DOCTYPE html>\n" +
                 "<html lang=\"en\">\n" +

@@ -28,7 +28,7 @@ Para utilizar el `ErrorPage` como manejador global de errores en tu servidor `Je
 ### Ejemplo de Configuración en `WebExampleMain.java`
 
 ```java
-import com.jettra.server.JettraServer;
+import io.jettra.server.JettraServer;
 import io.jettra.wui.complex.ErrorPage;
 
 public class WebExampleMain {

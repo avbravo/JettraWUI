@@ -5,8 +5,8 @@ import com.sun.net.httpserver.HttpHandler;
 import io.jettra.wui.assets.JettraTheme;
 import io.jettra.wui.events.EventRouter;
 import io.jettra.wui.mvc.JettraMVC;
-import com.jettra.server.core.JettraContext;
-import com.jettra.server.core.JettraContext.Scope;
+import io.jettra.server.core.JettraContext;
+import io.jettra.server.core.JettraContext.Scope;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -239,7 +239,7 @@ public abstract class Page extends UIComponent implements HttpHandler {
 
     private void injectSecurityHeartbeat(StringBuilder builder) {
         long startTime = io.jettra.wui.sync.JettraSyncManager.SERVER_START_TIME;
-        String loginPath = com.jettra.server.JettraServer.resolvePath("/login");
+        String loginPath = io.jettra.server.JettraServer.resolvePath("/login");
         
         builder.append("<script>\n")
                .append("  const J_SERVER_START_TIME = ").append(startTime).append(";\n")
