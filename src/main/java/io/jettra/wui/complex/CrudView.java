@@ -402,13 +402,13 @@ public class CrudView extends UIComponent {
             ClassLoader loader = Thread.currentThread().getContextClassLoader();
             Class<?> reportClass = null;
             try {
-                reportClass = Class.forName("com.jettra.report.Report", true, loader);
+                reportClass = Class.forName("io.jettra.report.Report", true, loader);
             } catch (Exception e) {
                 try {
                     loader = modelClass.getClassLoader();
-                    reportClass = Class.forName("com.jettra.report.Report", true, loader);
+                    reportClass = Class.forName("io.jettra.report.Report", true, loader);
                 } catch (Exception e2) {
-                    reportClass = Class.forName("com.jettra.report.Report");
+                    reportClass = Class.forName("io.jettra.report.Report");
                     loader = reportClass.getClassLoader();
                 }
             }
@@ -457,7 +457,7 @@ public class CrudView extends UIComponent {
                 // Page Orientation
                 try {
                     Object pageSettings = reportClass.getMethod("getPageSettings").invoke(reportInstance);
-                    Class<?> orientationEnum = Class.forName("com.jettra.report.Report$PageSettings$Orientation", true, loader);
+                    Class<?> orientationEnum = Class.forName("io.jettra.report.Report$PageSettings$Orientation", true, loader);
                     Object orientationVal = Enum.valueOf((Class<Enum>)orientationEnum, reportOrientation.toUpperCase());
                     pageSettings.getClass().getMethod("setOrientation", orientationEnum).invoke(pageSettings, orientationVal);
                 } catch (Exception e) {
@@ -467,9 +467,9 @@ public class CrudView extends UIComponent {
                 // Header
                 Object headerObj = reportClass.getMethod("getHeader").invoke(reportInstance);
                 Class<?> headerClass = headerObj.getClass();
-                Class<?> reportElementClass = Class.forName("com.jettra.report.Report$ReportElement", true, loader);
+                Class<?> reportElementClass = Class.forName("io.jettra.report.Report$ReportElement", true, loader);
                 Method addElement = headerClass.getMethod("addElement", reportElementClass);
-                Class<?> textElementClass = Class.forName("com.jettra.report.Report$TextElement", true, loader);
+                Class<?> textElementClass = Class.forName("io.jettra.report.Report$TextElement", true, loader);
                 
                 // Determinar tipo de reporte (MASTER/DETAILS o NORMAL)
                 boolean isMasterDetail = false;
@@ -485,9 +485,9 @@ public class CrudView extends UIComponent {
                 Class<? extends java.lang.annotation.Annotation> mrhClass = null;
                 Class<? extends java.lang.annotation.Annotation> mrfClass = null;
                 try {
-                    disabledHeaderClass = (Class<? extends java.lang.annotation.Annotation>) loader.loadClass("com.jettra.report.annotations.ModelReportDisabledHeader");
-                    mrhClass = (Class<? extends java.lang.annotation.Annotation>) loader.loadClass("com.jettra.report.annotations.ModelReportHeader");
-                    mrfClass = (Class<? extends java.lang.annotation.Annotation>) loader.loadClass("com.jettra.report.annotations.ModelReportFooter");
+                    disabledHeaderClass = (Class<? extends java.lang.annotation.Annotation>) loader.loadClass("io.jettra.report.annotations.ModelReportDisabledHeader");
+                    mrhClass = (Class<? extends java.lang.annotation.Annotation>) loader.loadClass("io.jettra.report.annotations.ModelReportHeader");
+                    mrfClass = (Class<? extends java.lang.annotation.Annotation>) loader.loadClass("io.jettra.report.annotations.ModelReportFooter");
                 } catch (Exception e) {}
 
                 boolean headerDisabled = false;
@@ -513,7 +513,7 @@ public class CrudView extends UIComponent {
                 java.lang.annotation.Annotation[] headers = null;
                 if (mrhClass != null) {
                     try {
-                        Class<? extends java.lang.annotation.Annotation> headersContainer = (Class<? extends java.lang.annotation.Annotation>) loader.loadClass("com.jettra.report.annotations.ModelReportHeaders");
+                        Class<? extends java.lang.annotation.Annotation> headersContainer = (Class<? extends java.lang.annotation.Annotation>) loader.loadClass("io.jettra.report.annotations.ModelReportHeaders");
                         if (modelClass.isAnnotationPresent(mrhClass) || modelClass.isAnnotationPresent(headersContainer)) {
                             headers = modelClass.getAnnotationsByType(mrhClass);
                         } else if (parentPage != null && (parentPage.getClass().isAnnotationPresent(mrhClass) || parentPage.getClass().isAnnotationPresent(headersContainer))) {
@@ -599,7 +599,7 @@ public class CrudView extends UIComponent {
                 java.lang.annotation.Annotation[] footers = null;
                 if (mrfClass != null) {
                     try {
-                        Class<? extends java.lang.annotation.Annotation> footersContainer = (Class<? extends java.lang.annotation.Annotation>) loader.loadClass("com.jettra.report.annotations.ModelReportFooters");
+                        Class<? extends java.lang.annotation.Annotation> footersContainer = (Class<? extends java.lang.annotation.Annotation>) loader.loadClass("io.jettra.report.annotations.ModelReportFooters");
                         if (modelClass.isAnnotationPresent(mrfClass) || modelClass.isAnnotationPresent(footersContainer)) {
                             footers = modelClass.getAnnotationsByType(mrfClass);
                         } else if (parentPage != null && (parentPage.getClass().isAnnotationPresent(mrfClass) || parentPage.getClass().isAnnotationPresent(footersContainer))) {
@@ -691,9 +691,9 @@ public class CrudView extends UIComponent {
 
                 // Table
                 Object detailObj = reportClass.getMethod("getDetail").invoke(reportInstance);
-                Class<?> tableClass = Class.forName("com.jettra.report.Report$Table", true, loader);
+                Class<?> tableClass = Class.forName("io.jettra.report.Report$Table", true, loader);
                 Object tableInstance = tableClass.getConstructor().newInstance();
-                Class<?> columnClass = Class.forName("com.jettra.report.Report$Column", true, loader);
+                Class<?> columnClass = Class.forName("io.jettra.report.Report$Column", true, loader);
                 Method addColumn = tableClass.getMethod("addColumn", columnClass);
 
                 Field[] fields = modelClass.getDeclaredFields();

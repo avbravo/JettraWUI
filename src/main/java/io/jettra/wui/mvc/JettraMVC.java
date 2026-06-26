@@ -558,25 +558,25 @@ public class JettraMVC {
             ClassLoader loader = Thread.currentThread().getContextClassLoader();
             Class<?> reportClass = null;
             try {
-                reportClass = Class.forName("com.jettra.report.Report", true, loader);
+                reportClass = Class.forName("io.jettra.report.Report", true, loader);
             } catch (Exception e) {
                 loader = page.getClass().getClassLoader();
-                reportClass = Class.forName("com.jettra.report.Report", true, loader);
+                reportClass = Class.forName("io.jettra.report.Report", true, loader);
             }
             
-            Class<?> textElementClass = Class.forName("com.jettra.report.Report$TextElement", true, loader);
-            Class<?> tableClass = Class.forName("com.jettra.report.Report$Table", true, loader);
-            Class<?> columnClass = Class.forName("com.jettra.report.Report$Column", true, loader);
-            Class<?> headerClass = Class.forName("com.jettra.report.Report$Header", true, loader);
-            Class<?> footerClass = Class.forName("com.jettra.report.Report$Footer", true, loader);
-            Class<?> detailClass = Class.forName("com.jettra.report.Report$Detail", true, loader);
-            Class<?> summaryClass = Class.forName("com.jettra.report.Report$Summary", true, loader);
+            Class<?> textElementClass = Class.forName("io.jettra.report.Report$TextElement", true, loader);
+            Class<?> tableClass = Class.forName("io.jettra.report.Report$Table", true, loader);
+            Class<?> columnClass = Class.forName("io.jettra.report.Report$Column", true, loader);
+            Class<?> headerClass = Class.forName("io.jettra.report.Report$Header", true, loader);
+            Class<?> footerClass = Class.forName("io.jettra.report.Report$Footer", true, loader);
+            Class<?> detailClass = Class.forName("io.jettra.report.Report$Detail", true, loader);
+            Class<?> summaryClass = Class.forName("io.jettra.report.Report$Summary", true, loader);
 
             Object report = reportClass.getConstructor(String.class).newInstance("Reporte de " + modelClass.getSimpleName());
 
             // Orientation
             Object pageSettings = reportClass.getMethod("getPageSettings").invoke(report);
-            Class<?> orientationEnum = Class.forName("com.jettra.report.Report$PageSettings$Orientation", true, loader);
+            Class<?> orientationEnum = Class.forName("io.jettra.report.Report$PageSettings$Orientation", true, loader);
             
             CrudView anno = page.getClass().getAnnotation(CrudView.class);
             String orientationStr = (anno != null) ? anno.reportOrientation() : "PORTRAIT";
@@ -605,9 +605,9 @@ public class JettraMVC {
             Class<? extends java.lang.annotation.Annotation> mrhClass = null;
             Class<? extends java.lang.annotation.Annotation> mrfClass = null;
             try {
-                disabledHeaderClass = (Class<? extends java.lang.annotation.Annotation>) loader.loadClass("com.jettra.report.annotations.ModelReportDisabledHeader");
-                mrhClass = (Class<? extends java.lang.annotation.Annotation>) loader.loadClass("com.jettra.report.annotations.ModelReportHeader");
-                mrfClass = (Class<? extends java.lang.annotation.Annotation>) loader.loadClass("com.jettra.report.annotations.ModelReportFooter");
+                disabledHeaderClass = (Class<? extends java.lang.annotation.Annotation>) loader.loadClass("io.jettra.report.annotations.ModelReportDisabledHeader");
+                mrhClass = (Class<? extends java.lang.annotation.Annotation>) loader.loadClass("io.jettra.report.annotations.ModelReportHeader");
+                mrfClass = (Class<? extends java.lang.annotation.Annotation>) loader.loadClass("io.jettra.report.annotations.ModelReportFooter");
             } catch (Exception e) {}
 
             boolean headerDisabled = false;
@@ -624,14 +624,14 @@ public class JettraMVC {
                 textElementClass.getMethod("setFontColor", String.class).invoke(titleEl, headerColor);
                 textElementClass.getMethod("setBold", boolean.class).invoke(titleEl, true);
                 textElementClass.getMethod("setFontSize", int.class).invoke(titleEl, 14);
-                headerClass.getMethod("addElement", Class.forName("com.jettra.report.Report$ReportElement")).invoke(header, titleEl);
+                headerClass.getMethod("addElement", Class.forName("io.jettra.report.Report$ReportElement")).invoke(header, titleEl);
             }
 
             // Procesar cabeceras repetibles con @ModelReportHeader y ReportType
             java.lang.annotation.Annotation[] headers = null;
             if (mrhClass != null) {
                 try {
-                    Class<? extends java.lang.annotation.Annotation> headersContainer = (Class<? extends java.lang.annotation.Annotation>) loader.loadClass("com.jettra.report.annotations.ModelReportHeaders");
+                    Class<? extends java.lang.annotation.Annotation> headersContainer = (Class<? extends java.lang.annotation.Annotation>) loader.loadClass("io.jettra.report.annotations.ModelReportHeaders");
                     if (modelClass.isAnnotationPresent(mrhClass) || modelClass.isAnnotationPresent(headersContainer)) {
                         headers = modelClass.getAnnotationsByType(mrhClass);
                     } else if (page.getClass().isAnnotationPresent(mrhClass) || page.getClass().isAnnotationPresent(headersContainer)) {
@@ -707,7 +707,7 @@ public class JettraMVC {
                                 textElementClass.getMethod("setStrikethrough", boolean.class).invoke(customTitleEl, isStrikethrough);
                             } catch(Exception e) {}
 
-                            headerClass.getMethod("addElement", Class.forName("com.jettra.report.Report$ReportElement", true, loader)).invoke(header, customTitleEl);
+                            headerClass.getMethod("addElement", Class.forName("io.jettra.report.Report$ReportElement", true, loader)).invoke(header, customTitleEl);
                         }
                     } catch (Exception e) {
                         System.err.println("Error processing @ModelReportHeader: " + e.getMessage());
@@ -719,7 +719,7 @@ public class JettraMVC {
             java.lang.annotation.Annotation[] footers = null;
             if (mrfClass != null) {
                 try {
-                    Class<? extends java.lang.annotation.Annotation> footersContainer = (Class<? extends java.lang.annotation.Annotation>) loader.loadClass("com.jettra.report.annotations.ModelReportFooters");
+                    Class<? extends java.lang.annotation.Annotation> footersContainer = (Class<? extends java.lang.annotation.Annotation>) loader.loadClass("io.jettra.report.annotations.ModelReportFooters");
                     if (modelClass.isAnnotationPresent(mrfClass) || modelClass.isAnnotationPresent(footersContainer)) {
                         footers = modelClass.getAnnotationsByType(mrfClass);
                     } else if (page.getClass().isAnnotationPresent(mrfClass) || page.getClass().isAnnotationPresent(footersContainer)) {
@@ -795,7 +795,7 @@ public class JettraMVC {
                                 textElementClass.getMethod("setStrikethrough", boolean.class).invoke(customFooterEl, isStrikethrough);
                             } catch(Exception e) {}
 
-                            footerClass.getMethod("addElement", Class.forName("com.jettra.report.Report$ReportElement", true, loader)).invoke(footer, customFooterEl);
+                            footerClass.getMethod("addElement", Class.forName("io.jettra.report.Report$ReportElement", true, loader)).invoke(footer, customFooterEl);
                         }
                     } catch (Exception e) {
                         System.err.println("Error processing @ModelReportFooter: " + e.getMessage());
@@ -843,7 +843,7 @@ public class JettraMVC {
                             String fieldOnly = vso.fieldOnlyMasterTable();
                             if (fieldOnly != null && !fieldOnly.isEmpty()) {
                                 try {
-                                    Class<?> ruClass = Class.forName("com.jettra.report.ReportUtils", true, loader);
+                                    Class<?> ruClass = Class.forName("io.jettra.report.ReportUtils", true, loader);
                                     Method getFV = ruClass.getMethod("getFieldValue", Object.class, String.class);
                                     valStr = String.valueOf(getFV.invoke(null, singleObj, f.getName()));
                                 } catch(Exception ex) {
@@ -877,7 +877,7 @@ public class JettraMVC {
 
                     Class<? extends java.lang.annotation.Annotation> mrlClass = null;
                     try {
-                        mrlClass = (Class<? extends java.lang.annotation.Annotation>) loader.loadClass("com.jettra.report.annotations.ModelReportLabel");
+                        mrlClass = (Class<? extends java.lang.annotation.Annotation>) loader.loadClass("io.jettra.report.annotations.ModelReportLabel");
                     } catch (Exception e) {}
 
                     if (mrlClass != null && f.isAnnotationPresent(mrlClass)) {
@@ -926,17 +926,17 @@ public class JettraMVC {
                     textElementClass.getMethod("setAlignment", String.class).invoke(labelValEl, alignment);
                     
                     if (targetSection.equalsIgnoreCase("HEADER")) {
-                        headerClass.getMethod("addElement", Class.forName("com.jettra.report.Report$ReportElement")).invoke(header, labelValEl);
+                        headerClass.getMethod("addElement", Class.forName("io.jettra.report.Report$ReportElement")).invoke(header, labelValEl);
                     } else if (targetSection.equalsIgnoreCase("FOOTER")) {
-                        footerClass.getMethod("addElement", Class.forName("com.jettra.report.Report$ReportElement")).invoke(footer, labelValEl);
+                        footerClass.getMethod("addElement", Class.forName("io.jettra.report.Report$ReportElement")).invoke(footer, labelValEl);
                     } else if (targetSection.equalsIgnoreCase("LASTPAGE")) {
-                        summaryClass.getMethod("addElement", Class.forName("com.jettra.report.Report$ReportElement")).invoke(summary, labelValEl);
+                        summaryClass.getMethod("addElement", Class.forName("io.jettra.report.Report$ReportElement")).invoke(summary, labelValEl);
                     }
                 }
 
                 // Línea separadora
                 Object separatorEl = textElementClass.getConstructor(String.class).newInstance("-----------------------------------------------------------------------------------------");
-                headerClass.getMethod("addElement", Class.forName("com.jettra.report.Report$ReportElement")).invoke(header, separatorEl);
+                headerClass.getMethod("addElement", Class.forName("io.jettra.report.Report$ReportElement")).invoke(header, separatorEl);
 
                 // Agregar columnas basadas en la clase del Detalle
                 Class<?> detailClassType = null;
@@ -999,12 +999,12 @@ public class JettraMVC {
             }
 
             Object detail = reportClass.getMethod("getDetail").invoke(report);
-            detailClass.getMethod("addElement", Class.forName("com.jettra.report.Report$ReportElement", true, loader)).invoke(detail, table);
+            detailClass.getMethod("addElement", Class.forName("io.jettra.report.Report$ReportElement", true, loader)).invoke(detail, table);
 
             // Footer
             footer = reportClass.getMethod("getFooter").invoke(report);
             Object footerEl = textElementClass.getConstructor(String.class).newInstance("Generado por JettraStack");
-            footerClass.getMethod("addElement", Class.forName("com.jettra.report.Report$ReportElement")).invoke(footer, footerEl);
+            footerClass.getMethod("addElement", Class.forName("io.jettra.report.Report$ReportElement")).invoke(footer, footerEl);
 
             // 3. Exportar a un archivo temporal
             String tmpFile = "report_" + System.currentTimeMillis() + "." + format;
