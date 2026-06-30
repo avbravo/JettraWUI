@@ -33,6 +33,8 @@ public class SwaggerUIPage extends Page {
                 "    window.ui = SwaggerUIBundle({\n" +
                 "      url: '" + resolvedUrl + "',\n" +
                 "      dom_id: '#swagger-ui',\n" +
+                "      operationsSorter: 'alpha',\n" +
+                "      tagsSorter: 'alpha',\n" +
                 "    });\n" +
                 "  };\n" +
                 "</script>\n" +
